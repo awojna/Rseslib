@@ -1,0 +1,22 @@
+# 18 conditional attributes + 1 decision
+
+
+class			decision, nominal
+lymphatics		conditional, nominal
+block_of_affere		conditional, nominal
+bl_of_lymph_c		conditional, nominal
+bl_of_lymph_s		conditional, nominal
+by_pass			conditional, nominal
+extravasates		conditional, nominal
+regeneration_of		conditional, nominal
+early_uptake_in		conditional, nominal
+lym_nodes_dimin		conditional, nominal
+lym_nodes_enlar		conditional, nominal
+changes_in_lym		conditional, nominal
+defect_in_node		conditional, nominal
+changes_in_node		conditional, nominal
+changes_in_stru		conditional, nominal
+special_forms		conditional, nominal
+dislocation_of		conditional, nominal
+exclusion_of_no		conditional, nominal
+no_of_nodes_in		conditional, nominal

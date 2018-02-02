@@ -1,0 +1,16 @@
+# 13 conditional attributes + 1 decision
+
+wine_class			decision, nominal
+Alcohol				conditional, numeric
+Malic_acid			conditional, numeric
+Ash				conditional, numeric
+Alcalinity_of_ash		conditional, numeric
+Magnesium			conditional, numeric
+Total_phenols			conditional, numeric
+Flavanoids			conditional, numeric
+Nonflavanoid_phenols		conditional, numeric
+Proanthocyanins			conditional, numeric
+Color_intensity			conditional, numeric
+Hue				conditional, numeric
+OD280_OD315_of_diluted_wines	conditional, numeric
+Proline				conditional, numeric

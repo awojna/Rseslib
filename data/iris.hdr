@@ -1,0 +1,7 @@
+# 4 conditional attributes + 1 decision
+
+sepal_length_in_cm	conditional, numeric
+sepal_width_in_cm	conditional, numeric
+petal_length_in_cm	conditional, numeric
+petal_width_in_cm	conditional, numeric
+iris_plant_type		decision, nominal

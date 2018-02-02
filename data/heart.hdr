@@ -1,0 +1,16 @@
+# 13 conditional attributes + 1 decision
+
+age								conditional, numeric
+sex 								conditional, nominal
+chest_pain_type							conditional, nominal
+resting_blood_pressure						conditional, numeric
+serum_cholestoral_in_mg_dl					conditional, numeric
+fasting_blood_sugar_greater_than_120_mg_dl			conditional, nominal
+resting_electrocardiographic_results				conditional, nominal
+maximum_heart_rate_achieved					conditional, numeric
+exercise_induced_angina						conditional, nominal
+oldpeak_ST_depression_induced_by_exercise_relative_to_rest	conditional, numeric
+the_slope_of_the_peak_exercise_ST_segment			conditional, numeric
+number_of_major_vessels_colored_by_flourosopy			conditional, numeric
+thal								conditional, nominal
+diagnosis							decision, nominal

@@ -4,9 +4,10 @@
 #
 # Script preparing sources and Weka package of Rseslib
 #
-# 1. Update Rseslib version, date and URL in Description.props
-# 2. Run maven with the goal 'package'
-# 3. Run ./make-pkg.sh  <new rseslib version>
+# 1. Update Rseslib version in pom.xml
+# 2. Update Rseslib version, date and URL in Description.props
+# 3. Run maven with the goal 'package'
+# 4. Run ./make-pkg.sh  <new rseslib version>
 #
 ########################################################################
 

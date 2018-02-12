@@ -2,29 +2,30 @@
 
 ########################################################################
 #
-# Script preparing sources and Weka package of Rseslib
+# Script preparing library, sources and Weka package of Rseslib
 #
 # 1. Update Rseslib version in pom.xml
 # 2. Update Rseslib version, date and URL in Description.props
 # 3. Run maven with the goal 'package'
-# 4. Run ./make-pkg.sh  <new rseslib version>
+# 4. Run ./make-pkg.sh  <upload working directory> <new rseslib version>
 #
 ########################################################################
 
-version=$1
+basedir=$1
+version=$2
 
-# clean old files
-rm -f target/rseslib-$version-src.zip
-rm -f target/Rseslib$version.zip
-rm -rf target/weka
+rm -rf $basedir
+mkdir $basedir
 
-# prepare sources
-git archive --format zip --output target/rseslib-$version-src.zip master src/ data/ COPYING
+# make library
+cp target/rseslib-$version.jar $basedir/
 
-# prepare weka package
-mkdir target/weka
-cp Description.props target/weka/
-cp target/rseslib-$version.jar target/weka/rseslib.jar
-cd target/weka
+# make sources
+git archive --format zip --output $basedir/rseslib-$version-src.zip master src/ data/ COPYING
+
+# make weka package
+mkdir $basedir/weka
+cp Description.props $basedir/weka/
+cp target/rseslib-$version.jar $basedir/weka/rseslib.jar
+cd $basedir/weka
 zip -r ../Rseslib$version.zip *
-cd ../..

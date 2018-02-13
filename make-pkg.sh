@@ -21,7 +21,7 @@ mkdir $basedir
 cp target/rseslib-$version.jar $basedir/
 
 # make sources
-git archive --format zip --output $basedir/rseslib-$version-src.zip master src/ data/ COPYING
+git archive --format zip --prefix=rseslib-$version-src/ --output $basedir/rseslib-$version-src.zip master
 
 # make weka package
 mkdir $basedir/weka

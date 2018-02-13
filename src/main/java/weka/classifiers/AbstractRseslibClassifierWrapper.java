@@ -174,6 +174,16 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
 		return m_WekaDecAttribute.indexOfValue(result);
     }
     
+    /**
+     * Returns native Rseslib classifier.
+     * 
+     * @return native Rseslib classifier.
+     */
+    public Classifier getRseslibClassifier()
+    {
+    	return m_RseslibClassifier;
+    }
+    
 	/**
 	 * Returns a description of the classifier.
 	 * 

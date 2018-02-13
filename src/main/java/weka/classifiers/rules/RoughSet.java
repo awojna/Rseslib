@@ -21,6 +21,7 @@
 package weka.classifiers.rules;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -30,6 +31,7 @@ import rseslib.processing.discernibility.DiscernibilityMatrixProvider;
 import rseslib.processing.discretization.DiscretizationFactory;
 import rseslib.processing.reducts.PartialReductsProvider;
 import rseslib.processing.rules.ReductRuleGenerator;
+import rseslib.structure.rule.Rule;
 import weka.classifiers.AbstractRseslibClassifierWrapper;
 import weka.core.Option;
 import weka.core.SelectedTag;
@@ -547,6 +549,16 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
 		result.addAll(Arrays.asList(super.getOptions())); // superclass
 		return result.toArray(new String[result.size()]);
 	}
+
+    /**
+     * Returns collection of rules induced by this classifier.
+     * 
+     * @return collection of rules induced by this classifier.
+     */
+    public Collection<Rule> getRules()
+    {
+        return ((RoughSetRuleClassifier)getRseslibClassifier()).getRules();
+    }
 
 	/**
 	* Main method for executing this classifier.

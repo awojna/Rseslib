@@ -1,0 +1,2 @@
+rseslib.processing.classification.rules.roughset.RoughSetRuleClassifier data/iris.dat data/iris.dat Discretization=MaximalDiscernibilityHeurisitcLocal;Reducts=AllLocal;IndiscernibilityForMissing=DiscernFromValue;DiscernibilityMethod=OrdinaryDecisionAndInconsistenciesOmitted;MissingValueDescriptorsInRules=TRUE
+rseslib.processing.classification.tree.c45.C45 data/iris.dat data/iris.dat pruning=FALSE

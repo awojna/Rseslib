@@ -108,8 +108,8 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
 		TechnicalInformation 	result;
 
 		result = new TechnicalInformation(Type.MANUAL);
-		result.setValue(Field.AUTHOR, "Arkadiusz Wojna, Lukasz Kowalski");
-		result.setValue(Field.TITLE, "Rseslib: Programmer's Guide");
+		result.setValue(Field.AUTHOR, "Arkadiusz Wojna, Rafal Latkowski, Lukasz Kowalski");
+		result.setValue(Field.TITLE, "Rseslib: User Guide");
 		result.setValue(Field.URL, "http://rseslib.mimuw.edu.pl/rseslib.pdf");
 
 		return result;

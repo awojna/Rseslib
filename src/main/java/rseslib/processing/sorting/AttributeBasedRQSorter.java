@@ -94,7 +94,7 @@ public class AttributeBasedRQSorter implements AttributeBasedSorting
 		 */
 		public int getLast()
 		{
-			return m_data.length;
+			return m_data.length-1;
 		}
 		
 	}

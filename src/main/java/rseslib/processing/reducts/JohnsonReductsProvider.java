@@ -161,7 +161,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
 	* Remove from copy of discernibility matrix all set of atributes which has one of attributes existed in toRemove array.
 	*
 	* @param copyDiscernMatrix 	Indescirnibility matrix.
-	* @param toRemove 			Array with possition attributes selected in previous steps. Tablica atrybut�w o najwiekszej liczbie wyst�pie�.
+	* @param toRemove 			Array with possition attributes selected in previous steps. Attributes with the greatest number of occurrence.
 	* @return                  	A cut collection of indescirnibility matrix which will be returned, in order to count new attribute/s for generated reduct. 
 	*/
 	private Vector<BitSet> RemoveCheckedObjectsByAttr(Vector<BitSet> copyDiscernMatrix, Integer[] toRemove){
@@ -258,7 +258,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
 			if (startCount[posMaxValue]<startCount[i]){
 				posMaxValue=i;
 				attributesList.clear();				
-				Integer[] array= new Integer[firstAttributesList.length+1]; //zwiekszenie aktualnego wektora o 1 !!!
+				Integer[] array= new Integer[firstAttributesList.length+1]; //extend the current vector by 1 !!!
 				for (int j=0;j<firstAttributesList.length;j++) 
 					array[j]=firstAttributesList[j];
 				array[firstAttributesList.length]=i;
@@ -271,7 +271,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
     /**
 	* This function add array of reduced attributes to reducts set.
 	*
-	* @param integers 	Tablica numer�w atrybut�w w pliku nag�owkowym.
+	* @param integers 	Indices of attributes
 	* @param reducts 	Reducts set that will be return (glabal variable).
 	* @return          void.
 	*/

@@ -184,7 +184,7 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
     }
 
     protected boolean pairCovered(int i, int j, int atr) {  //pairSeparatedbyAttr
-        if (T.get(i).get(atr) != T.get(j).get(atr) /*wykluczyc missingi&& t.tab[c][i] >= 0 && t.tab[c][j] >= 0*/) {
+        if (T.get(i).get(atr) != T.get(j).get(atr) /*exclude missings&& t.tab[c][i] >= 0 && t.tab[c][j] >= 0*/) {
             return true;
         } else {
             return false;
@@ -315,7 +315,7 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
                 //System.out.println("partialSetCoverProvider::alphaCover j = " + j);
                 if (differentDecisions(j, i)) 
                     if (differentRows(j, i)) {
-                        //sprawdzamy czy redukt oddziela pare
+                        //check if the reduct separates a pair
                         //int atr = 0;
                         int separated = 0;
                         for (int k = 0; k < NumberOfSubsets; k++) 

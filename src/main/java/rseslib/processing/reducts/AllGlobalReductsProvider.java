@@ -55,9 +55,9 @@ public class AllGlobalReductsProvider extends Configuration implements GlobalRed
 
     public Collection<BitSet> getReducts()
     {
-        /* generowanie CNF */
+        /* generate CNF */
         Collection<BitSet> cnf = m_Discernibility.getDiscernibilityMatrix();
-        /* wyliczanie implikantow pierwszych */
+        /* compute prime implicants */
         return m_oPrimeImplicantsProvider.generatePrimeImplicants(cnf, m_nNumberOfAttributes);
     }
 

@@ -350,7 +350,7 @@ public class Node
             Object method = Class.forName(task_class).getConstructor(cTypes).newInstance(oArgs);
             
             TestResult results = new SingleClassifierTest().classify((Classifier)method,tst,emptyProg);
-            Properties stat = results.getStatistics();
+            Properties stat = results.getStatisticsAndResults();
             StringBuffer sb = new StringBuffer();
             for (Entry e : stat.entrySet())
                 sb.append(e.getKey()+"="+e.getValue()+";");

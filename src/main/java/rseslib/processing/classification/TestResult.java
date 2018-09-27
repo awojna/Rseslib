@@ -166,6 +166,16 @@ public class TestResult implements Serializable
      */
     public Properties getStatistics()
     {
+    	return m_Statistics;
+    }
+    
+    /**
+     * Returns statistics and results.
+     *
+     * @return  Statistics and results.
+     */
+    public Properties getStatisticsAndResults()
+    {
     	Properties stats = (Properties)m_Statistics.clone();
     	stats.put("all_cnt",Integer.toString(m_nAll));
     	stats.put("cover_cnt",Integer.toString(m_nCovered));

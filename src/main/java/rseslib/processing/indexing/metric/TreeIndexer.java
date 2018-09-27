@@ -182,4 +182,11 @@ public class TreeIndexer extends ConfigurationWithStatistics
         addToStatistics("Height of the indexing tree", Double.toString(m_nHeight));
         addToStatistics("Average number of distance comparisions", Double.toString(m_nDistOperCounter));
     }
+
+    /**
+     * Resets statistics.
+     */
+    public void resetStatistics()
+    {
+    }
 }

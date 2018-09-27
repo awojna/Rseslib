@@ -38,7 +38,6 @@ import rseslib.structure.data.formats.ArffDoubleDataInput;
 import rseslib.structure.table.ArrayListDoubleDataTable;
 import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.Configuration;
-import rseslib.system.ConfigurationWithStatistics;
 import rseslib.system.progress.EmptyProgress;
 import rseslib.system.progress.Progress;
 import rseslib.system.progress.StdOutProgress;
@@ -193,7 +192,7 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
 	{
 		if (m_RseslibClassifier != null) {
 			m_RseslibClassifier.calculateStatistics();
-			return ((ConfigurationWithStatistics)m_RseslibClassifier).getStatistics().toString();
+			return m_RseslibClassifier.getStatistics().toString();
 		}
 		return new String();
 	}

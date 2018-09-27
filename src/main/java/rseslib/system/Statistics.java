@@ -18,24 +18,31 @@
  */
 
 
-package rseslib.processing.classification;
+package rseslib.system;
 
-import rseslib.structure.data.DoubleData;
-import rseslib.system.PropertyConfigurationException;
-import rseslib.system.Statistics;
+import java.util.Properties;
 
 /**
- * Interface for classification methods.
+ * Interface for methods providing statistics of computations.
  *
  * @author      Arkadiusz Wojna
  */
-public interface Classifier extends Statistics
+public interface Statistics
 {
     /**
-     * Assigns a decision to a single test object.
-     *
-     * @param dObj  Test object.
-     * @return      Assigned decision.
+     * Calculates statistics.
      */
-    public abstract double classify(DoubleData dObj) throws PropertyConfigurationException;
+    public abstract void calculateStatistics();
+
+    /**
+     * Resets statistics.
+     */
+    public abstract void resetStatistics();
+    
+    /**
+    * Returns statistics about the performance.
+    *
+    * @return Statistics about the performance.
+    */
+    public abstract Properties getStatistics();
 }

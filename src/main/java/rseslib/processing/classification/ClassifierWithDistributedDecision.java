@@ -22,13 +22,14 @@ package rseslib.processing.classification;
 
 import rseslib.structure.data.DoubleData;
 import rseslib.system.PropertyConfigurationException;
+import rseslib.system.Statistics;
 
 /**
  * Interface for classification methods that provide distributed decision.
  *
  * @author      Arkadiusz Wojna
  */
-public interface ClassifierWithDistributedDecision
+public interface ClassifierWithDistributedDecision extends Statistics
 {
     /**
      * Returns a decision distribution vector
@@ -41,9 +42,4 @@ public interface ClassifierWithDistributedDecision
      * @return      Assigned decision distribution.
      */
     public abstract double[] classifyWithDistributedDecision(DoubleData dObj) throws PropertyConfigurationException;
-
-    /**
-     * Calculates statistics.
-     */
-    public abstract void calculateStatistics();
 }

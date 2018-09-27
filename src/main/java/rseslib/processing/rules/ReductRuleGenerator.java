@@ -98,7 +98,7 @@ public class ReductRuleGenerator extends Configuration implements RuleGenerator
 
     /**
      */
-    private Collection<Rule> generateGlobal(GlobalReductsProvider reductsProv, DoubleDataTable tab, Progress prog) throws PropertyConfigurationException, InterruptedException
+    public Collection<Rule> generateGlobal(GlobalReductsProvider reductsProv, DoubleDataTable tab, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
 		prog.set("Generating reducts and rules", tab.getDataObjects().size());
         Collection<BitSet> reducts = reductsProv.getReducts();

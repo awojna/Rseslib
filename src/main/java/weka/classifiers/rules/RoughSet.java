@@ -403,7 +403,7 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
 						+ "\t(default: 0.5)",
 						"A", 1, "-A <alpha value>"));
 
-	    result.addElement(new Option("\tEnable missing values in descriptors of rules.",
+	    result.addElement(new Option("\tDisable missing values in descriptors of rules.",
 			      "M", 0, "-M"));
 
 		return result.elements();
@@ -484,7 +484,7 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
 			setAlphaForPartialReducts(Double.parseDouble(tmpStr));
 		}
 
-	    setMissingValueDescriptorsInRules(Utils.getFlag('M', options));
+	    setMissingValueDescriptorsInRules(!Utils.getFlag('M', options));
 
 	    super.setOptions(options);
 	}
@@ -543,7 +543,7 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
 			result.add("" + getAlphaForPartialReducts());
 		}
 
-		if(getMissingValueDescriptorsInRules())
+		if(!getMissingValueDescriptorsInRules())
 			result.add("-M");
 
 		result.addAll(Arrays.asList(super.getOptions())); // superclass

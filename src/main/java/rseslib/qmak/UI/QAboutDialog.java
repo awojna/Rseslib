@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2018 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -46,7 +46,7 @@ public class QAboutDialog extends JDialog implements ActionListener {
   private FlowLayout flowLayout1 = new FlowLayout();
   private GridLayout gridLayout1 = new GridLayout();
   private String product = "Qmak 1.0.0";
-  private String copyright = "Copyright (C) 2005 - 2017";
+  private String copyright = "Copyright (C) 2005 - 2018";
   private TitledBorder titledBorder2;
   JPanel panelAuthors = new JPanel();
   JPanel authorNames = new JPanel();
@@ -92,7 +92,7 @@ public class QAboutDialog extends JDialog implements ActionListener {
     gridLayout1.setColumns(1);
     label1.setText(product);
     label3.setText(copyright);
-    label4.setText("Logic Group, Warsaw University");
+    label4.setText("The Rseslib Contributors");
     insetsPanel3.setLayout(gridLayout1);
     insetsPanel3.setBorder(BorderFactory.createEmptyBorder(10, 60, 10, 10));
     buttonOk.setText("Ok");

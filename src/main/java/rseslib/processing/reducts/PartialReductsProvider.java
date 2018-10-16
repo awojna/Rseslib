@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Marcin Piliszczuk, Beata Zielosko
+ * Copyright (C) 2002 - 2018 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *

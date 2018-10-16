@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Dariusz Og�rek
+ * Copyright (C) 2002 - 2018 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *

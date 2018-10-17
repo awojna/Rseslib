@@ -28,6 +28,8 @@ import javax.swing.JOptionPane;
 
 import rseslib.qmak.QmakMain;
 import rseslib.qmak.UI.QMainFrame;
+import rseslib.system.Report;
+import rseslib.system.output.StandardErrorOutput;
 
 public class QmakMain {
 
@@ -82,6 +84,7 @@ public class QmakMain {
 	}
 
 	public static void main(String[] args) {
+		Report.addErrorOutput(new StandardErrorOutput());
 		new QmakMain();
 	}
 

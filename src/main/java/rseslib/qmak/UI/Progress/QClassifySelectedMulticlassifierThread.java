@@ -58,7 +58,7 @@ public class QClassifySelectedMulticlassifierThread extends Thread {
 		Map<String, TestResult> re;
 		
 		try {
-			re = multiclassifier.classify(tab, progres);
+			re = multiclassifier.classify(tab.getDataTable(), progres);
 			if (!progres.Cancel)
 				QmakMain.getMainFrame().jMainWindow.
 					classifySelectedMulticlassifierEndThred(re,multiclass,table);

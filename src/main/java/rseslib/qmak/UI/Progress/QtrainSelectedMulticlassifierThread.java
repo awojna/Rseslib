@@ -55,7 +55,7 @@ public class QtrainSelectedMulticlassifierThread extends Thread {
 		QVisualProgress progres = new QVisualProgress();
 		progres.show();
 		try {
-			multiclassifier.trainOn(tab, progres);
+			multiclassifier.trainOn(tab.getDataTable(), progres);
 			if (!progres.Cancel)
 				QmakMain.getMainFrame().jMainWindow.trainSelectedMulticlassifierEndThred(
 					multiclass,table);

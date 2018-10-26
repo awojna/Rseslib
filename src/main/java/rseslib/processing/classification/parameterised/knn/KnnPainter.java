@@ -91,6 +91,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 	private DoubleData hovered;
 	private DoubleData selected;
 	private DoubleData classified;
+    private DoubleData origClassified;
 	
 	public KnnPainter(ArrayList<DoubleData> orig, ArrayList<DoubleData> transformed, Metric m, Random r, Hashtable<Double, Integer> colors, double avg_dist, String legend)
 	{
@@ -124,6 +125,8 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 	
 	private DoubleData findOriginal(DoubleData dat)
 	{
+		if(classified != null && classified == dat)
+			return origClassified;
 		int nr = 0;
         for (DoubleData next : transformedData)
         {
@@ -202,6 +205,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 				jtMax.setText("" + maxcnt);
 				findRandomPlacement(maxcnt);
 				classified = null;
+				origClassified = null;
 	        	repaint();
 	        	startThread();
 			}
@@ -324,7 +328,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 		calcThread.start();
 	}
 
-	public void drawClassify(JPanel canvas, DoubleData obj, Neighbour[] n)
+	public void drawClassify(JPanel canvas, DoubleData obj, DoubleData origObj, Neighbour[] n)
 	{
 		try
 		{
@@ -343,26 +347,8 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
         	   placement.put(n[i].neighbour(), guess);				
 			}
 	    	placement.put(obj, new DPoint(avg));				
-        	int attr = obj.attributes().noOfAttr();
-        	double best = Double.MAX_VALUE;
-        	DoubleData newobj = obj;
-	        for (DoubleData next : placement.keySet())
-	        {
-	        	double dist = 0;
-	        	for (int i=0;i<attr;i++)
-	        	{
-	        		double del = next.get(i) - obj.get(i);
-	        		if (del < 0) del = -del;
-	        		dist += del;
-	        	}
-	        	if (dist < best)
-	        	{
-	        		best = dist;
-	        		newobj = next;
-	        	}
-	        }
-			obj = newobj;
 			classified = obj;
+			origClassified = origObj;
 			selected = obj;
 			repaint();
 

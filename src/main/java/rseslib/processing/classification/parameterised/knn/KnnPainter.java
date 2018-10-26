@@ -466,10 +466,11 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     {
     	String info = "<html>";
     	//g.setFont(Font.getFont("Monospaced"));
-    	int w = getWidth()-POINT_SIZE*2;
-    	int h = getHeight()-POINT_SIZE*2;
+    	int psize = (classified == null) ? POINT_SIZE : POINT_SIZE * 2;
+    	int w = getWidth()-psize*2;
+    	int h = getHeight()-psize*2;
     	g.clearRect(0, 0, getWidth(), getHeight());
-    	g.translate(POINT_SIZE, POINT_SIZE);
+    	g.translate(psize, psize);
     	{
     		int dec = -1;
     		for (DoubleData elem1 : placement.keySet())
@@ -485,22 +486,22 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     			if (elem1 == selected)
     			{
     				g.setColor(new Color(0, 0, 0));
-    				g.fillOval(x-POINT_SIZE/2, y-POINT_SIZE/2, POINT_SIZE*2, POINT_SIZE*2);		        		
+    				g.fillOval(x-psize/2, y-psize/2, psize*2, psize*2);		        		
     			}
 
     			g.setColor(new Color(val%256, (val/256)%256, 0));
-    			g.fillOval(x, y, POINT_SIZE, POINT_SIZE);
+    			g.fillOval(x, y, psize, psize);
 
     			if (elem1 == classified)
     			{
-    				g.drawLine(x-POINT_SIZE*2, y+POINT_SIZE/2, x+POINT_SIZE*3, y+POINT_SIZE/2);
-    				g.drawLine(x+POINT_SIZE/2, y-POINT_SIZE*2, x+POINT_SIZE/2, y+POINT_SIZE*3);
+    				g.drawLine(x-psize*2, y+psize/2, x+psize*3, y+psize/2);
+    				g.drawLine(x+psize/2, y-psize*2, x+psize/2, y+psize*3);
     			}
 
     			if (elem1 == hovered)
     			{
     				g.setColor(new Color(0, 0, 0));
-    				g.fillOval(x+1, y+1, POINT_SIZE/2, POINT_SIZE/2);		        		
+    				g.fillOval(x+1, y+1, psize/2, psize/2);		        		
     			}
     		}
     		g.setColor(Color.BLACK);
@@ -525,10 +526,10 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     			double len_met = metric.dist(selected, hovered);
     			double len_vis = p_sel.dist(p_hov);
 
-    			int x1 = (int)((p_sel.x - xmin) / (xmax - xmin) * w)+POINT_SIZE/2; 
-    			int y1 = (int)((p_sel.y - ymin) / (ymax - ymin) * h)+POINT_SIZE/2;
-    			int x2 = (int)((p_hov.x - xmin) / (xmax - xmin) * w)+POINT_SIZE/2; 
-    			int y2 = (int)((p_hov.y - ymin) / (ymax - ymin) * h)+POINT_SIZE/2;
+    			int x1 = (int)((p_sel.x - xmin) / (xmax - xmin) * w)+psize/2; 
+    			int y1 = (int)((p_sel.y - ymin) / (ymax - ymin) * h)+psize/2;
+    			int x2 = (int)((p_hov.x - xmin) / (xmax - xmin) * w)+psize/2; 
+    			int y2 = (int)((p_hov.y - ymin) / (ymax - ymin) * h)+psize/2;
 
     			g.drawLine(x1, y1, x2, y2);
 

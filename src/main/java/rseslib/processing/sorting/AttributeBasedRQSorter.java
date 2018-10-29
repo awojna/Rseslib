@@ -24,7 +24,7 @@ import rseslib.structure.data.DoubleData;
 import rseslib.structure.linearorder.LinearOrder;
 
 /**
- * @author Rafa� Latkowski
+ * @author Rafal Latkowski
  */
 public class AttributeBasedRQSorter implements AttributeBasedSorting
 {

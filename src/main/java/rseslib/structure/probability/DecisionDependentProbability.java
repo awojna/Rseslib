@@ -23,7 +23,7 @@ package rseslib.structure.probability;
 /**
  * Interface for conditional probability of values given a decision.
  *
- * @author �ukasz Ligowski
+ * @author Lukasz Ligowski
  */
 public interface DecisionDependentProbability
 {

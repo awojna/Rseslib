@@ -31,7 +31,7 @@ import java.util.*;
  * The properties file name is the name of the class
  * extending this abstract class.
  *
- * @author      Grzegorz G�ra, Arkadiusz Wojna
+ * @author      Grzegorz Gora, Arkadiusz Wojna
  */
 public abstract class Configuration
 {

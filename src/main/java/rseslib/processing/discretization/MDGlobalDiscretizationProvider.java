@@ -40,7 +40,7 @@ import rseslib.structure.table.DoubleDataTable;
  * This class represents a method of discretizing continuous attributes based on
  * a local MD heuristic.
  * 
- * @author Marcin Jałmużna
+ * @author Marcin Jalmuzna
  */
 public class MDGlobalDiscretizationProvider implements TransformationProvider {
 

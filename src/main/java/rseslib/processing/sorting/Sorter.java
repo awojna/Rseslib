@@ -23,7 +23,7 @@ package rseslib.processing.sorting;
 import rseslib.structure.linearorder.LinearOrder;
 
 /**
- * @author Rafa� Latkowski
+ * @author Rafal Latkowski
  */
 public interface Sorter
 {

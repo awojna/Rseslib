@@ -33,7 +33,7 @@ import rseslib.structure.metric.AbstractWeightedMetric;
  * is required to be closer or equal to the value of a test object
  * than to the value of the second data point.
  *
- * @author      Grzegorz G�ra, Arkadiusz Wojna
+ * @author      Grzegorz Gora, Arkadiusz Wojna
  */
 public class MixedCityAndMetricCube implements BooleanFunction
 {

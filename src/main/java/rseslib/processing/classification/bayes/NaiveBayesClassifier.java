@@ -36,7 +36,7 @@ import rseslib.system.progress.Progress;
 /**
  * Naive bayesian classifier.
  *
- * @author �ukasz Ligowski
+ * @author Lukasz Ligowski
  */
 
 public class NaiveBayesClassifier extends ConfigurationWithStatistics implements Classifier

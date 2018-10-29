@@ -28,7 +28,7 @@ import rseslib.structure.data.DoubleData;
 /**
  * Interface for classifiers with visualisation.
  *
- * @author      Maciej Pr�chniak, Arkadiusz Wojna
+ * @author      Maciej Prochniak, Arkadiusz Wojna
  */
 public interface VisualClassifier extends Classifier, Headerable
 {

@@ -26,7 +26,7 @@ import java.util.Comparator;
  * Comparator defining lexicographical order
  * on data objects with double values.
  *
- * @author      Grzegorz G�ra, Arkadiusz Wojna
+ * @author      Grzegorz Gora, Arkadiusz Wojna
  */
 public class DoubleDataComparator implements Comparator<DoubleData>
 {

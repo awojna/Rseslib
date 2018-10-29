@@ -33,7 +33,7 @@ import rseslib.system.output.Output;
  * The other two are directed either
  * to outputs provided.
  *
- * @author      Grzegorz G�ra, Marcin Staszczyk, Arkadiusz Wojna
+ * @author      Grzegorz Gora, Marcin Staszczyk, Arkadiusz Wojna
  */
 public class Report
 {

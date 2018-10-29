@@ -28,7 +28,7 @@ import rseslib.structure.data.DoubleData;
  * Interface for metrics defining distance
  * between data objects with double values.
  *
- * @author      Grzegorz G�ra, Arkadiusz Wojna
+ * @author      Grzegorz Gora, Arkadiusz Wojna
  */
 public interface Metric extends Headerable
 {

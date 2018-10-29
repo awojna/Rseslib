@@ -34,7 +34,7 @@ import rseslib.system.PropertyConfigurationException;
  * This class represents a method of discretizing continuous attributes based on
  * a minimal enthropy heuristic, static version (1993 Fayyad & Irani).
  * 
- * @author Marcin Jałmużna
+ * @author Marcin Jalmuzna
  */
 public class EntropyMinStaticDiscretizationProvider extends
 		AbstractDiscretizationProvider {

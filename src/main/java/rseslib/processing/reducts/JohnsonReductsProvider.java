@@ -36,7 +36,7 @@ import rseslib.system.Configuration;
 import rseslib.system.PropertyConfigurationException;
 
 /**
- * @author Dariusz Og�rek
+ * @author Dariusz Ogorek
  *
  */
 public class JohnsonReductsProvider extends Configuration implements GlobalReductsProvider{

@@ -39,7 +39,7 @@ import rseslib.system.PropertyConfigurationException;
  * to the maximal possible distance for this attribute
  * and the distance between two null values is 0.
  *
- * @author      Grzegorz G�ra, Arkadiusz Wojna
+ * @author      Grzegorz Gora, Arkadiusz Wojna
  */
 public class CitySVDMetric extends AbstractWeightedMetric
 {

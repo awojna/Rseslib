@@ -59,7 +59,7 @@ import rseslib.system.progress.Progress;
  * Two types of vote weighting is possible:
  * uniform and inversely proportional to distance.
  *
- * @author      Grzegorz G�ra, Arkadiusz Wojna, Lukasz Ligowski
+ * @author      Grzegorz Gora, Arkadiusz Wojna, Lukasz Ligowski
  */
 public class KnnClassifier extends AbstractParameterisedClassifier implements ClassifierWithDistributedDecision, Serializable
 {

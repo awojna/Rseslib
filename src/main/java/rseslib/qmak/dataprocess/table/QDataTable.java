@@ -55,7 +55,7 @@ import java.awt.Point;
 /**
  * QDataTable represents data set in Qmak program.
  * 
- * @author Damian Wójcik
+ * @author Damian Wojcik
  */
 public class QDataTable extends AbstractTableModel implements iQDataTable, FileStoreable {
 	

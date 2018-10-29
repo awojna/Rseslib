@@ -27,7 +27,7 @@ import rseslib.structure.data.DoubleData;
  * equals or above the cut value returns 1 and values below the
  * cut value returns 0.
  *
- * @author Rafa� Latkowski
+ * @author Rafal Latkowski
  */
 public class AttributeSharpCut implements BoundedIntegerFunction
 {

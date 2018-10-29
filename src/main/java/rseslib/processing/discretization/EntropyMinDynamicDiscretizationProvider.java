@@ -42,7 +42,7 @@ import rseslib.structure.table.DoubleDataTable;
  * This class represents a method of discretizing continuous attributes based on
  * a minimal enthropy heuristic, dynamic version (1993 Fayyad & Irani).
  * 
- * @author Marcin Jałmużna
+ * @author Marcin Jalmuzna
  */
 public class EntropyMinDynamicDiscretizationProvider implements
 		TransformationProvider {

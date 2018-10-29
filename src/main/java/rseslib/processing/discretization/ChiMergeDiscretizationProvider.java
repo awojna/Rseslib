@@ -34,7 +34,7 @@ import rseslib.system.PropertyConfigurationException;
  * This class represents an algorithm that uses the chi square statistic to
  * discretize numeric attributes
  * 
- * @author Marcin Jałmużna
+ * @author Marcin Jalmuzna
  */
 public class ChiMergeDiscretizationProvider extends
 		AbstractDiscretizationProvider {

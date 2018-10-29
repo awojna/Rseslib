@@ -23,7 +23,7 @@ package rseslib.structure.function.intval;
 import rseslib.structure.data.DoubleData;
 
 /**
- * @author Rafa� Latkowski
+ * @author Rafal Latkowski
  */
 public class AttributeDoubleCut implements BoundedIntegerFunction
 {

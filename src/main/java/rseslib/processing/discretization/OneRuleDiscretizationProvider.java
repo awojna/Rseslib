@@ -32,7 +32,7 @@ import rseslib.system.PropertyConfigurationException;
  * This class represents Holte's One Rule discretization algorithm that
  * discretize numeric attributes.
  * 
- * @author Marcin Jałmużna
+ * @author Marcin Jalmuzna
  */
 public class OneRuleDiscretizationProvider extends
 		AbstractDiscretizationProvider {

@@ -21,7 +21,7 @@
 package rseslib.structure.function.intval;
 
 /**
- * @author Rafa� Latkowski
+ * @author Rafal Latkowski
  */
 public interface BoundedIntegerFunction extends IntegerFunction
 {

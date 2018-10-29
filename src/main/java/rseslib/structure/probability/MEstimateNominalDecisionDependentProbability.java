@@ -41,7 +41,7 @@ import rseslib.system.Report;
  * It uses value distribution in decision classes
  * to estimate value probability. 
  *
- * @author �ukasz Ligowski
+ * @author Lukasz Ligowski
  */
 public class MEstimateNominalDecisionDependentProbability extends Configuration implements DecisionDependentProbability
 {

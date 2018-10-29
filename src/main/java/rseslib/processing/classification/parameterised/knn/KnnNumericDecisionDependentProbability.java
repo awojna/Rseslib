@@ -36,7 +36,7 @@ import rseslib.system.PropertyConfigurationException;
 import rseslib.system.progress.EmptyProgress;
 
 /**
- * @author �ukasz Ligowski
+ * @author Lukasz Ligowski
  */
 public class KnnNumericDecisionDependentProbability extends Configuration implements DecisionDependentProbability
 {

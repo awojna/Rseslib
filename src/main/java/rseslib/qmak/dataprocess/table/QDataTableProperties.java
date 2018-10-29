@@ -25,7 +25,7 @@ import rseslib.qmak.dataprocess.table.QDataTableProperties;
 /**
  * QDataTableProperties class represents properties of a table.
  * 
- * @author Damian Wójcik
+ * @author Damian Wojcik
  */
 public class QDataTableProperties {
 	//przy dodawaniu nowych pol prosze pamietac o metodzie clone - Krzysiek

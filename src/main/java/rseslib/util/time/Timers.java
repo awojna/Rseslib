@@ -25,7 +25,7 @@ import rseslib.system.Report;
 /**
  * Timers.
  *
- * @author      Grzegorz G�ra, Arkadiusz Wojna
+ * @author      Grzegorz Gora, Arkadiusz Wojna
  */
 public class Timers
 {

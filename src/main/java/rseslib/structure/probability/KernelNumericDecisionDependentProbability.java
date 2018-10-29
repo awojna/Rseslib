@@ -43,7 +43,7 @@ import rseslib.system.PropertyConfigurationException;
  * in the definition of the probability density function.
  * A set of different kernel function is available.
  *
- * @author �ukasz Ligowski
+ * @author Lukasz Ligowski
  */
 public class KernelNumericDecisionDependentProbability extends Configuration implements DecisionDependentProbability
 {

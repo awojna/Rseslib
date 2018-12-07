@@ -154,6 +154,16 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
         else
         	prog = new EmptyProgress();
         m_RseslibClassifier = ClassifierFactory.createClassifier(m_ClassifierClass, m_Options, rseslib_tab, prog);
+        if (getDebug())
+        {
+        	m_RseslibClassifier.calculateStatistics();
+        	Properties stats = m_RseslibClassifier.getStatistics();
+        	if (!stats.isEmpty())
+        	{
+        		System.out.println(stats);
+        		System.out.println();
+        	}
+        }
     }
 
     /**

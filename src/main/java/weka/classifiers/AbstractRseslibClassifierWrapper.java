@@ -154,9 +154,9 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
         else
         	prog = new EmptyProgress();
         m_RseslibClassifier = ClassifierFactory.createClassifier(m_ClassifierClass, m_Options, rseslib_tab, prog);
+    	m_RseslibClassifier.calculateStatistics();
         if (getDebug())
         {
-        	m_RseslibClassifier.calculateStatistics();
         	Properties stats = m_RseslibClassifier.getStatistics();
         	if (!stats.isEmpty())
         	{
@@ -200,10 +200,8 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
 	 */
 	public String toString()
 	{
-		if (m_RseslibClassifier != null) {
-			m_RseslibClassifier.calculateStatistics();
+		if (m_RseslibClassifier != null)
 			return m_RseslibClassifier.getStatistics().toString();
-		}
 		return new String();
 	}
 }

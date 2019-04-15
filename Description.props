@@ -6,10 +6,10 @@
 PackageName=Rseslib
 
 # Version (required)
-Version=3.2.1-SNAPSHOT
+Version=3.2.1
 
 #Date
-Date=2018-10-17
+Date=2019-04-15
 
 # Title (required)
 Title=Rough Sets and Analogy-Based Reasoning
@@ -34,7 +34,7 @@ The third classifier is the extension of k nearest neighbours method that induce
 It is dedicated rather to large data sets (2000+ training instances) and improves accuracy particularly in case of data containing nominal attributes.
 
 # Package URL for obtaining the package archive (required)
-PackageURL=http://rseslib.mimuw.edu.pl/weka/Rseslib3.2.1-SNAPSHOT.zip
+PackageURL=http://rseslib.mimuw.edu.pl/weka/Rseslib3.2.1.zip
 
 # URL for further information
 URL=http://rseslib.mimuw.edu.pl

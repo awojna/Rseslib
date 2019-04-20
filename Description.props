@@ -6,7 +6,7 @@
 PackageName=Rseslib
 
 # Version (required)
-Version=3.2.1
+Version=3.2.2-SNAPSHOT
 
 #Date
 Date=2019-04-15
@@ -34,7 +34,7 @@ The third classifier is the extension of k nearest neighbours method that induce
 It is dedicated rather to large data sets (2000+ training instances) and improves accuracy particularly in case of data containing nominal attributes.
 
 # Package URL for obtaining the package archive (required)
-PackageURL=http://rseslib.mimuw.edu.pl/weka/Rseslib3.2.1.zip
+PackageURL=http://rseslib.mimuw.edu.pl/weka/Rseslib3.2.2-SNAPSHOT.zip
 
 # URL for further information
 URL=http://rseslib.mimuw.edu.pl

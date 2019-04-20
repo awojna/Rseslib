@@ -117,7 +117,7 @@ public class ReductRuleGenerator extends Configuration implements RuleGenerator
      * @param prog                   Progress object for reporting progress.
      * @throws InterruptedException  when a user interrupts execution.
      */
-    public Collection<Rule> generateGlobal(GlobalReductsProvider reductsProv, DoubleDataTable tab, Progress prog) throws PropertyConfigurationException, InterruptedException
+    public Collection<Rule> generateGlobal(GlobalReductsProvider reductsProv, DoubleDataTable tab, Progress prog) throws InterruptedException
     {
 		prog.set("Generating reducts and rules", tab.getDataObjects().size());
         Collection<BitSet> reducts = reductsProv.getReducts();
@@ -145,7 +145,7 @@ public class ReductRuleGenerator extends Configuration implements RuleGenerator
      * @param prog                   Progress object for reporting progress.
      * @throws InterruptedException  when a user interrupts execution.
      */
-    public Collection<Rule> generateLocal(LocalReductsProvider reductsProv, DoubleDataTable tab, Progress prog) throws PropertyConfigurationException, InterruptedException
+    public Collection<Rule> generateLocal(LocalReductsProvider reductsProv, DoubleDataTable tab, Progress prog) throws InterruptedException
     {
         prog.set("Generating reducts and rules", tab.getDataObjects().size());
         HashSet<Rule> decisionRules = new HashSet<Rule>();

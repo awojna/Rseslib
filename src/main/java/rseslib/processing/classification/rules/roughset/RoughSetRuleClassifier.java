@@ -44,7 +44,10 @@ import rseslib.processing.transformation.Transformer;
 /**
  * Rough set based classifier.
  * It discretizes the training table,
- * computes reducts and generates rules from the reducts. 
+ * computes reducts and generates rules from the reducts.
+ * While classifying a test object,
+ * it sums the supports of all rules matching the object for each decision class
+ * and assigns the decision with the greatest sum.
  * 
  * @author Rafal Latkowski
  */
@@ -124,6 +127,8 @@ public class RoughSetRuleClassifier extends ConfigurationWithStatistics implemen
 
     /**
      * Assigns a decision to a single test object.
+     * The method sums the supports of all rules matching the object for each decision class
+     * and assigns the decision with the greatest sum.
      *
      * @param object  Test object to be classified.
      * @return        Decision assigned.

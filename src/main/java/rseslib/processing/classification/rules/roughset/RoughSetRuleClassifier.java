@@ -43,6 +43,8 @@ import rseslib.processing.transformation.Transformer;
 
 /**
  * Rough set based classifier.
+ * It discretizes the training table,
+ * computes reducts and generates rules from the reducts. 
  * 
  * @author Rafal Latkowski
  */
@@ -51,19 +53,25 @@ public class RoughSetRuleClassifier extends ConfigurationWithStatistics implemen
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
 
+	/** Discretizer used to discretize numerical attributes. */
 	Transformer m_cDiscretizer = null;
+	/** Generated rules used for classification. */
     Collection<Rule> m_cDecisionRules = null;
+    /** Data attributes. */
     Header m_DiscrHeader;
+    /** Decision attribute. */
     NominalAttribute m_DecAttr;
     
     /**
      * Constructor required by rseslib tools.
+     * It discretizes the training table,
+     * computes reducts and generates rules from the reducts. 
      *
-     * @param prop                   Settings of this clasifier.
-     * @param trainTable             Table used to generate rules.
-     * @param prog                   Progress object to report training progress.
-     * @throws InterruptedException 			when a user interrupts the execution.
-     * @throws PropertyConfigurationExcpetion 	when the properties are incorrect.
+     * @param prop					 Parameters of this classifier.
+     * @param trainTable             Table used to generate reducts and rules.
+     * @param prog                   Progress object for reporting training progress.
+     * @throws PropertyConfigurationException	when the parameters are incorrect or incomplete.
+     * @throws InterruptedException				when a user interrupts execution.
      */
     public RoughSetRuleClassifier(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
@@ -75,13 +83,14 @@ public class RoughSetRuleClassifier extends ConfigurationWithStatistics implemen
     		trainTable = TableTransformer.transform(trainTable, m_cDiscretizer);
     	m_DiscrHeader = trainTable.attributes();
         m_DecAttr = m_DiscrHeader.nominalDecisionAttribute();
-        // There are some properties for rules within bmorg
         m_cDecisionRules = new ReductRuleGenerator(getProperties()).generate(trainTable, prog);
-        //System.out.println(rules);
     }
 
     /**
+     * Constructor based on a prepared set of rules.
      * 
+     * @param	Prepared set of rules.
+     * @param	Decision attribute.
      */
     public RoughSetRuleClassifier(Collection<Rule> rules, NominalAttribute decAttr)
     {
@@ -104,7 +113,7 @@ public class RoughSetRuleClassifier extends ConfigurationWithStatistics implemen
     /**
      * Reads this object.
      *
-     * @param out			Output for writing.
+     * @param in			Input for reading.
      * @throws IOException	if an I/O error has occured.
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -113,6 +122,12 @@ public class RoughSetRuleClassifier extends ConfigurationWithStatistics implemen
     	in.defaultReadObject();
     }
 
+    /**
+     * Assigns a decision to a single test object.
+     *
+     * @param object  Test object to be classified.
+     * @return        Decision assigned.
+     */
     public double classify(DoubleData object)
     {
     	if (m_cDiscretizer != null)
@@ -152,8 +167,9 @@ public class RoughSetRuleClassifier extends ConfigurationWithStatistics implemen
     }
     
     /**
-     * Returns collection of rules induced by this classifier.
-     * @return collection of rules induced by this classifier.
+     * Returns the collection of rules induced by this classifier.
+     * 
+     * @return Collection of rules induced by this classifier.
      */
     public Collection<Rule> getRules()
     {

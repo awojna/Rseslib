@@ -23,10 +23,8 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 
 import rseslib.processing.discernibility.DiscernibilityMatrixProvider;
 import rseslib.processing.reducts.GlobalReductsProvider;
@@ -38,7 +36,6 @@ import rseslib.system.PropertyConfigurationException;
 
 /**
  * Greedy Johnson algorithm calculating a reduct.
- * TODO: tests, comments, optimization
  * 
  * @author Wiktor Gromniak
  */
@@ -61,7 +58,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
 
     public Collection<BitSet> getReducts() {
         Collection<BitSet> cnf = m_Discernibility.getDiscernibilityMatrix();
-        Vector<BitSet> bs = new Vector<BitSet>();
+        ArrayList<BitSet> bs = new ArrayList<BitSet>();
         bs.addAll(cnf);
         Collection<BitSet> collection = null;
         switch (m_Generate) {
@@ -83,7 +80,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
      * @param discern_attrs Indiscirnibility matrix.
      * @return All reducts set.
      */
-    private Collection<BitSet> getAllCountedReducts(Vector<BitSet> discern_attrs) {
+    private Collection<BitSet> getAllCountedReducts(ArrayList<BitSet> discern_attrs) {
 
         if (discern_attrs.isEmpty()) {
             return Collections.emptyList();
@@ -91,7 +88,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
 
         List<BitSet> results = new ArrayList<BitSet>();
 
-        int[] counts = new int[m_Header.noOfAttr() - 1]; // TODO: this may contain decision, if we decide so
+        int[] counts = new int[m_Header.noOfAttr()];
 
         for (BitSet cell : discern_attrs) {
             for (int i = cell.nextSetBit(0); i >= 0; i = cell.nextSetBit(i + 1)) {
@@ -103,16 +100,14 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
 
         for (int maxIndex : maxIndices) {
 
-            @SuppressWarnings("unchecked")
-            Vector<BitSet> discMatCopy = (Vector<BitSet>) discern_attrs.clone();
             BitSet result = new BitSet();
             result.set(maxIndex);
 
-            removeCellsWithAttr(maxIndex, discMatCopy);
+            ArrayList<BitSet> discMatCopy = removeCellsWithAttr(maxIndex, discern_attrs);
 
             while (!discMatCopy.isEmpty()) {
 
-                counts = new int[m_Header.noOfAttr() - 1];
+                counts = new int[m_Header.noOfAttr()];
 
                 for (BitSet cell : discMatCopy) {
                     for (int i = cell.nextSetBit(0); i >= 0; i = cell.nextSetBit(i + 1)) {
@@ -124,7 +119,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
 
                 result.set(maxIndex);
 
-                removeCellsWithAttr(maxIndex, discMatCopy);
+                discMatCopy = removeCellsWithAttr(maxIndex, discMatCopy);
             }
 
             results.add(result);
@@ -136,7 +131,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
     private static List<Integer> maxIndices(int[] counts) {
         List<Integer> result = new ArrayList<Integer>();
         int maxIndex = 0;
-        int maxCount = 0;
+        int maxCount = counts[maxIndex];
         for (int i = 1; i < counts.length; i++) {
             if (counts[i] > counts[maxIndex]) {
                 maxIndex = i;
@@ -158,7 +153,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
      * @param discern_attrs Indiscirnibility matrix.
      * @return All reducts set.
      */
-    private Collection<BitSet> getOneCountedReducts(Vector<BitSet> discern_attrs) {
+    private Collection<BitSet> getOneCountedReducts(ArrayList<BitSet> discern_attrs) {
 
         if (discern_attrs.isEmpty()) {
             return Collections.emptyList();
@@ -168,7 +163,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
 
         while (!discern_attrs.isEmpty()) {
 
-            int[] counts = new int[m_Header.noOfAttr() - 1];
+            int[] counts = new int[m_Header.noOfAttr()];
 
             for (BitSet cell : discern_attrs) {
                 for (int i = cell.nextSetBit(0); i >= 0; i = cell.nextSetBit(i + 1)) {
@@ -180,7 +175,7 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
 
             result.set(maxIndex);
 
-            removeCellsWithAttr(maxIndex, discern_attrs);
+            discern_attrs = removeCellsWithAttr(maxIndex, discern_attrs);
         }
 
         return Collections.singletonList(result);
@@ -196,17 +191,12 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
         return maxIndex;
     }
 
-    private static void removeCellsWithAttr(int attr, Vector<BitSet> discMatCopy) {
-        for (Iterator<BitSet> iter = discMatCopy.iterator(); iter.hasNext(); ) {
-            BitSet cell = iter.next();
-
-            for (int i = cell.nextSetBit(0); i >= 0; i = cell.nextSetBit(i + 1)) {
-                if (i == attr) {
-                    iter.remove();
-                    break;
-                }
-            }
-        }
+    private static ArrayList<BitSet> removeCellsWithAttr(int attr, ArrayList<BitSet> discMatCopy) {
+    	ArrayList<BitSet> remaining = new ArrayList<BitSet>(discMatCopy.size());
+        for (BitSet cell : discMatCopy)
+            if (!cell.get(attr))
+            	remaining.add(cell);
+        return remaining;
     }
 
     public Indiscernibility getIndiscernibilityForMissing() {

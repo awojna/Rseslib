@@ -40,6 +40,7 @@ import weka.core.Utils;
 
 /**
  * Weka wrapper for rough set classifier.
+ * @see rseslib.processing.classification.rules.roughset.RoughSetRuleClassifier
  *
  * @author      Arkadiusz Wojna
  */

@@ -69,7 +69,6 @@ public class AccurateRuleGenerator extends Configuration implements RuleGenerato
      */
     public Collection<Rule> generate(DoubleDataTable tab, Progress prog) throws InterruptedException
     {
-        // konstrukcja regul
         prog.set("Generating accurate rules", 1);
         int noOfDescriptors = 0;
         for (int attr = 0; attr < tab.attributes().noOfAttr(); attr++)

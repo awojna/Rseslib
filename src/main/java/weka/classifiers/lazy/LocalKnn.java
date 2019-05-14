@@ -33,7 +33,8 @@ import weka.core.Tag;
 import weka.core.Utils;
 
 /**
- * Weka wrapper for rseslib Local K-NN classifier.
+ * Weka wrapper for K-NN classifier with local metric induction.
+ * @see rseslib.processing.classification.parameterised.knn.LocalKnnClassifier
  *
  * @author      Arkadiusz Wojna
  */

@@ -34,6 +34,7 @@ import weka.core.Utils;
 
 /**
  * Weka wrapper for rseslib K-NN classifier.
+ * @see rseslib.processing.classification.parameterised.knn.KnnClassifier
  *
  * @author      Arkadiusz Wojna
  */

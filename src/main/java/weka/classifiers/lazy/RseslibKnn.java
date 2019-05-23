@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -34,6 +34,7 @@ import weka.core.Utils;
 
 /**
  * Weka wrapper for rseslib K-NN classifier.
+ * @see rseslib.processing.classification.parameterised.knn.KnnClassifier
  *
  * @author      Arkadiusz Wojna
  */
@@ -306,11 +307,11 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 						+ "\t(default: "+MetricFactory.Weighting.DistanceBased.ordinal()+"="+MetricFactory.Weighting.DistanceBased.name()+")",
 						"W", 1, "-W"));
 
-	    result.addElement(new Option("\tUse indexing to accelarate nearest neighours search.",
-			      "I", 0, "-I"));
+	    result.addElement(new Option("\tDo not use indexing tree (linear search for nearest neighbours is used).",
+			      "L", 0, "-L"));
 
-	    result.addElement(new Option("\tFind optimal number of nearest neighbours.",
-			      "O", 0, "-O"));
+	    result.addElement(new Option("\tDo not optimize the number of the nearest neighbours automatically.",
+			      "U", 0, "-U"));
 
 		result.addElement(new Option(
 				"\tMaximum number of neighbours while optimizing automatically.\n"
@@ -362,9 +363,9 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 		if (tmpStr.length() != 0)
 			setWeightingMethod(new SelectedTag(Integer.parseInt(tmpStr), TAGS_WEIGHTING));
 		
-	    setIndexing(Utils.getFlag('I', options));
+	    setIndexing(!Utils.getFlag('L', options));
 
-	    boolean learn = Utils.getFlag('O', options);
+	    boolean learn = !Utils.getFlag('U', options);
 	    setLearnOptimalK(learn);
 	    
 	    if (learn) {
@@ -412,14 +413,14 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 		result.add("-W");
 		result.add("" + getWeigthingOrdinal());
 
-		if(getIndexing())
-			result.add("-I");
+		if(!getIndexing())
+			result.add("-L");
 
 		if(getLearnOptimalK()) {
-			result.add("-O");
 			result.add("-N");
 			result.add("" + getMaxK());
 		} else {
+			result.add("-U");
 			result.add("-K");
 			result.add("" + getK());
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -36,7 +36,7 @@ import rseslib.system.progress.Progress;
 /**
  * Naive bayesian classifier.
  *
- * @author �ukasz Ligowski
+ * @author Lukasz Ligowski
  */
 
 public class NaiveBayesClassifier extends ConfigurationWithStatistics implements Classifier

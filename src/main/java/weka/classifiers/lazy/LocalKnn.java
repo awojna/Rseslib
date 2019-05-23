@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -33,7 +33,8 @@ import weka.core.Tag;
 import weka.core.Utils;
 
 /**
- * Weka wrapper for rseslib Local K-NN classifier.
+ * Weka wrapper for K-NN classifier with local metric induction.
+ * @see rseslib.processing.classification.parameterised.knn.LocalKnnClassifier
  *
  * @author      Arkadiusz Wojna
  */
@@ -274,8 +275,8 @@ public class LocalKnn extends AbstractRseslibClassifierWrapper
 						+ "\t(default: "+MetricFactory.Weighting.DistanceBased.ordinal()+"="+MetricFactory.Weighting.DistanceBased.name()+")",
 						"W", 1, "-W"));
 
-	    result.addElement(new Option("\tFind optimal number of nearest neighbours.",
-			      "O", 0, "-O"));
+	    result.addElement(new Option("\tDo not optimize the number of the nearest neighbours automatically.",
+			      "U", 0, "-U"));
 
 		result.addElement(new Option(
 				"\tSize of the local set used to induce local metric.\n"
@@ -324,7 +325,7 @@ public class LocalKnn extends AbstractRseslibClassifierWrapper
 		if (tmpStr.length() != 0)
 			setWeightingMethod(new SelectedTag(Integer.parseInt(tmpStr), TAGS_WEIGHTING));
 		
-	    boolean learn = Utils.getFlag('O', options);
+	    boolean learn = !Utils.getFlag('U', options);
 	    setLearnOptimalK(learn);
 
 		tmpStr = Utils.getOption('L', options);
@@ -371,9 +372,8 @@ public class LocalKnn extends AbstractRseslibClassifierWrapper
 		result.add("-L");
 		result.add("" + getLocalSetSize());
 
-		if(getLearnOptimalK()) {
-			result.add("-O");
-		} else {
+		if(!getLearnOptimalK()) {
+			result.add("-U");
 			result.add("-K");
 			result.add("" + getK());
 		}

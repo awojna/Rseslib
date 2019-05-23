@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -39,7 +39,7 @@ import rseslib.system.PropertyConfigurationException;
  * to the maximal possible distance for this attribute
  * and the distance between two null values is 0.
  *
- * @author      Grzegorz G�ra, Arkadiusz Wojna
+ * @author      Grzegorz Gora, Arkadiusz Wojna
  */
 public class CitySVDMetric extends AbstractWeightedMetric
 {

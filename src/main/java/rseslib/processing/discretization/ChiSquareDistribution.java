@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -22,7 +22,7 @@ package rseslib.processing.discretization;
 /**
  * This class represents Chi-square distribution.
  * 
- * @author Marcin Jałmużna
+ * @author Marcin Jalmuzna
  */
 public class ChiSquareDistribution {
 	private Double [] header = {	0.995	, 	0.975	, 	0.20	, 	0.10	, 	0.05	, 	0.025	, 	0.02	, 	0.01	, 	0.005	, 	0.002	, 	0.001	};

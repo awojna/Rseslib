@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -27,7 +27,7 @@ import rseslib.structure.data.DoubleData;
  * equals or above the cut value returns 1 and values below the
  * cut value returns 0.
  *
- * @author Rafa� Latkowski
+ * @author Rafal Latkowski
  */
 public class AttributeSharpCut implements BoundedIntegerFunction
 {

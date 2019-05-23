@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -165,6 +165,16 @@ public class TestResult implements Serializable
      * @return  Statistics.
      */
     public Properties getStatistics()
+    {
+    	return m_Statistics;
+    }
+    
+    /**
+     * Returns statistics and results.
+     *
+     * @return  Statistics and results.
+     */
+    public Properties getStatisticsAndResults()
     {
     	Properties stats = (Properties)m_Statistics.clone();
     	stats.put("all_cnt",Integer.toString(m_nAll));

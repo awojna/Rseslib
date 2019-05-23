@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -23,7 +23,7 @@ package rseslib.structure.probability;
 /**
  * Interface for conditional probability of values given a decision.
  *
- * @author �ukasz Ligowski
+ * @author Lukasz Ligowski
  */
 public interface DecisionDependentProbability
 {

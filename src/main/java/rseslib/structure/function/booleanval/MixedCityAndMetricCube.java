@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -33,7 +33,7 @@ import rseslib.structure.metric.AbstractWeightedMetric;
  * is required to be closer or equal to the value of a test object
  * than to the value of the second data point.
  *
- * @author      Grzegorz G�ra, Arkadiusz Wojna
+ * @author      Grzegorz Gora, Arkadiusz Wojna
  */
 public class MixedCityAndMetricCube implements BooleanFunction
 {

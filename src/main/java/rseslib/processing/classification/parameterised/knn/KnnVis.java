@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -147,6 +147,7 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
 	{
 		try
 		{
+			DoubleData orig = obj;
 	        if (m_Transformer!=null)
 	        	obj = m_Transformer.transformToNew(obj);
 			Neighbour[] n = m_VicinityProvider.getVicinity(obj, getIntProperty(K_PROPERTY_NAME));
@@ -158,7 +159,7 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
 		    }
 			if(painter_clas == null)
 				painter_clas = new KnnPainter(m_OriginalData, m_TransformedTrainTable.getDataObjects(), m_Metric, rnd_clas, htCols, avg, strLegend);
-			painter_clas.drawClassify(canvas, obj, n);
+			painter_clas.drawClassify(canvas, obj, orig, n);
 		}
 		catch (Exception exc)
 		{

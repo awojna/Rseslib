@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -59,10 +59,10 @@ public class AllLocalReductsProvider extends Configuration implements LocalReduc
 
     public Collection<BitSet> getSingleObjectReducts(DoubleData object)
     {
-        /* generowanie CNF */
+        /* generate CNF */
         Collection<BitSet> cnf = m_Discernibility.getLocalDiscernibility(object);
         if (cnf.isEmpty()) return new ArrayList<BitSet>();
-        /* wyliczanie implikantow pierwszych */
+        /* compute prime implicants */
         return m_oPrimeImplicantsProvider.generatePrimeImplicants(cnf, m_nNumberOfAttributes);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -22,13 +22,14 @@ package rseslib.processing.classification;
 
 import rseslib.structure.data.DoubleData;
 import rseslib.system.PropertyConfigurationException;
+import rseslib.system.Statistics;
 
 /**
  * Interface for classification methods.
  *
  * @author      Arkadiusz Wojna
  */
-public interface Classifier
+public interface Classifier extends Statistics
 {
     /**
      * Assigns a decision to a single test object.
@@ -37,14 +38,4 @@ public interface Classifier
      * @return      Assigned decision.
      */
     public abstract double classify(DoubleData dObj) throws PropertyConfigurationException;
-
-    /**
-     * Calculates statistics.
-     */
-    public abstract void calculateStatistics();
-
-    /**
-     * Resets statistics.
-     */
-    public abstract void resetStatistics();
 }

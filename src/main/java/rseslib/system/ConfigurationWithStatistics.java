@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -32,7 +32,7 @@ import java.util.Properties;
  *
  * @author      Arkadiusz Wojna
  */
-public abstract class ConfigurationWithStatistics extends Configuration
+public abstract class ConfigurationWithStatistics extends Configuration implements Statistics
 {
     /** Map between statistics names and statistics values. */
     private Properties m_Statistics = new Properties();
@@ -61,7 +61,7 @@ public abstract class ConfigurationWithStatistics extends Configuration
     * @param name  Name of the statistical value to be added.
     * @param value Statistical value to be added.
     */
-    public void addToStatistics(String name, String value)
+    protected void addToStatistics(String name, String value)
     {
         m_Statistics.setProperty(name, value);
     }

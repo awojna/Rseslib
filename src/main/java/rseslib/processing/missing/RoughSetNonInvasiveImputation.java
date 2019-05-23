@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -133,13 +133,14 @@ public class RoughSetNonInvasiveImputation  extends ConfigurationWithStatistics 
         return m_nIterations;
     }
     
-    public ArrayList getImputedValueCounts()
+    public ArrayList<Integer> getImputedValueCounts()
     {
         return m_alIterationStatistics;
     }
 
     public void calculateStatistics()
     {
+        addToStatistics("Number of iterations", Integer.toString(getNumberOfIterations()));
     }
 
     public void resetStatistics()

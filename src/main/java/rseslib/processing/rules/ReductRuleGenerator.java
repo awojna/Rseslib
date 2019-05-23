@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -44,25 +44,37 @@ import rseslib.system.PropertyConfigurationException;
 import rseslib.system.progress.Progress;
 
 /**
+ * Universal generator of rules from reducts.
+ * It generates rules from all types of reducts.
+ * 
  * @author Rafal Latkowski
- *
  */
 public class ReductRuleGenerator extends Configuration implements RuleGenerator
 {
+	/** Types of reducts. */
 	public enum ReductsMethod { AllLocal, AllGlobal, OneJohnson, AllJohnson, PartialLocal, PartialGlobal; };
+	/** Types of indiscernibility relations related to missing values. */
 	public enum IndiscernibilityRelation { DiscernFromValue, DiscernFromValueOneWay, DontDiscernFromValue; };
 
+	/** Parameter name for type of reducts. */
     public static final String s_sReductsMethod = "Reducts";
+	/** Parameter name for type of indiscernibility relation. */
 	public static final String s_sIndiscernibilityRelation = "IndiscernibilityForMissing";
+	/** Parameter name for the switch enabling or disabling descriptors with missing values in generated rules. */
     public static final String s_sAllowComparingMissingValues = "MissingValueDescriptorsInRules";
 
+    /** Type of used reducts. */
     private ReductsMethod m_ReductsMethod;
+    /** Type of used indiscernibiliy relation for missing values. */
     private Indiscernibility m_indiscernibility = null;
+    /** Switch enabling or disabling descriptors with missing values in generated rules. */
     boolean m_bAllowComparingMissingValues = true;
         
     /**
-     * @throws PropertyConfigurationException 
+     * Constructor preparing this rule generator depending on the parameter values.
      * 
+     * @param prop	Parameters defining the rules to be generated.
+     * @throws PropertyConfigurationException when the parameters are incorrect or incomplete.
      */
     public ReductRuleGenerator(Properties prop) throws PropertyConfigurationException
     {
@@ -97,8 +109,15 @@ public class ReductRuleGenerator extends Configuration implements RuleGenerator
     }
 
     /**
+     * This method generates global reducts given a reduct provider
+     * and rules from the generated reducts. 
+     * 
+     * @param reductsProv            Provider of global reducts, defines the type of global reducts to be used.
+     * @param tab		             Table used to generate reducts and rules.
+     * @param prog                   Progress object for reporting progress.
+     * @throws InterruptedException  when a user interrupts execution.
      */
-    private Collection<Rule> generateGlobal(GlobalReductsProvider reductsProv, DoubleDataTable tab, Progress prog) throws PropertyConfigurationException, InterruptedException
+    public Collection<Rule> generateGlobal(GlobalReductsProvider reductsProv, DoubleDataTable tab, Progress prog) throws InterruptedException
     {
 		prog.set("Generating reducts and rules", tab.getDataObjects().size());
         Collection<BitSet> reducts = reductsProv.getReducts();
@@ -118,8 +137,15 @@ public class ReductRuleGenerator extends Configuration implements RuleGenerator
     }
 
     /**
+     * This method generates local reducts given a reduct provider
+     * and rules from the generated reducts.
+     * 
+     * @param reductsProv            Provider of local reducts, defines the type of local reducts to be used.
+     * @param tab		             Table used to generate reducts and rules.
+     * @param prog                   Progress object for reporting progress.
+     * @throws InterruptedException  when a user interrupts execution.
      */
-    public Collection<Rule> generateLocal(LocalReductsProvider reductsProv, DoubleDataTable tab, Progress prog) throws PropertyConfigurationException, InterruptedException
+    public Collection<Rule> generateLocal(LocalReductsProvider reductsProv, DoubleDataTable tab, Progress prog) throws InterruptedException
     {
         prog.set("Generating reducts and rules", tab.getDataObjects().size());
         HashSet<Rule> decisionRules = new HashSet<Rule>();
@@ -139,6 +165,15 @@ public class ReductRuleGenerator extends Configuration implements RuleGenerator
     }
 
     /**
+     * Computes reducts from the data table
+     * and generates rules from these reducts
+     * as defined by the parameters.
+     *
+     * @param tab  Data set used to generate reducts and rules.
+     * @param prog Progress object for reporting progress.
+     * @return     Collection of generated rules.
+     * @throws PropertyConfigurationException	when the parameters are incorrect or incomplete.
+     * @throws InterruptedException				when a user interrupts execution.
      * @see rseslib.processing.rules.RuleGenerator#generate(rseslib.structure.table.DoubleDataTable, Progress)
      */
     public Collection<Rule> generate(DoubleDataTable tab, Progress prog) throws PropertyConfigurationException, InterruptedException

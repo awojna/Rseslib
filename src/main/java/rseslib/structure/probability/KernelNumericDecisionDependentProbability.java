@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -43,7 +43,7 @@ import rseslib.system.PropertyConfigurationException;
  * in the definition of the probability density function.
  * A set of different kernel function is available.
  *
- * @author �ukasz Ligowski
+ * @author Lukasz Ligowski
  */
 public class KernelNumericDecisionDependentProbability extends Configuration implements DecisionDependentProbability
 {

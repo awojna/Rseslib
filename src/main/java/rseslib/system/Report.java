@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -33,7 +33,7 @@ import rseslib.system.output.Output;
  * The other two are directed either
  * to outputs provided.
  *
- * @author      Grzegorz G�ra, Marcin Staszczyk, Arkadiusz Wojna
+ * @author      Grzegorz Gora, Marcin Staszczyk, Arkadiusz Wojna
  */
 public class Report
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -28,7 +28,7 @@ import rseslib.structure.data.DoubleData;
 /**
  * Interface for classifiers with visualisation.
  *
- * @author      Maciej Pr�chniak, Arkadiusz Wojna
+ * @author      Maciej Prochniak, Arkadiusz Wojna
  */
 public interface VisualClassifier extends Classifier, Headerable
 {

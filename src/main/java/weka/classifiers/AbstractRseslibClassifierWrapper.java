@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -38,7 +38,6 @@ import rseslib.structure.data.formats.ArffDoubleDataInput;
 import rseslib.structure.table.ArrayListDoubleDataTable;
 import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.Configuration;
-import rseslib.system.ConfigurationWithStatistics;
 import rseslib.system.progress.EmptyProgress;
 import rseslib.system.progress.Progress;
 import rseslib.system.progress.StdOutProgress;
@@ -108,8 +107,8 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
 		TechnicalInformation 	result;
 
 		result = new TechnicalInformation(Type.MANUAL);
-		result.setValue(Field.AUTHOR, "Arkadiusz Wojna, Lukasz Kowalski");
-		result.setValue(Field.TITLE, "Rseslib: Programmer's Guide");
+		result.setValue(Field.AUTHOR, "Arkadiusz Wojna, Rafal Latkowski, Lukasz Kowalski");
+		result.setValue(Field.TITLE, "Rseslib: User Guide");
 		result.setValue(Field.URL, "http://rseslib.mimuw.edu.pl/rseslib.pdf");
 
 		return result;
@@ -155,6 +154,16 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
         else
         	prog = new EmptyProgress();
         m_RseslibClassifier = ClassifierFactory.createClassifier(m_ClassifierClass, m_Options, rseslib_tab, prog);
+    	m_RseslibClassifier.calculateStatistics();
+        if (getDebug())
+        {
+        	Properties stats = m_RseslibClassifier.getStatistics();
+        	if (!stats.isEmpty())
+        	{
+        		System.out.println(stats);
+        		System.out.println();
+        	}
+        }
     }
 
     /**
@@ -191,10 +200,8 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
 	 */
 	public String toString()
 	{
-		if (m_RseslibClassifier != null) {
-			m_RseslibClassifier.calculateStatistics();
-			return ((ConfigurationWithStatistics)m_RseslibClassifier).getStatistics().toString();
-		}
+		if (m_RseslibClassifier != null)
+			return m_RseslibClassifier.getStatistics().toString();
 		return new String();
 	}
 }

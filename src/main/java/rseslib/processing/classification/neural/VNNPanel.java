@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -160,17 +160,17 @@ public class VNNPanel extends JComponent implements
 
 		if (addButtons)
 		{
-			TrainButton = new JButton("Train");
-			this.add(TrainButton);
-			TrainButton.setLocation(20, getHeight() - 30);
-			TrainButton.setSize(new Dimension(100, 30));
-			TrainButton.setVisible(true);
-
-			AddNodes = new JButton("Add Perceptrons");
+			AddNodes = new JButton("Add Neurons");
 			this.add(AddNodes);
-			AddNodes.setLocation(120, getHeight() - 30);
+			AddNodes.setLocation(20, getHeight() - 30);
 			AddNodes.setSize(new Dimension(160, 30));
 			AddNodes.setVisible(true);
+			
+			TrainButton = new JButton("Retrain");
+			this.add(TrainButton);
+			TrainButton.setLocation(180, getHeight() - 30);
+			TrainButton.setSize(new Dimension(100, 30));
+			TrainButton.setVisible(true);
 		}
 		
 		setLayout(null);
@@ -331,9 +331,9 @@ public class VNNPanel extends JComponent implements
 				gg.drawString("Output: " + zoomedPerceptron.getOutput(), corner.x, corner.y);
 				corner.y = corner.y + 2*ROW_DISTANCE;
 			}
-			gg.drawString("Treshold: " + zoomedPerceptron.getWeight(zoomedPerceptron.getWeightLength() - 1), corner.x, corner.y);
+			gg.drawString("Bias: " + zoomedPerceptron.getWeight(zoomedPerceptron.getWeightLength() - 1), corner.x, corner.y);
 			corner.y = corner.y + ROW_DISTANCE;
-			gg.drawString("Weight values: ", corner.x, corner.y);
+			gg.drawString("Weights: ", corner.x, corner.y);
 			corner.y = corner.y + ROW_DISTANCE;
 			for (i = 0; i < (zoomedPerceptron.getWeightLength() - 1); i++) {
 				gg.drawString(i + " : " + zoomedPerceptron.getWeight(i), corner.x, corner.y);
@@ -406,14 +406,14 @@ public class VNNPanel extends JComponent implements
 		/* dodanie przyciskow */
 		if (TrainButton!=null)
 		{
-			TrainButton.setLocation(20, getHeight() - 30);
-			TrainButton.setVisible(true);
+			AddNodes.setLocation(20, getHeight() - 30);
+			AddNodes.setVisible(true);
 		}
 		
 		if (TrainButton!=null)
 		{
-			AddNodes.setLocation(120, getHeight() - 30);
-			AddNodes.setVisible(true);
+			TrainButton.setLocation(180, getHeight() - 30);
+			TrainButton.setVisible(true);
 		}
 		
 		/* inne */

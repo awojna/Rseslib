@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -91,6 +91,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 	private DoubleData hovered;
 	private DoubleData selected;
 	private DoubleData classified;
+    private DoubleData origClassified;
 	
 	public KnnPainter(ArrayList<DoubleData> orig, ArrayList<DoubleData> transformed, Metric m, Random r, Hashtable<Double, Integer> colors, double avg_dist, String legend)
 	{
@@ -124,6 +125,8 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 	
 	private DoubleData findOriginal(DoubleData dat)
 	{
+		if(classified != null && classified == dat)
+			return origClassified;
 		int nr = 0;
         for (DoubleData next : transformedData)
         {
@@ -202,6 +205,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 				jtMax.setText("" + maxcnt);
 				findRandomPlacement(maxcnt);
 				classified = null;
+				origClassified = null;
 	        	repaint();
 	        	startThread();
 			}
@@ -324,7 +328,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 		calcThread.start();
 	}
 
-	public void drawClassify(JPanel canvas, DoubleData obj, Neighbour[] n)
+	public void drawClassify(JPanel canvas, DoubleData obj, DoubleData origObj, Neighbour[] n)
 	{
 		try
 		{
@@ -343,26 +347,8 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
         	   placement.put(n[i].neighbour(), guess);				
 			}
 	    	placement.put(obj, new DPoint(avg));				
-        	int attr = obj.attributes().noOfAttr();
-        	double best = Double.MAX_VALUE;
-        	DoubleData newobj = obj;
-	        for (DoubleData next : placement.keySet())
-	        {
-	        	double dist = 0;
-	        	for (int i=0;i<attr;i++)
-	        	{
-	        		double del = next.get(i) - obj.get(i);
-	        		if (del < 0) del = -del;
-	        		dist += del;
-	        	}
-	        	if (dist < best)
-	        	{
-	        		best = dist;
-	        		newobj = next;
-	        	}
-	        }
-			obj = newobj;
 			classified = obj;
+			origClassified = origObj;
 			selected = obj;
 			repaint();
 
@@ -480,10 +466,11 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     {
     	String info = "<html>";
     	//g.setFont(Font.getFont("Monospaced"));
-    	int w = getWidth()-POINT_SIZE*2;
-    	int h = getHeight()-POINT_SIZE*2;
+    	int psize = (classified == null) ? POINT_SIZE : POINT_SIZE * 2;
+    	int w = getWidth()-psize*2;
+    	int h = getHeight()-psize*2;
     	g.clearRect(0, 0, getWidth(), getHeight());
-    	g.translate(POINT_SIZE, POINT_SIZE);
+    	g.translate(psize, psize);
     	{
     		int dec = -1;
     		for (DoubleData elem1 : placement.keySet())
@@ -499,22 +486,22 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     			if (elem1 == selected)
     			{
     				g.setColor(new Color(0, 0, 0));
-    				g.fillOval(x-POINT_SIZE/2, y-POINT_SIZE/2, POINT_SIZE*2, POINT_SIZE*2);		        		
+    				g.fillOval(x-psize/2, y-psize/2, psize*2, psize*2);		        		
     			}
 
     			g.setColor(new Color(val%256, (val/256)%256, 0));
-    			g.fillOval(x, y, POINT_SIZE, POINT_SIZE);
+    			g.fillOval(x, y, psize, psize);
 
     			if (elem1 == classified)
     			{
-    				g.drawLine(x-POINT_SIZE*2, y+POINT_SIZE/2, x+POINT_SIZE*3, y+POINT_SIZE/2);
-    				g.drawLine(x+POINT_SIZE/2, y-POINT_SIZE*2, x+POINT_SIZE/2, y+POINT_SIZE*3);
+    				g.drawLine(x-psize*2, y+psize/2, x+psize*3, y+psize/2);
+    				g.drawLine(x+psize/2, y-psize*2, x+psize/2, y+psize*3);
     			}
 
     			if (elem1 == hovered)
     			{
     				g.setColor(new Color(0, 0, 0));
-    				g.fillOval(x+1, y+1, POINT_SIZE/2, POINT_SIZE/2);		        		
+    				g.fillOval(x+1, y+1, psize/2, psize/2);		        		
     			}
     		}
     		g.setColor(Color.BLACK);
@@ -539,10 +526,10 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     			double len_met = metric.dist(selected, hovered);
     			double len_vis = p_sel.dist(p_hov);
 
-    			int x1 = (int)((p_sel.x - xmin) / (xmax - xmin) * w)+POINT_SIZE/2; 
-    			int y1 = (int)((p_sel.y - ymin) / (ymax - ymin) * h)+POINT_SIZE/2;
-    			int x2 = (int)((p_hov.x - xmin) / (xmax - xmin) * w)+POINT_SIZE/2; 
-    			int y2 = (int)((p_hov.y - ymin) / (ymax - ymin) * h)+POINT_SIZE/2;
+    			int x1 = (int)((p_sel.x - xmin) / (xmax - xmin) * w)+psize/2; 
+    			int y1 = (int)((p_sel.y - ymin) / (ymax - ymin) * h)+psize/2;
+    			int x2 = (int)((p_hov.x - xmin) / (xmax - xmin) * w)+psize/2; 
+    			int y2 = (int)((p_hov.y - ymin) / (ymax - ymin) * h)+psize/2;
 
     			g.drawLine(x1, y1, x2, y2);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -24,7 +24,6 @@ import rseslib.structure.attribute.NominalAttribute;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.data.DoubleDataWithDecision;
 import rseslib.structure.table.DoubleDataTable;
-import rseslib.system.ConfigurationWithStatistics;
 import rseslib.system.PropertyConfigurationException;
 import rseslib.system.Report;
 import rseslib.system.progress.Progress;
@@ -73,6 +72,6 @@ public class SingleClassifierTest
             prog.step();
         }
         cl.calculateStatistics();
-        return new TestResult(decAttr, testTable.getDecisionDistribution(), confusionMatrix, ((ConfigurationWithStatistics)cl).getStatistics());
+        return new TestResult(decAttr, testTable.getDecisionDistribution(), confusionMatrix, cl.getStatistics());
     }
 }

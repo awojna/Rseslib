@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -226,6 +226,10 @@ public void paint(Graphics g, int x, int y, boolean ifClas) {
 			g.setColor(Color.red);
 		}
 		g.drawLine(position_x, position_y, parent.position_x, parent.position_y);
+		if(m_path != 0) {
+			g.drawLine(position_x - 1, position_y, parent.position_x - 1, parent.position_y);
+			g.drawLine(position_x + 1, position_y, parent.position_x + 1, parent.position_y);
+		}
 	}
 	if (this.isLeaf())
 		g.drawImage(leaf.getImage(), x, y, leaf.getImageObserver());

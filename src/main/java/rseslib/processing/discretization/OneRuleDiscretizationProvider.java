@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -32,7 +32,7 @@ import rseslib.system.PropertyConfigurationException;
  * This class represents Holte's One Rule discretization algorithm that
  * discretize numeric attributes.
  * 
- * @author Marcin Jałmużna
+ * @author Marcin Jalmuzna
  */
 public class OneRuleDiscretizationProvider extends
 		AbstractDiscretizationProvider {

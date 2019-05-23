@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -40,6 +40,7 @@ import weka.core.Utils;
 
 /**
  * Weka wrapper for rough set classifier.
+ * @see rseslib.processing.classification.rules.roughset.RoughSetRuleClassifier
  *
  * @author      Arkadiusz Wojna
  */
@@ -403,7 +404,7 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
 						+ "\t(default: 0.5)",
 						"A", 1, "-A <alpha value>"));
 
-	    result.addElement(new Option("\tEnable missing values in descriptors of rules.",
+	    result.addElement(new Option("\tDisable missing values in descriptors of rules.",
 			      "M", 0, "-M"));
 
 		return result.elements();
@@ -484,7 +485,7 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
 			setAlphaForPartialReducts(Double.parseDouble(tmpStr));
 		}
 
-	    setMissingValueDescriptorsInRules(Utils.getFlag('M', options));
+	    setMissingValueDescriptorsInRules(!Utils.getFlag('M', options));
 
 	    super.setOptions(options);
 	}
@@ -543,7 +544,7 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
 			result.add("" + getAlphaForPartialReducts());
 		}
 
-		if(getMissingValueDescriptorsInRules())
+		if(!getMissingValueDescriptorsInRules())
 			result.add("-M");
 
 		result.addAll(Arrays.asList(super.getOptions())); // superclass

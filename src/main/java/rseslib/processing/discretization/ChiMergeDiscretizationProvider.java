@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -34,7 +34,7 @@ import rseslib.system.PropertyConfigurationException;
  * This class represents an algorithm that uses the chi square statistic to
  * discretize numeric attributes
  * 
- * @author Marcin Jałmużna
+ * @author Marcin Jalmuzna
  */
 public class ChiMergeDiscretizationProvider extends
 		AbstractDiscretizationProvider {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -222,20 +222,6 @@ public class Radial implements DoubleFunction
         return radials;
     }
 
-    /**
-     * algorytm k centroidow z iteracyjnie rosnaco liczba centroidow
-     * dla wybranej klasy decyzyjnej
-     */
-    /**
-     * Algorytm k centroidow z iteracyjnie rosnaco liczba centroidow
-     * dla wybranej klasy decyzyjnej.
-     * Warunkiem zakonczenia algorytmu jest roznica w energii
-     * funkcji pomiedzy ostatnia i przedostatnia iteracja nie wieksza niz 1.
-     *
-     * @param tab Tabela treningowa.
-     * @param dec Klasa decyzyjna.
-     * @return Zbior wyuczonych funkcji odleglosci, jedna dla kazdego centroidu.
-     */
     /**
      *
      * Constructs k radial function

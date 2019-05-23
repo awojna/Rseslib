@@ -6,10 +6,10 @@
 PackageName=Rseslib
 
 # Version (required)
-Version=3.1.2
+Version=3.2.2-SNAPSHOT
 
 #Date
-Date=2017-09-21
+Date=2019-04-15
 
 # Title (required)
 Title=Rough Sets and Analogy-Based Reasoning
@@ -26,15 +26,15 @@ Maintainer=Arkadiusz Wojna <wojna@mimuw.edu.pl>
 License=GPL 3.0
 
 # Description (required)
-Description=The package provides 3 classifiers. Rule classifier based on rough sets uses the concepts of discernibility matrix, reducts and rules generated from reducts. \
-It provides variety of algorithms generating reducts including faster for larger data sets local reducts and has modes to work with incomplete data and inconsistent data. \
-K nearest neighbours classifier provides variety of distance measures that can work also for data with both numeric and nominal attributes and has built-in k optimization. \
-It implements fast neighbours searching algorithm making the classifier work for very large data sets. The classifier has also the mode to work as RIONA algorithm. \
-The third classifier is the extension of k nearest neighbours method that induces local metric for each classified object. \
+Description=The package provides 3 classifiers. The rule classifier RoughSet uses the concepts of discernibility matrix, reducts and rules generated from reducts. \
+It provides variety of algorithms generating reducts including giving more general rules local reducts and has modes to work with incomplete data and inconsistent data. \
+The k nearest neighbors classifier RseslibKnn provides variety of distance measures that can work also for data with both numeric and nominal attributes and has built-in k optimization. \
+It implements a fast neighbors searching algorithm making the classifier work for very large data sets. The classifier has also the mode to work as RIONA algorithm. \
+The third classifier LocalKnn is the extension of the k nearest neighbors method that induces a local metric for each classified object. \
 It is dedicated rather to large data sets (2000+ training instances) and improves accuracy particularly in case of data containing nominal attributes.
 
 # Package URL for obtaining the package archive (required)
-PackageURL=http://rseslib.mimuw.edu.pl/weka/Rseslib3.1.2.zip
+PackageURL=http://rseslib.mimuw.edu.pl/weka/Rseslib3.2.2-SNAPSHOT.zip
 
 # URL for further information
 URL=http://rseslib.mimuw.edu.pl

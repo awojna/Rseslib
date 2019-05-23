@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -41,7 +41,7 @@ import rseslib.system.Report;
  * It uses value distribution in decision classes
  * to estimate value probability. 
  *
- * @author �ukasz Ligowski
+ * @author Lukasz Ligowski
  */
 public class MEstimateNominalDecisionDependentProbability extends Configuration implements DecisionDependentProbability
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -42,7 +42,7 @@ import rseslib.structure.table.DoubleDataTable;
  * This class represents a method of discretizing continuous attributes based on
  * a minimal enthropy heuristic, dynamic version (1993 Fayyad & Irani).
  * 
- * @author Marcin Jałmużna
+ * @author Marcin Jalmuzna
  */
 public class EntropyMinDynamicDiscretizationProvider implements
 		TransformationProvider {

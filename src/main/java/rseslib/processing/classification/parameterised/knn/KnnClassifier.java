@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -54,12 +54,16 @@ import rseslib.system.progress.MultiProgress;
 import rseslib.system.progress.Progress;
 
 /**
- * K nearest neighbours classifier.
- * Consistency checking among nearest neighbours may be used.
- * Two types of vote weighting is possible:
- * uniform and inversely proportional to distance.
+ * K nearest neighbors classifier.
+ * It induces a metric from a training set
+ * and optimizes the attribute weights in this metric
+ * and the number of nearest neighbors used for classification.
+ * Various methods of voting by nearest neighbors can be used to select the decision.
+ * The nearest neighbors can be filtered using rules (RIONA algorithm).
+ * This k-nn implementation uses a metric tree with dual search pruning criterion
+ * to accelerate searching for nearest neighbors.
  *
- * @author      Grzegorz G�ra, Arkadiusz Wojna, Lukasz Ligowski
+ * @author      Arkadiusz Wojna, Grzegorz Gora, Lukasz Ligowski
  */
 public class KnnClassifier extends AbstractParameterisedClassifier implements ClassifierWithDistributedDecision, Serializable
 {
@@ -68,56 +72,60 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
 
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
-    /** Property name for weighting method. */
+    /** Parameter name for the used method weighting the attributes in the metric. */
     public static final String WEIGHTING_METHOD_PROPERTY_NAME = "weightingMethod";
-    /** Name of property indicating whether the classifier uses indexing to accelerate search of nearest neighbours. */
+    /** Name for the switch indicating whether the classifier uses a metric tree to speed up searching for nearest neighbors. */
     public static final String INDEXING_PROPERTY_NAME = "indexing";
-    /** Name of property indicating whether the classifier learns the optimal number k. */
+    /** Name for the switch indicating whether the classifier optimizes automatically the number of neighbors. */
     public static final String LEARN_OPTIMAL_K_PROPERTY_NAME = "learnOptimalK";
-    /** Name of property defining the maximal number of k while learning the optimal value. */
+    /** Name of the parameter defining the maximal number of neighbors while learning the optimal number. */
     public static final String MAXIMAL_K_PROPERTY_NAME = "maxK";
-    /** Parameter name. */
+    /** Parameter name for the number of nearest neighbors. */
     public static final String K_PROPERTY_NAME = "k";
-    /** Name of property indicating whether consistency checking is considered. */
+    /** Name of the switch indicating whether rules are used to filter the nearest neighbors. */
     public static final String FILTER_NEIGHBOURS_PROPERTY_NAME = "filterNeighboursUsingRules";
-    /** Name of property indicating whether neighbour voting is weighted with distance. */
+    /** Parameter name for the method of voting by the nearest neighbors. */
     public static final String VOTING_PROPERTY_NAME = "voting";
 
-    /** Collection of the original training data objects. */  
+    /** Original training data. */  
     ArrayList<DoubleData> m_OriginalData;
-    /** Data transoformer used in the induced metric. */
+    /** Data transformer speeding up distance calculation. */
     AttributeTransformer m_Transformer;
     /** Transformed training data. */
     DoubleDataTable m_TransformedTrainTable;
-    /** The induced metric. */
+    /** Induced metric. */
     Metric m_Metric;
-    /** Provider of vicinity for test data objects. */
+    /** Provider of nearest neighbors. */
     VicinityProvider m_VicinityProvider;
-    /** Filter for neigbours using cubes on objects and consistency. */
+    /** Optional rule filter for nearest neighbors (RIONA algorithm). */
     private CubeBasedNeighboursFilter m_NeighboursFilter;
-    /** Switch to recognize whether searching for optimal k is going on. */
+    /** Switch indicating whether the classified objects come from the training set. */
     private boolean m_bSelfLearning = false;
-    /** Maximal value k in parameterised classification. */
+    /** Maximal number of neighbors while optimizing automatically the number of nearest neighbors. */
     private int m_nMaxK;
     /** Decision attribute. */
     private NominalAttribute m_DecisionAttribute;
-    /** The default decision defined by the largest support in a training data set. */
+    /** The default decision defined by the largest decision class in the training data. */
     private int m_nDefaultDec;
     
     
     /**
-     * Constructor that induces a metric
-     * from a given training set trainTable
-     * and constructs an indexing tree.
-     * It transforms data objects inside the constructor.
+     * Constructor required by rseslib tools.
+     * It induces a metric from a training set
+     * and optimizes the attribute weights in this metric.
+     * Next it builds the metric tree with the training objects
+     * to accelerate searching for nearest neighbors. 
+     * At last it optimizes the number of nearest neighbors used for classification.
      *
-     * @param prop                   Properties of this knn clasifier.
-     * @param trainTable             Table used to build vicinity provider and to learn the optimal value of the classifier parameter.
-     * @param prog                   Progress object to report training progress.
-     * @throws InterruptedException when the user interrupts the execution.
+     * @param prop                   Parameters of this classifier.
+     * @param trainTable             Training data used to induce a metric and to classify test objects.
+     * @param prog                   Progress object for reporting training progress.
+     * @throws PropertyConfigurationException	when the parameters are incorrect or incomplete.
+     * @throws InterruptedException				when a user interrupts execution.
      */
     public KnnClassifier(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
+    	// partition progress into three or two stages: metric induction, metric tree construction and optionally k optimization
         super(prop, K_PROPERTY_NAME);
         // prepare progress information
         int[] progressVolumes = null;
@@ -135,7 +143,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
             progressVolumes[1] = 20;
         }
         prog = new MultiProgress("Learning the k-nn classifier", prog, progressVolumes);
-        // induce a metric and transform training objects for optimization of distance computations 
+        // induce a metric and transform training objects to speed up distance computation
         m_OriginalData =  trainTable.getDataObjects();
         m_Metric = MetricFactory.getMetric(getProperties(), trainTable);
         m_Transformer = m_Metric.transformationOutside();
@@ -146,10 +154,11 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
         	MetricFactory.adjustWeights(getProperty(WEIGHTING_METHOD_PROPERTY_NAME), (AbstractWeightedMetric)m_Metric, m_TransformedTrainTable, prog);
         if(getBoolProperty(INDEXING_PROPERTY_NAME))
         {
-        	// index the training objects
+        	// build the metric tree and index the training objects
         	IndexingTreeNode indexingTree = new TreeIndexer(null).indexing(m_TransformedTrainTable.getDataObjects(), m_Metric, prog);
         	m_VicinityProvider = new IndexingTreeVicinityProvider(null, m_Metric, indexingTree);
         } else {
+        	// use linear search
             prog.set("Constructing simple vicinity provider", 1);
             m_VicinityProvider = new ArrayVicinityProvider(m_Metric, m_TransformedTrainTable.getDataObjects());
             prog.step();
@@ -165,6 +174,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
             	m_nDefaultDec = dec;
         if (getBoolProperty(LEARN_OPTIMAL_K_PROPERTY_NAME))
         {
+        	// optimize the number of nearest neighbors using the leave-one-out method
             m_bSelfLearning = true;
             learnOptimalParameterValue(trainTable, prog);
             m_bSelfLearning = false;
@@ -175,15 +185,14 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
     }
 
     /**
-     * Constructor that builds an indexing tree.
-     * It uses the metric given as the parameter.
-     * It assumes that objects are transformed outside the classifier.
+     * Constructor provided with a prepared metric.
      *
-     * @param prop                   Properties of this knn clasifier.
+     * @param prop                   Parameters of this classifier.
      * @param metric                 Metric used in this classifier.
-     * @param trainTable             Table used to build vicinity provider and to learn the optimal value of the classifier parameter.
-     * @param prog                   Progress object to report training progress.
-     * @throws InterruptedException when the user interrupts the execution.
+     * @param trainTable             Training set used to induce a metric and to classify test objects.
+     * @param prog                   Progress object for reporting training progress.
+     * @throws PropertyConfigurationException	when the parameters are incorrect or incomplete.
+     * @throws InterruptedException				when a user interrupts execution.
      */
     public KnnClassifier(Properties prop, Metric metric, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
@@ -203,13 +212,13 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
     }
 
     /**
-     * Constructor.
-     * It assumes that objects are transformed outside the classifier.
+     * Constructor provided with a provider of nearest neighbors.
      *
-     * @param prop            Map between property names and property values.
-     * @param decAttr         Decision attribute.
-     * @param vicinProv       Provider of vicninities for test data objects.
-     * @param decDistribution Distribution of decision in a training data set.
+     * @param prop            	Parameters of this classifier.
+     * @param decAttr         	Decision attribute.
+     * @param vicinProv       	Provider of nearest neighbors.
+     * @param neighbourFilter	Rule filter for nearest neighbors.
+     * @param decDistribution 	Decision distribution in the training set.
      */
     public KnnClassifier(Properties prop, NominalAttribute decAttr, VicinityProvider vicinProv, CubeBasedNeighboursFilter neighbourFilter, int[] decDistribution) throws PropertyConfigurationException
     {
@@ -246,7 +255,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
     /**
      * Reads this object.
      *
-     * @param out			Output for writing.
+     * @param in			Input for reading.
      * @throws IOException	if an I/O error has occured.
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -289,8 +298,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
     }
 
     /**
-     * Sets the self-learning switch, required to set,
-     * if k optimization is done outside the classifier.
+     * Informs the classifier whether the classified objects come from the training set.
      * 
      * @param selfLearning	The value to be set.
      */
@@ -300,23 +308,23 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
     }
     
     /**
-     * Learn the optimal value of the parameter using cross-validation.
+     * Optimizes the number of nearest neighbors using cross-validation.
      *
-     * @param trainTable Training data table.
-     * @param prog       Progress object for optimal parameter value search.
-     * @return           Optimal value of the parameter.
-     * @throws InterruptedException when the user interrupts the execution.
+     * @param trainTable Training data.
+     * @param prog		 Progress object for reporting progress.
+     * @throws PropertyConfigurationException	when the parameters are incorrect or incomplete.
+     * @throws InterruptedException				when a user interrupts execution.
      */
     protected void learnOptimalParameterValueCV(DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
-        // podzial danych na n czesci
+        // partition the training set into folds
         Collection<DoubleData>[] parts =  trainTable.randomStratifiedPartition(10);
         int[][][] confusionMatrices = null;
         prog.set("Learning optimal parameter value using cross-validation", trainTable.noOfObjects());
         
         for (int cv = 0; cv < parts.length; cv++)
         {
-            // utworzenie tabeli treningowej i testowej
+            // construct the training part and the test part
         	ArrayList<DoubleData> trn = new ArrayList<DoubleData>();
         	ArrayList<DoubleData> tst = new ArrayList<DoubleData>();
             for (int part = 0; part < parts.length; part++)
@@ -332,7 +340,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
             } else
             	vicProv = new ArrayVicinityProvider(m_Metric, trn);
             
-            // klasyfikacja jednego foldu
+            // classify single fold
             for (DoubleData dObj : tst)
             {
             	double[] decisions = classifyWithParameter(dObj, vicProv.getVicinity(dObj, m_nMaxK));
@@ -352,7 +360,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
             }
         }
 
-        // wybór najlepszego k
+        // select the best number of nearest neighbors
         ParameterisedTestResult results = new ParameterisedTestResult(getParameterName(), m_DecisionAttribute, trainTable.getDecisionDistribution(), confusionMatrices, new Properties());
         int bestParamValue = 0;
         for (int parVal = 1; parVal < results.getParameterRange(); parVal++)
@@ -363,13 +371,13 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
     }
 
     /**
-     * Returns a decision distribution vector
-     * for a single test object.
-     * The weight of each decision value is given
-     * at the position of the vector
-     * identifed by the local code of this decision value.
+     * Assigns a decision distribution given a single test object.
+     * The method searches for the nearest neighbors, optionally filters them by rules
+     * and applies the selected method of voting by the neighbors.
+     * The index of each position with a decision weight in the output vector
+     * corresponds to the local code of a decision value.
      *
-     * @param dObj  Test object.
+     * @param dObj  Object to be classified.
      * @return      Assigned decision distribution.
      */
     public double[] classifyWithDistributedDecision(DoubleData dObj) throws PropertyConfigurationException
@@ -411,8 +419,10 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
 
     /**
      * Assigns a decision to a single test object.
+     * The method searches for the nearest neighbors, optionally filters them by rules
+     * and applies the selected method of voting by the neighbors.
      *
-     * @param dObj  Test object.
+     * @param dObj  Object to be classified.
      * @return      Assigned decision.
      */
     public double classify(DoubleData dObj) throws PropertyConfigurationException
@@ -425,10 +435,10 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
     }
 
     /**
-     * Classifies a test object on the basis of nearest neighbours.
+     * Assigns decisions for the range of different numbers of nearest neighbors.
      *
-     * @param dObj         Test object.
-     * @return             Array of assigned decisions, indices correspond to parameter values.
+     * @param dObj         Object to be classified.
+     * @return             Array of assigned decisions, array indices are the numbers of nearest neighbors.
      */
     public double[] classifyWithParameter(DoubleData dObj) throws PropertyConfigurationException
     {
@@ -448,10 +458,12 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
     }
     
     /**
-     * Classifies a test object on the basis of nearest neighbours.
+     * Assigns decisions for the range of different numbers of nearest neighbors
+     * provided the nearest neighbors ordered by the distance to the classified object.
      *
-     * @param dObj         Test object.
-     * @return             Array of assigned decisions, indices correspond to parameter values.
+     * @param dObj         Object to be classified.
+     * @param neighbors	   Nearest neighbors ordered by the distance to the classified object.
+     * @return             Array of assigned decisions, array indices are the numbers of nearest neighbors.
      */
     public double[] classifyWithParameter(DoubleData dObj, Neighbour[] neighbours) throws PropertyConfigurationException
     {

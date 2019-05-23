@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -181,5 +181,12 @@ public class TreeIndexer extends ConfigurationWithStatistics
         addToStatistics("Maximum number of indexing iterations", Double.toString(getMaximumNoOfIterations()));
         addToStatistics("Height of the indexing tree", Double.toString(m_nHeight));
         addToStatistics("Average number of distance comparisions", Double.toString(m_nDistOperCounter));
+    }
+
+    /**
+     * Resets statistics.
+     */
+    public void resetStatistics()
+    {
     }
 }

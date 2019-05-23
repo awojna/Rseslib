@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2017 Logic Group, Institute of Mathematics, Warsaw University
+ * Copyright (C) 2002 - 2019 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -24,7 +24,7 @@ import rseslib.structure.data.DoubleData;
 import rseslib.structure.linearorder.LinearOrder;
 
 /**
- * @author Rafa� Latkowski
+ * @author Rafal Latkowski
  */
 public class AttributeBasedRQSorter implements AttributeBasedSorting
 {
@@ -94,7 +94,7 @@ public class AttributeBasedRQSorter implements AttributeBasedSorting
 		 */
 		public int getLast()
 		{
-			return m_data.length;
+			return m_data.length-1;
 		}
 		
 	}

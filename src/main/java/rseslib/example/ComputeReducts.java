@@ -28,11 +28,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
 
-import rseslib.processing.classification.rules.roughset.RoughSetRuleClassifier;
-import rseslib.processing.discretization.DiscretizationFactory;
+import rseslib.processing.discretization.*;
 import rseslib.processing.discretization.DiscretizationFactory.DiscretizationType;
 import rseslib.processing.reducts.*;
-import rseslib.processing.rules.ReductRuleGenerator;
+import rseslib.processing.reducts.JohnsonReductsProvider.GenerateMethod;
 import rseslib.processing.rules.ReductRuleGenerator.ReductsMethod;
 import rseslib.processing.transformation.TableTransformer;
 import rseslib.processing.transformation.TransformationProvider;
@@ -42,7 +41,6 @@ import rseslib.structure.data.DoubleData;
 import rseslib.structure.table.ArrayListDoubleDataTable;
 import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.Configuration;
-import rseslib.system.PropertyConfigurationException;
 import rseslib.system.Report;
 import rseslib.system.output.StandardErrorOutput;
 import rseslib.system.output.StandardOutput;
@@ -67,29 +65,25 @@ public class ComputeReducts
     public static void main(String[] args) throws Exception
     {
     	// parse the options, print help
-        Properties props = Configuration.loadDefaultProperties(RoughSetRuleClassifier.class);
-    	String discretization = DiscretizationType.MaximalDiscernibilityHeurisitcLocal.name();
+        DiscretizationType discretization = DiscretizationType.MaximalDiscernibilityHeurisitcLocal;
     	ReductsMethod reductsType = ReductsMethod.AllGlobal;
     	int requiredArgs = 1;
     	if (args.length > requiredArgs && args[requiredArgs - 1].equals("-d"))
     	{
-   			discretization = args[requiredArgs];
+    		try
+    		{
+       			discretization = DiscretizationType.valueOf(args[requiredArgs]);
+    		}
+    		catch (IllegalArgumentException e)
+    		{
+        		System.out.println("Unknown discretization: " + args[requiredArgs]);
+        		System.out.println("Use one of:");
+        		for(DiscretizationType discr : DiscretizationType.values())
+        			System.out.println("    " + discr);
+        		System.exit(0);
+    		}
     		requiredArgs += 2;
     	}
-        props.setProperty(DiscretizationFactory.DISCRETIZATION_PROPERTY_NAME, discretization);
-        TransformationProvider discrProv = null;
-        try
-        {
-        	discrProv = DiscretizationFactory.getDiscretizationProvider(props);
-        }
-        catch (PropertyConfigurationException e)
-        {
-    		System.out.println(e.getMessage());
-    		System.out.println("Use one of:");
-    		for(DiscretizationType discr : DiscretizationType.values())
-    			System.out.println("    " + discr);
-    		System.exit(0);
-        }
     	if (args.length > requiredArgs && args[requiredArgs - 1].equals("-r"))
     	{
     		try
@@ -106,7 +100,6 @@ public class ComputeReducts
     		}
     		requiredArgs += 2;
     	}
-		props.setProperty(ReductRuleGenerator.s_sReductsMethod, reductsType.toString());
     	if (args.length != requiredArgs && args.length != requiredArgs + 1)
     	{
     		System.out.println("Program computes reducts from a dataset and writes to a file.");
@@ -140,6 +133,36 @@ public class ComputeReducts
         Report.displaynl(table);
 
         // discretize the table
+        TransformationProvider discrProv = null;
+    	switch (discretization)
+    	{
+    		case None:
+    			break;
+    		case EqualWidth:
+    			discrProv = new RangeDiscretizationProvider(null);
+    			break;
+    		case EqualFrequency:
+    			discrProv = new HistogramDiscretizationProvider(null);
+    			break;
+    		case OneRule:
+    			discrProv = new OneRuleDiscretizationProvider(null);
+    			break;
+    		case EntropyMinimizationStatic:
+    			discrProv = new EntropyMinStaticDiscretizationProvider(null);
+    			break;
+    		case EntropyMinimizationDynamic:
+    			discrProv = new EntropyMinDynamicDiscretizationProvider();
+    			break;
+    		case ChiMerge:
+    			discrProv = new ChiMergeDiscretizationProvider(null);
+    			break;
+    		case MaximalDiscernibilityHeurisitcGlobal:
+    			discrProv = new MDGlobalDiscretizationProvider();
+    			break;
+    		case MaximalDiscernibilityHeurisitcLocal:
+    			discrProv = new MDLocalDiscretizationProvider();
+    			break;
+    	}
         if (discrProv != null)
         {
             Report.display("Discretizing...");
@@ -153,23 +176,28 @@ public class ComputeReducts
         Report.display("Computing reducts...");
         LocalReductsProvider localProv = null;
         GlobalReductsProvider globalProv = null;
+        Properties johnsonProps;
     	switch (reductsType)
     	{
     	case AllLocal:
-    		localProv = new AllLocalReductsProvider(props, table);
+    		localProv = new AllLocalReductsProvider(null, table);
     		break;
     	case AllGlobal:
-    		globalProv = new AllGlobalReductsProvider(props, table);
+    		globalProv = new AllGlobalReductsProvider(null, table);
     		break;
     	case OneJohnson:
+    		globalProv = new JohnsonReductsProvider(null, table);
+    		break;
     	case AllJohnson:
-    		globalProv = new JohnsonReductsProvider(props, table);
+    		johnsonProps = Configuration.loadDefaultProperties(JohnsonReductsProvider.class);
+    		johnsonProps.setProperty(JohnsonReductsProvider.s_sGenerate, GenerateMethod.AllJohnson.name());
+    		globalProv = new JohnsonReductsProvider(johnsonProps, table);
     		break;
     	case PartialLocal:
-    		localProv = new PartialReductsProvider(props, table);
+    		localProv = new PartialReductsProvider(null, table);
     		break;
     	case PartialGlobal:
-    		globalProv = new PartialReductsProvider(props, table);
+    		globalProv = new PartialReductsProvider(null, table);
     		break;
     	}
     	Collection<BitSet> reducts = null;

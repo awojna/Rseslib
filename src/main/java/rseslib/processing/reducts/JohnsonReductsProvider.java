@@ -41,9 +41,9 @@ import rseslib.system.PropertyConfigurationException;
  */
 public class JohnsonReductsProvider extends Configuration implements GlobalReductsProvider {
 
-	private enum GenerateMethod { AllJohnson, OneJohnson; };
+	public enum GenerateMethod { AllJohnson, OneJohnson; };
 
-	private static final String s_sGenerate = "Reducts";
+	public static final String s_sGenerate = "Reducts";
 
     private GenerateMethod m_Generate;
     private DiscernibilityMatrixProvider m_Discernibility;

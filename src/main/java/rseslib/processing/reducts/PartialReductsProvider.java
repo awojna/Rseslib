@@ -25,6 +25,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Properties;
 
+import rseslib.structure.attribute.Header;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.data.DoubleDataWithDecision;
 import rseslib.structure.table.DoubleDataTable;
@@ -41,6 +42,7 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
 	public static final String s_sAlpha = "AlphaForPartialReducts";
 
 	DoubleDataTable TrainTable;
+	Header DataHeader;
 	double alpha;
     protected int NumberOfSubsets = 0;  //num_vars
     protected int NumberOfRows = 0;
@@ -59,13 +61,14 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
     	super(prop);
     	alpha = getDoubleProperty(s_sAlpha);
     	TrainTable = table;
+    	DataHeader = table.attributes();
     }
     
     /**
      * Returns global reduct for data table
      */
     public Collection<BitSet> getReducts() {
-        NumberOfSubsets = TrainTable.attributes().noOfAttr()-1;
+        NumberOfSubsets = DataHeader.noOfAttr();
         PartialCover = new boolean[NumberOfSubsets];   
         NumberOfRows = TrainTable.noOfObjects();
         T = TrainTable.getDataObjects();
@@ -95,7 +98,7 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
      */
     public Collection<BitSet> getSingleObjectReducts(DoubleData object)
     {
-        NumberOfSubsets = TrainTable.attributes().noOfAttr()-1;
+        NumberOfSubsets = DataHeader.noOfAttr();
         PartialCover = new boolean[NumberOfSubsets];   
         NumberOfRows = TrainTable.noOfObjects();
         T = TrainTable.getDataObjects();
@@ -194,11 +197,9 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
     protected boolean pairCovered(int i, int j) {
         boolean result = false;
         for (int c = 0; c < NumberOfSubsets; c++) {
-            if (pairCovered(i, j, c)) {
-                if (PartialCover[c] == true) {
-                    result = true;
-                    break;
-                }
+            if (PartialCover[c] == true && pairCovered(i, j, c)) {
+                result = true;
+                break;
             }
         }
         return result;
@@ -207,7 +208,7 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
     protected boolean differentRows(int i, int j) {
         boolean result = false;
         for (int c = 0; c < NumberOfSubsets; c++) {
-            if (pairCovered(i, j, c)) {
+            if (DataHeader.isConditional(c) && pairCovered(i, j, c)) {
                 result = true;
                 break;
             }
@@ -226,7 +227,7 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
         for (int j = i + 1; j < T.size(); j++) {
             if (differentDecisions(i, j) && !pairCovered(i, j) && differentRows(i, j)) {
                 for (int c = 0; c < NumberOfSubsets; c++) {
-                    if (PartialCover[c] == false) {
+                    if (PartialCover[c] == false && DataHeader.isConditional(c)) {
                         if (pairCovered(i, j, c)) {
                             card[c]++;
                         }

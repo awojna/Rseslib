@@ -35,20 +35,19 @@ import rseslib.system.progress.EmptyProgress;
 import rseslib.system.progress.StdOutProgress;
 
 /**
- * Cross-validation test for a set of classifiers.
- * It is easily convertable to multitest
+ * Cross-validation test of Rseslib classifiers.
+ * It is easily convertible to multitest
  * and cross-validation multitest (see the comments in the main class method).
  *
  * @author      Arkadiusz Wojna
  */
-public class CrossValidationTester
+public class CrossValidation
 {
     /**
-     * The main method creates the subdirectory results/
-     * in the directory with a data file and writes the cross-validation results
-     * to the file with the name corresponding to the data file name.
+     * The main method runs the cross-validation test for Rseslib classifiers
+     * and prints the results to the standard output.
      *
-     * @param args Two arguments: the path to data file and the path to header file.
+     * @param args Two arguments: the number of folds and the path to a data file.
      * @throws Exception when an error occurs.
      */
     public static void main(String[] args) throws Exception
@@ -56,9 +55,9 @@ public class CrossValidationTester
     	// check the number of program arguments and print help
     	if (args.length!=2)
     	{
+    		System.out.println("Program runs n-cross-validation on a dataset.");
     		System.out.println("Usage:");
     		System.out.println("    java ... rseslib.example.CrossValidationTester  <number of folds>  <data file>");
-    		System.out.println("Program runs n-cross-validation on a dataset.");
     		System.exit(0);
     	}
 
@@ -70,22 +69,39 @@ public class CrossValidationTester
         DoubleDataTable table = new ArrayListDoubleDataTable(new File(args[1]), new EmptyProgress());
         Report.displaynl(table);
 
-        // set the cross-validation parameter
-        Properties params = Configuration.loadDefaultProperties(CrossValidationTest.class);
-        params.setProperty(CrossValidationTest.NO_OF_FOLDS_PROPERTY_NAME, args[0]);
+        // define classifiers to be tested
+        // delete the lines with the classifiers not to be tested
+        ClassifierSet classifiers = new ClassifierSet();
+        classifiers.addClassifier("Rough Set", rseslib.processing.classification.rules.roughset.RoughSetRuleClassifier.class);
+        classifiers.addClassifier("KNN", rseslib.processing.classification.parameterised.knn.KnnClassifier.class);
+        classifiers.addClassifier("Local KNN", rseslib.processing.classification.parameterised.knn.LocalKnnClassifier.class);
+        classifiers.addClassifier("C4.5", rseslib.processing.classification.tree.c45.C45.class);
+        classifiers.addClassifier("AQ15", rseslib.processing.classification.rules.AQ15Classifier.class);
+        classifiers.addClassifier("Neural Network", rseslib.processing.classification.neural.NeuronNetwork.class);
+        classifiers.addClassifier("Naive Bayes", rseslib.processing.classification.bayes.NaiveBayesClassifier.class);
+        classifiers.addClassifier("SVM", rseslib.processing.classification.svm.SVM.class);
+        classifiers.addClassifier("PCA", rseslib.processing.classification.parameterised.pca.PcaClassifier.class);
+        classifiers.addClassifier("Local PCA", rseslib.processing.classification.parameterised.pca.LocalPcaClassifier.class);
 
+        // define an exemplary classifier with non-default parameter values
+        Properties nonDefaultParams = Configuration.loadDefaultProperties(rseslib.processing.classification.tree.c45.C45.class);
+        nonDefaultParams.setProperty("pruning", "TRUE");
+        classifiers.addClassifier("C4.5 Pruned", rseslib.processing.classification.tree.c45.C45.class, nonDefaultParams);
+        
         // run cross-validation
-        CrossValidationTest crossValid = new CrossValidationTest(params, new RseslibClassifiers(null).getClassifierSet());
+        Properties cvParams = Configuration.loadDefaultProperties(CrossValidationTest.class);
+        cvParams.setProperty(CrossValidationTest.NO_OF_FOLDS_PROPERTY_NAME, args[0]);
+        CrossValidationTest crossValid = new CrossValidationTest(cvParams, classifiers);
         Map<String,MultipleTestResult> results = crossValid.test(table, new StdOutProgress());
         Report.displaynl();
         Report.displaynl();
 
         // uncomment to run test with multiple random split
-//        MultipleRandomSplitTest multiTst = new MultipleRandomSplitTest(null, new RseslibClassifiers(null).getClassifierSet());
+//        MultipleRandomSplitTest multiTst = new MultipleRandomSplitTest(null, classifiers);
 //        Map<String,MultipleTestResult> results = multiTst.test(table, new StdOutProgress());
 
         // uncomment to run multiple cross-validation
-//        MultipleCrossValidationTest cvMultiTst = new MultipleCrossValidationTest(null, new RseslibClassifiers(null).getClassifierSet());
+//        MultipleCrossValidationTest cvMultiTst = new MultipleCrossValidationTest(null, classifiers);
 //        Map<String,MultipleTestResult> results = cvMultiTst.test(table, new StdOutProgress());
 
         // print the results

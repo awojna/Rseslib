@@ -31,7 +31,6 @@ import java.util.Properties;
 import rseslib.processing.discretization.*;
 import rseslib.processing.discretization.DiscretizationFactory.DiscretizationType;
 import rseslib.processing.reducts.*;
-import rseslib.processing.reducts.JohnsonReductsProvider.GenerateMethod;
 import rseslib.processing.rules.ReductRuleGenerator.ReductsMethod;
 import rseslib.processing.transformation.TableTransformer;
 import rseslib.processing.transformation.TransformationProvider;
@@ -190,7 +189,7 @@ public class ComputeReducts
     		break;
     	case AllJohnson:
     		johnsonProps = Configuration.loadDefaultProperties(JohnsonReductsProvider.class);
-    		johnsonProps.setProperty(JohnsonReductsProvider.s_sGenerate, GenerateMethod.AllJohnson.name());
+    		johnsonProps.setProperty("Reducts", "AllJohnson");
     		globalProv = new JohnsonReductsProvider(johnsonProps, table);
     		break;
     	case PartialLocal:

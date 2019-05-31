@@ -283,7 +283,6 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
     public String toString()
     {
         StringBuffer sb = new StringBuffer();
-        sb.append('\n');
         if (m_bPresenceOfDescriptor!=null)
         {
             boolean notfirst = false;

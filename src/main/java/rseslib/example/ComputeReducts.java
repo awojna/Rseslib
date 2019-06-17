@@ -64,7 +64,7 @@ public class ComputeReducts
     public static void main(String[] args) throws Exception
     {
     	// parse the options, print help
-        DiscretizationType discretization = DiscretizationType.MaximalDiscernibilityHeurisitcLocal;
+        DiscretizationType discretization = DiscretizationType.MaximalDiscernibilityHeuristicLocal;
     	ReductsMethod reductsType = ReductsMethod.AllGlobal;
     	int requiredArgs = 1;
     	if (args.length > requiredArgs && args[requiredArgs - 1].equals("-d"))
@@ -155,10 +155,10 @@ public class ComputeReducts
     		case ChiMerge:
     			discrProv = new ChiMergeDiscretizationProvider(null);
     			break;
-    		case MaximalDiscernibilityHeurisitcGlobal:
+    		case MaximalDiscernibilityHeuristicGlobal:
     			discrProv = new MDGlobalDiscretizationProvider();
     			break;
-    		case MaximalDiscernibilityHeurisitcLocal:
+    		case MaximalDiscernibilityHeuristicLocal:
     			discrProv = new MDLocalDiscretizationProvider();
     			break;
     	}

@@ -54,8 +54,8 @@ public class DiscretizationFactory
 		EntropyMinimizationStatic(EntropyMinStaticDiscretizationProvider.class),
 		EntropyMinimizationDynamic(null),
 		ChiMerge(ChiMergeDiscretizationProvider.class),
-		MaximalDiscernibilityHeurisitcGlobal(null),
-		MaximalDiscernibilityHeurisitcLocal(null);
+		MaximalDiscernibilityHeuristicGlobal(null),
+		MaximalDiscernibilityHeuristicLocal(null);
 
 	    /** The class of this discretization type. */
 		private final Class classobj;
@@ -108,9 +108,9 @@ public class DiscretizationFactory
     			prop.setProperty(ChiMergeDiscretizationProvider.CONFIDENCE_LEVEL_PROPERTY_NAME, discrProperties.getProperty(CONFIDENCE_LEVEL_PROPERTY_NAME));
     			prop.setProperty(ChiMergeDiscretizationProvider.MIN_INTERVALS_PROPERTY_NAME, discrProperties.getProperty(MIN_INTERVALS_PROPERTY_NAME));
     			return new ChiMergeDiscretizationProvider(prop);
-    		case MaximalDiscernibilityHeurisitcGlobal:
+    		case MaximalDiscernibilityHeuristicGlobal:
     			return new MDGlobalDiscretizationProvider();
-    		case MaximalDiscernibilityHeurisitcLocal:
+    		case MaximalDiscernibilityHeuristicLocal:
     			return new MDLocalDiscretizationProvider();
     	}
     	return null;

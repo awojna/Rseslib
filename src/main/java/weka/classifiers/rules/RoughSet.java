@@ -58,8 +58,8 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
 			new Tag(DiscretizationFactory.DiscretizationType.EntropyMinimizationStatic.ordinal(), DiscretizationFactory.DiscretizationType.EntropyMinimizationStatic.name()),
 			new Tag(DiscretizationFactory.DiscretizationType.EntropyMinimizationDynamic.ordinal(), DiscretizationFactory.DiscretizationType.EntropyMinimizationDynamic.name()),
 			new Tag(DiscretizationFactory.DiscretizationType.ChiMerge.ordinal(), DiscretizationFactory.DiscretizationType.ChiMerge.name()),
-			new Tag(DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeurisitcGlobal.ordinal(), DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeurisitcGlobal.name()),
-			new Tag(DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeurisitcLocal.ordinal(), DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeurisitcLocal.name()),
+			new Tag(DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeuristicGlobal.ordinal(), DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeuristicGlobal.name()),
+			new Tag(DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeuristicLocal.ordinal(), DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeuristicLocal.name()),
 	};
 
 	/** Tags for 'Reducts' option */
@@ -360,7 +360,7 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
 		result.addElement(new Option(
 				"\tDiscretization method:\n"
 						+ enumarateDiscretizationToString()
-						+ "\t(default: "+DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeurisitcLocal.ordinal()+"="+DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeurisitcLocal.name()+")",
+						+ "\t(default: "+DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeuristicLocal.ordinal()+"="+DiscretizationFactory.DiscretizationType.MaximalDiscernibilityHeuristicLocal.name()+")",
 						"D", 1, "-D"));
 		
 		result.addElement(new Option(

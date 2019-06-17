@@ -65,7 +65,7 @@ public class ComputeRules
     public static void main(String[] args) throws Exception
     {
     	// parse the options, print help
-        DiscretizationType discretization = DiscretizationType.MaximalDiscernibilityHeurisitcLocal;
+        DiscretizationType discretization = DiscretizationType.MaximalDiscernibilityHeuristicLocal;
     	ReductsMethod reductsType = ReductsMethod.AllGlobal;
     	boolean aq15 = false, accurate = false;
     	int requiredArgs = 1;
@@ -178,10 +178,10 @@ public class ComputeRules
     		case ChiMerge:
     			discrProv = new ChiMergeDiscretizationProvider(null);
     			break;
-    		case MaximalDiscernibilityHeurisitcGlobal:
+    		case MaximalDiscernibilityHeuristicGlobal:
     			discrProv = new MDGlobalDiscretizationProvider();
     			break;
-    		case MaximalDiscernibilityHeurisitcLocal:
+    		case MaximalDiscernibilityHeuristicLocal:
     			discrProv = new MDLocalDiscretizationProvider();
     			break;
     	}

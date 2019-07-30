@@ -45,7 +45,7 @@ public class QAboutDialog extends JDialog implements ActionListener {
   private BorderLayout borderLayout2 = new BorderLayout();
   private FlowLayout flowLayout1 = new FlowLayout();
   private GridLayout gridLayout1 = new GridLayout();
-  private String product = "Qmak 3.2.2";
+  private String product = "Qmak 3.2.3-SNAPSHOT";
   private String copyright = "Copyright (C) 2005 - 2019";
   private TitledBorder titledBorder2;
   JPanel panelAuthors = new JPanel();

@@ -31,8 +31,8 @@ import rseslib.structure.data.DoubleData;
 import rseslib.structure.indiscernibility.Indiscernibility;
 
 /**
- * A rule in the form of equality descriptors conjuction.
- * It enables to define different modes of missing values indiscernibility.
+ * A rule in the form of conjuction of equality descriptors.
+ * It enables to define different modes of indiscernibility of missing values.
  * 
  * @author Rafal Latkowski
  */
@@ -41,31 +41,31 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
 	/** Serialization version. */
 	private static final long serialVersionUID = 1L;
 	
-	/** Rule header. */
+	/** Data header. */
     Header m_Header;
-	/** Mask of attributes that have descriptors in this rule. */
+	/** Mask of the attributes having descriptors in this rule. */
     boolean[] m_bPresenceOfDescriptor = null;
-    /** Attribute values in the rule descriptors. */ 
+    /** Attribute values in the descriptors, valid only for the indexes i such that m_bPresenceOfDescriptor[i] == true. */ 
     double[] m_nValueOfDescriptor = null;
-    /** Indiscernibility relation between attribute values. */
+    /** Indiscernibility mode for missing values. */
     Indiscernibility m_indiscernibility = null;
     /** Number of descriptors in this rule. */
     int m_nRuleLength;
     
     /**
-     * Constructor.
+     * Constructor of a rule with descriptors for a given subset of attributes.
      * 
-     * @param reduct	Reduct defining attributes to be used in descriptors.
-     * @param object	Objects providing attribute values in descriptors.
+     * @param mask		Mask of the attributes defining descriptors.
+     * @param object	Object providing attribute values in the descriptors.
      */
-    public EqualityDescriptorsRule(BitSet reduct, DoubleData object)
+    public EqualityDescriptorsRule(BitSet mask, DoubleData object)
     {
         m_Header = object.attributes();
         m_bPresenceOfDescriptor = new boolean[m_Header.noOfAttr()];
         m_nValueOfDescriptor = new double[m_Header.noOfAttr()];
         m_nRuleLength=0;
         for (int i=0; i<m_Header.noOfAttr(); i++)
-        	if (m_Header.isConditional(i) && reduct.get(i))
+        	if (m_Header.isConditional(i) && mask.get(i))
         	{
         		m_bPresenceOfDescriptor[i]=true;
         		m_nValueOfDescriptor[i]=object.get(i);
@@ -76,15 +76,16 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
     }
 
     /**
-     * Constructor.
+     * Constructor of a rule with descriptors for a given subset of attributes
+     * provided with an indiscernibility relation.
      * 
-     * @param reduct			Reduct defining attributes to be used in descriptors.
-     * @param object			Objects providing attribute values in descriptors.
+     * @param mask				Mask of the attributes defining descriptors.
+     * @param object			Object providing attribute values in the descriptors.
      * @param indiscernibility	Indiscernibility mode for missing values.
      */
-    public EqualityDescriptorsRule(BitSet reduct, DoubleData object, Indiscernibility indiscernibility)
+    public EqualityDescriptorsRule(BitSet mask, DoubleData object, Indiscernibility indiscernibility)
     {
-    	this(reduct, object);
+    	this(mask, object);
         m_indiscernibility = indiscernibility;
     }
 
@@ -92,7 +93,7 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
      * Writes this object.
      *
      * @param out			Output for writing.
-     * @throws IOException	if an I/O error has occured.
+     * @throws IOException	if an I/O error has occurred.
      */
     private void writeObject(ObjectOutputStream out) throws IOException
     {
@@ -113,7 +114,7 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
      * Reads this object.
      *
      * @param out			Output for writing.
-     * @throws IOException	if an I/O error has occured.
+     * @throws IOException	if an I/O error has occurred.
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
@@ -136,8 +137,8 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
     /**
      * Checks whether this rule matches a given data object.
      *
-     * @param dObj Double data to be matched.
-     * @return     True if this rule matches to a data object, false otherwise.
+     * @param dObj Object to be checked.
+     * @return     True if this rule matches the object, false otherwise.
      * @see rseslib.structure.rule.AbstractDistrDecRuleWithStatistics#matches(rseslib.structure.data.DoubleData)
      */
     public boolean matches(DoubleData dObj)
@@ -161,12 +162,12 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
     }
 
     /**
-     * Defines how this rule and a given object match.
+     * Returns the degree of matching an object by this rule.
      *
-     * @param dObj Double data to be matched.
+     * @param dObj Object to be matched.
      * @return     The value between 0 and 1.
      *             The values near 1 means that
-     *             the object dObj matches this rule quite well.
+     *             the object dObj is matched by this rule quite well.
      * @see rseslib.structure.rule.PartialMatchingRule#matchesPartial(rseslib.structure.data.DoubleData)
      */
     public double matchesPartial(DoubleData dObj)
@@ -204,7 +205,7 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
     }
 
     /**
-     * Return true if this rule contains a descriptor for a given attribute.
+     * Checks whether this rule contains a descriptor for a given attribute.
      * 
      * @param i		Attribute index.
      * @return		True if this rule contains a descriptor for the attribute i
@@ -230,7 +231,7 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
     }
 
     /**
-     * True if this rule contains a descriptor with the missing value.
+     * Checks whether this rule contains a descriptor with the missing value.
      * 
      * @return	True if this rule contains a descriptor with the missing value
      * 			false otherwise.
@@ -244,11 +245,10 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
     }
 
     /**
-     * Returns true if parameter object is an equivalent simple decision rule.
-     * Warning: only descriptor presence and values are compared. Other parts
-     * remain unchecked.
+     * Checks whether a given object is a rule equivalent to this rule.
+     * Warning: only descriptor attributes and values are compared. Other parts remain unchecked.
      * 
-     * @return true if parameter object is an equivalent simple decision rule
+     * @return True if the object o is a rule equivalent to this rule.
      */
     public boolean equals(Object o)
     {
@@ -265,9 +265,9 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
     }
 
     /**
-     * Returns hash code based on array of descriptor values
+     * Returns hash code based on array of descriptor values.
      * 
-     * @return hash code based on array of descriptor values
+     * @return hash code based on array of descriptor values.
      * @see java.util.Arrays#hashCode(double[])
      */
     public int hashCode()
@@ -312,9 +312,6 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
                 if (notfirst) sb.append(", ");
                 else notfirst=true;
                 sb.append(NominalAttribute.stringValue(m_DecAttr.globalValueCode(i)));
-           /*     sb.append('[');
-                sb.append(m_DecisionVector.get(i));
-                sb.append(']');*/
             }
             sb.append(" } )");
         }

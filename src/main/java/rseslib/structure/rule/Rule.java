@@ -32,8 +32,8 @@ public interface Rule
     /**
      * Checks whether this rule matches a given data object.
      *
-     * @param dObj Double data to be matched.
-     * @return     True if this rule matches to a data object, false otherwise.
+     * @param dObj Object to be checked.
+     * @return     True if this rule matches the object, false otherwise.
      */
     public abstract boolean matches(DoubleData dObj);
     

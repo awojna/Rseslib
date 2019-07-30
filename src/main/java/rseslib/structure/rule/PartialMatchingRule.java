@@ -30,12 +30,12 @@ import rseslib.structure.data.DoubleData;
 public interface PartialMatchingRule
 {
     /**
-     * Defines how this rule and a given object match.
+     * Returns the degree of matching an object by this rule.
      *
-     * @param dObj Double data to be matched.
+     * @param dObj Object to be matched.
      * @return     The value between 0 and 1.
      *             The values near 1 means that
-     *             the object dObj matches this rule quite well.
+     *             the object dObj is matched by this rule quite well.
      */
     public abstract double matchesPartial(DoubleData dObj);
 }

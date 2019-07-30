@@ -48,8 +48,11 @@ import rseslib.system.progress.EmptyProgress;
 /**
  * This program computes reducts for a given data table
  * and writes them to a file.
+ * 
  * Usage:
  *     java ... rseslib.example.ComputeReducts [-d <discretization>] [-r <reducts>] <data file> [<output file>]
+ * 
+ * Run the class without arguments to see possible values of the program options.
  *
  * @author      Arkadiusz Wojna
  */
@@ -101,7 +104,7 @@ public class ComputeReducts
     	}
     	if (args.length != requiredArgs && args.length != requiredArgs + 1)
     	{
-    		System.out.println("Program computes reducts from a dataset and writes to a file.");
+    		System.out.println("Program computes reducts from a dataset and writes them to a file.");
     		System.out.println("Usage:");
     		System.out.println("    java ... rseslib.example.ComputeReducts [-d <discretization>] [-r <reducts>] <data file> [<output file>]");
     		System.out.print("Discretizations: ");

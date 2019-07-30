@@ -48,9 +48,12 @@ import rseslib.system.progress.StdOutProgress;
 
 /**
  * This program computes rules for a given data table and writes them to a file.
- * The possible rule types are reduct, AQ15 or accurate rules. 
+ * The possible rule types are reduct, AQ15 or accurate rules.
+ *  
  * Usage:
  *     java ... rseslib.example.ComputeRules [-d <discretization>] [-r <rules>] <data file> [<output file>]
+ * 
+ * Run the class without arguments to see possible values of the program options.
  *
  * @author      Arkadiusz Wojna
  */
@@ -122,7 +125,7 @@ public class ComputeRules
     	}
     	if (args.length != requiredArgs && args.length != requiredArgs + 1)
     	{
-    		System.out.println("Program computes rules from a dataset and writes to a file.");
+    		System.out.println("Program computes rules from a dataset and writes them to a file.");
     		System.out.println("Usage:");
     		System.out.println("    java ... rseslib.example.ComputeRules [-d <discretization>] [-r <rules>] <data file> [<output file>]");
     		System.out.print("Discretizations: ");

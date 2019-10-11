@@ -32,6 +32,7 @@ import weka.core.Capabilities.Capability;
 import weka.core.Instance;
 import rseslib.processing.classification.Classifier;
 import rseslib.processing.classification.ClassifierFactory;
+import rseslib.processing.classification.ClassifierWithDistributedDecision;
 import rseslib.structure.attribute.NominalAttribute;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.data.formats.ArffDoubleDataInput;
@@ -166,6 +167,26 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
         }
     }
 
+    /**
+     * Classifies an instance.
+     *
+     * @param instance the instance to classify
+     * @return the class distribution for the instance
+     * @throws Exception if instance can't be classified successfully
+     */
+	public double[] distributionForInstance(Instance instance) throws Exception
+	{
+    	DoubleData dObj = m_WekaInstancesConverter.convertToDoubleData(instance);
+		double[] decDistr = ((ClassifierWithDistributedDecision)getRseslibClassifier()).classifyWithDistributedDecision(dObj);
+		double sum = 0.0;
+		for(int dec = 0; dec < decDistr.length; ++dec)
+			sum += decDistr[dec];
+		if(sum > 0)
+			for(int dec = 0; dec < decDistr.length; ++dec)
+				decDistr[dec] /= sum;
+		return decDistr;
+	}
+	
     /**
      * Classifies an instance.
      *

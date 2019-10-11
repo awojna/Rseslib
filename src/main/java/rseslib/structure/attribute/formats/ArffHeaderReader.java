@@ -98,8 +98,12 @@ public class ArffHeaderReader implements HeaderReader
             {
                 if (attr!=arffTab.classIndex())
                     m_arrAttributes[attr] = new NominalAttribute(Attribute.Type.conditional, arffTab.attribute(attr).name());
-                else
+                else {
+                	weka.core.Attribute wekaDec = arffTab.attribute(attr);
                     m_arrAttributes[attr] = new NominalAttribute(Attribute.Type.decision, arffTab.attribute(attr).name());
+                    for(int val = 0; val < wekaDec.numValues(); ++val)
+                    	((NominalAttribute)m_arrAttributes[attr]).globalValueCode(wekaDec.value(val));
+                }
             }
             else if (arffTab.attribute(attr).isNumeric())
                     m_arrAttributes[attr] = new NumericAttribute(Attribute.Type.conditional, arffTab.attribute(attr).name());

@@ -35,6 +35,7 @@ import rseslib.structure.attribute.NominalAttribute;
 import rseslib.structure.data.*;
 import rseslib.structure.rule.*;
 import rseslib.processing.classification.Classifier;
+import rseslib.processing.classification.ClassifierWithDistributedDecision;
 import rseslib.processing.discretization.DiscretizationFactory;
 import rseslib.processing.rules.ReductRuleGenerator;
 import rseslib.processing.transformation.TableTransformer;
@@ -51,7 +52,7 @@ import rseslib.processing.transformation.Transformer;
  * 
  * @author Rafal Latkowski
  */
-public class RoughSetRuleClassifier extends ConfigurationWithStatistics implements Classifier, Serializable
+public class RoughSetRuleClassifier extends ConfigurationWithStatistics implements Classifier, ClassifierWithDistributedDecision, Serializable
 {
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
@@ -126,6 +127,28 @@ public class RoughSetRuleClassifier extends ConfigurationWithStatistics implemen
     }
 
     /**
+     * Assigns a decision distribution to a single test object.
+     * The method sums the supports of all rules matching the object for each decision class
+     * and assigns the decision with the greatest sum.
+     *
+     * @param object  Test object to be classified.
+     * @return        Decision assigned.
+     */
+    public double[] classifyWithDistributedDecision(DoubleData object)
+    {
+    	if (m_cDiscretizer != null)
+    		object = m_cDiscretizer.transformToNew(object);
+        Vector dv = new Vector(m_DecAttr.noOfValues());
+        for (Rule rule : m_cDecisionRules)
+            if (rule.matches(object)) 
+                dv.add(((DistributedDecisionRule)rule).getDecisionVector()); 
+        double[] result = new double[dv.dimension()];
+       	for (int i=0; i<dv.dimension(); i++)
+       		result[i] = dv.get(i);
+       	return result;
+    }
+    
+    /**
      * Assigns a decision to a single test object.
      * The method sums the supports of all rules matching the object for each decision class
      * and assigns the decision with the greatest sum.
@@ -135,25 +158,13 @@ public class RoughSetRuleClassifier extends ConfigurationWithStatistics implemen
      */
     public double classify(DoubleData object)
     {
-    	if (m_cDiscretizer != null)
-    		object = m_cDiscretizer.transformToNew(object);
-        Vector dv = new Vector(m_DecAttr.noOfValues());
-        int rules=0;
-        for (Rule rule : m_cDecisionRules)
-            if (rule.matches(object)) 
-            { 
-                dv.add(((DistributedDecisionRule)rule).getDecisionVector()); 
-                rules++; 
-            }
-        if (rules==0) return Double.NaN;
+       	double[] decDistr = classifyWithDistributedDecision(object);
        	int best = 0;
-       	for (int i=1;i<dv.dimension();i++)
-       	{
-       		if (dv.get(i)>dv.get(best)) 
+       	for (int i=1; i<decDistr.length; i++)
+       		if (decDistr[i] > decDistr[best]) 
                 best=i;
-       	}
-       	double result=m_DecAttr.globalValueCode(best);
-        return result;
+       	if (decDistr[best] == 0.0) return Double.NaN;
+       	return m_DecAttr.globalValueCode(best);
     }
     
     /**

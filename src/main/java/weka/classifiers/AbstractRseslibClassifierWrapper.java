@@ -20,6 +20,7 @@
 
 package weka.classifiers;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -154,17 +155,27 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
         	prog = new StdOutProgress();
         else
         	prog = new EmptyProgress();
-        m_RseslibClassifier = ClassifierFactory.createClassifier(m_ClassifierClass, m_Options, rseslib_tab, prog);
-    	m_RseslibClassifier.calculateStatistics();
-        if (getDebug())
-        {
-        	Properties stats = m_RseslibClassifier.getStatistics();
-        	if (!stats.isEmpty())
-        	{
-        		System.out.println(stats);
-        		System.out.println();
-        	}
-        }
+		try
+		{
+			m_RseslibClassifier = ClassifierFactory.createClassifier(m_ClassifierClass, m_Options, rseslib_tab, prog);
+		}
+		catch (InvocationTargetException e)
+		{
+			Throwable cause = e.getCause();
+			if(cause instanceof Error)
+				throw (Error)cause;
+			throw (Exception)e.getCause();
+		}
+		m_RseslibClassifier.calculateStatistics();
+		if (getDebug())
+		{
+			Properties stats = m_RseslibClassifier.getStatistics();
+			if (!stats.isEmpty())
+			{
+				System.out.println(stats);
+				System.out.println();
+			}
+		}
     }
 
     /**

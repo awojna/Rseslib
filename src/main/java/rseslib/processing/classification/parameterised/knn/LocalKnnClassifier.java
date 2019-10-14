@@ -85,7 +85,7 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
 
     /** Collection of the original training data objects. */  
     private Collection<DoubleData> m_OriginalData;
-    /** Data transoformer used in the induced metric. */
+    /** Data transformer used in the induced metric. */
     private AttributeTransformer m_Transformer;
     /** The induced metric. */
     private Metric m_Metric;
@@ -97,7 +97,9 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
     private int m_nLocalSetSize;
     /** Properties of a local metric. */
     Properties m_LocalMetricProperties = new Properties();
-    /** Distances in the global metric to be restored at neighbours. */
+    /** The set of objects use to induce local metric. */
+    Neighbour[] m_Neighbours;
+    /** Distances in the global metric to be restored in m_Neighbours after classification. */
     double[] m_DistancesToRestore;
     /** Decision attribute. */
     NominalAttribute m_DecisionAttribute;
@@ -105,12 +107,6 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
     int m_nDefaultDec;
     /** Empty progress object. */
     Progress m_EmptyProgress = new EmptyProgress();
-    /** The minimal number of weighting iterations over all tested objects. */
-    //private int m_nMinNoOfIterations = -1;
-    /** The sum of weighting iterations over all tested objects. */
-    //private int m_nSumOfIterations = 0;
-    /** The number of tested objects. */
-    //private int m_nNoOfTestObjects = 0;
 
     /**
      * Constructor that induces a metric
@@ -275,14 +271,16 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
     }
     
     /**
-     * Classifies a test object on the basis of nearest neighbours.
-     * If an object with memory is provided, this classifier assumes
+     * Returns the nearest neighbours of a given test object sorted by the distance in the local metric.
+     * If an object with memory is provided, this method assumes
      * that the original values are saved in the store 0.
+     * The method requires to restore the distances from m_DistancesToRestore
+     * in m_Neighbours after each call.
      *
-     * @param dObj         Test object.
-     * @return             Array of assigned decisions, indices correspond to parameter values.
+     * @param dObj  Object to be classified.
+     * @return      Nearest neighbours sorted by the distance in the local metric.
      */
-    public double[] classifyWithParameter(DoubleData dObj) throws PropertyConfigurationException
+    private Neighbour[] getNeighboursSortedByLocalDistance(DoubleData dObj) throws PropertyConfigurationException
     {
     	// convert dObj to an object with memory and transform
     	DoubleDataObjectWithMemory dObjMem;
@@ -298,22 +296,21 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
         }
 		if (m_Transformer!=null) m_Transformer.transform(dObjMem);
     	// extract the local set
-        Neighbour[] neighbours = null;
         if (m_bSelfLearning)
         {
             Neighbour[] neighboursOneMore = m_VicinityProvider.getVicinity(dObjMem, m_nLocalSetSize+1);
-            neighbours = new Neighbour[neighboursOneMore.length-1];
+            m_Neighbours = new Neighbour[neighboursOneMore.length-1];
             int i = 1;
-            for (; i < neighbours.length && !dObjMem.equals(neighboursOneMore[i].neighbour()); i++)
-            	neighbours[i] = neighboursOneMore[i];
-           	for (; i < neighbours.length; i++) neighbours[i] = neighboursOneMore[i+1];
+            for (; i < m_Neighbours.length && !dObjMem.equals(neighboursOneMore[i].neighbour()); i++)
+            	m_Neighbours[i] = neighboursOneMore[i];
+           	for (; i < m_Neighbours.length; i++) m_Neighbours[i] = neighboursOneMore[i+1];
         }
-        else neighbours = m_VicinityProvider.getVicinity(dObjMem, m_nLocalSetSize);
+        else m_Neighbours = m_VicinityProvider.getVicinity(dObjMem, m_nLocalSetSize);
         // induce a local metric
-        DoubleData[] dataObjects = new DoubleData[neighbours.length-1];
-        for (int n = 1; n < neighbours.length; n++)
+        DoubleData[] dataObjects = new DoubleData[m_Neighbours.length-1];
+        for (int n = 1; n < m_Neighbours.length; n++)
         {
-            dataObjects[n-1] = neighbours[n].neighbour();
+            dataObjects[n-1] = m_Neighbours[n].neighbour();
             ((DoubleDataObjectWithMemory)dataObjects[n-1]).restoreSavedValues(0);
         }
         DoubleDataTable localTab = new ArrayListDoubleDataTable(dataObjects);
@@ -327,29 +324,39 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
         		MetricFactory.adjustWeights(MetricFactory.Weighting.DistanceBased.name(), (AbstractWeightedMetric)localMetr, localTab, m_EmptyProgress);
         }
         catch (InterruptedException e) { }
-        /*if (m_nMinNoOfIterations==-1 || ((WeightedMetric)localMetr).getNoOfWeightingIterations() < m_nMinNoOfIterations)
-        	m_nMinNoOfIterations = ((WeightedMetric)localMetr).getNoOfWeightingIterations();
-        m_nSumOfIterations += ((WeightedMetric)localMetr).getNoOfWeightingIterations();
-        m_nNoOfTestObjects++;*/
         // computes the distances according to the local metric 
         dObjMem.restoreSavedValues(0);
         trans.transform(dObjMem);
-        Neighbour[] shiftedNeighbours = new Neighbour[neighbours.length-1];
+        Neighbour[] shiftedNeighbours = new Neighbour[m_Neighbours.length-1];
         if (m_DistancesToRestore==null || m_DistancesToRestore.length < shiftedNeighbours.length)
         	m_DistancesToRestore = new double[shiftedNeighbours.length];
-        for (int n = 1; n < neighbours.length; n++)
+        for (int n = 1; n < m_Neighbours.length; n++)
         {
-        	m_DistancesToRestore[n-1] = neighbours[n].dist(); 
-        	shiftedNeighbours[n-1] = neighbours[n];
+        	m_DistancesToRestore[n-1] = m_Neighbours[n].dist(); 
+        	shiftedNeighbours[n-1] = m_Neighbours[n];
         	shiftedNeighbours[n-1].setDist(localMetr.dist(dObjMem, shiftedNeighbours[n-1].neighbour()));
         }
         // sort the objects according to the distances in the local metric
         Arrays.sort(shiftedNeighbours);
-        // classify
+        // restore the object values for the global metric
+        for (int obj = 0; obj < dataObjects.length; obj++)
+        	((DoubleDataObjectWithMemory)dataObjects[obj]).restoreSavedValues(1);
+    	if (dObj instanceof DoubleDataObjectWithMemory) dObjMem.restoreSavedValues(1);
+        return shiftedNeighbours;
+    }
+    
+    /**
+     * Classifies a test object on the basis of nearest neighbours.
+     * If an object with memory is provided, this classifier assumes
+     * that the original values are saved in the store 0.
+     *
+     * @param dObj         Test object.
+     * @return             Array of assigned decisions, indices correspond to parameter values.
+     */
+    public double[] classifyWithParameter(DoubleData dObj) throws PropertyConfigurationException
+    {
+    	Neighbour[] shiftedNeighbours = getNeighboursSortedByLocalDistance(dObj);
         double[] decisions = new double[m_nLocalSetSize+1];
-        double[] decDistr = new double[m_DecisionAttribute.noOfValues()];
-        int bestDec = m_nDefaultDec;
-        decisions[0] = m_DecisionAttribute.globalValueCode(bestDec);
         Voting votingType;
         try
         {
@@ -359,6 +366,9 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
         {
         	throw new PropertyConfigurationException("Unknown voting method: "+getProperty(VOTING_PROPERTY_NAME));
         }
+        int bestDec = m_nDefaultDec;
+        decisions[0] = m_DecisionAttribute.globalValueCode(bestDec);
+        double[] decDistr = new double[m_DecisionAttribute.noOfValues()];
         int firstNotSet = 1;
         for (int n = 0; n < shiftedNeighbours.length; n++)
         {
@@ -392,11 +402,9 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
         for (int i = firstNotSet; i < decisions.length; i++)
 			decisions[i] = m_DecisionAttribute.globalValueCode(bestDec);
         // restore the object values and distances for the global metric
-        for (int n = 1; n < neighbours.length; n++)
-        	neighbours[n].setDist(m_DistancesToRestore[n-1]); 
-        for (int obj = 0; obj < dataObjects.length; obj++)
-        	((DoubleDataObjectWithMemory)dataObjects[obj]).restoreSavedValues(1);
-    	if (dObj instanceof DoubleDataObjectWithMemory) dObjMem.restoreSavedValues(1);
+        for (int n = 1; n < m_Neighbours.length; n++)
+        	m_Neighbours[n].setDist(m_DistancesToRestore[n-1]);
+        m_Neighbours = null;
         return decisions;
     }
 
@@ -410,64 +418,7 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
      */
     public double[] classifyWithDistributedDecision(DoubleData dObj) throws PropertyConfigurationException
     {
-    	// convert dObj to an object with memory and transform
-    	DoubleDataObjectWithMemory dObjMem;
-    	if (dObj instanceof DoubleDataObjectWithMemory)
-    	{
-    		dObjMem = (DoubleDataObjectWithMemory)dObj;
-    		dObjMem.saveValues(1);
-    	}
-    	else
-    	{
-   			dObjMem = new DoubleDataObjectWithMemory(dObj); 
-   			dObjMem.saveValues(0);
-        }
-		if (m_Transformer!=null) m_Transformer.transform(dObjMem);
-    	// extract the local set
-        Neighbour[] neighbours = null;
-        if (m_bSelfLearning)
-        {
-            Neighbour[] neighboursOneMore = m_VicinityProvider.getVicinity(dObjMem, m_nLocalSetSize+1);
-            neighbours = new Neighbour[neighboursOneMore.length-1];
-            int i = 1;
-            for (; i < neighbours.length && !dObjMem.equals(neighboursOneMore[i].neighbour()); i++)
-            	neighbours[i] = neighboursOneMore[i];
-           	for (; i < neighbours.length; i++) neighbours[i] = neighboursOneMore[i+1];
-        }
-        else neighbours = m_VicinityProvider.getVicinity(dObjMem, m_nLocalSetSize);
-        // induce a local metric
-        DoubleData[] dataObjects = new DoubleData[neighbours.length-1];
-        for (int n = 1; n < neighbours.length; n++)
-        {
-            dataObjects[n-1] = neighbours[n].neighbour();
-            ((DoubleDataObjectWithMemory)dataObjects[n-1]).restoreSavedValues(0);
-        }
-        DoubleDataTable localTab = new ArrayListDoubleDataTable(dataObjects);
-        Metric localMetr = MetricFactory.getMetric(m_LocalMetricProperties, localTab);
-        AttributeTransformer trans = localMetr.transformationOutside();
-        for (int obj = 0; obj < dataObjects.length; obj++)
-        	trans.transform(dataObjects[obj]);
-        try
-        {
-        	if (localMetr instanceof AbstractWeightedMetric)
-        		MetricFactory.adjustWeights(MetricFactory.Weighting.DistanceBased.name(), (AbstractWeightedMetric)localMetr, localTab, m_EmptyProgress);
-        }
-        catch (InterruptedException e) { }
-        // computes the distances according to the local metric 
-        dObjMem.restoreSavedValues(0);
-        trans.transform(dObjMem);
-        Neighbour[] shiftedNeighbours = new Neighbour[neighbours.length-1];
-        if (m_DistancesToRestore==null || m_DistancesToRestore.length < shiftedNeighbours.length)
-        	m_DistancesToRestore = new double[shiftedNeighbours.length];
-        for (int n = 1; n < neighbours.length; n++)
-        {
-        	m_DistancesToRestore[n-1] = neighbours[n].dist(); 
-        	shiftedNeighbours[n-1] = neighbours[n];
-        	shiftedNeighbours[n-1].setDist(localMetr.dist(dObjMem, shiftedNeighbours[n-1].neighbour()));
-        }
-        // sort the objects according to the distances in the local metric
-        Arrays.sort(shiftedNeighbours);
-        // classify
+    	Neighbour[] shiftedNeighbours = getNeighboursSortedByLocalDistance(dObj);
         double[] decDistr = new double[m_DecisionAttribute.noOfValues()];
         Voting votingType;
         try
@@ -478,29 +429,33 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
         {
         	throw new PropertyConfigurationException("Unknown voting method: "+getProperty(VOTING_PROPERTY_NAME));
         }
-        int noOfNeighbors = getIntProperty(K_PROPERTY_NAME);
-        for (int n = 0; n < noOfNeighbors || (n < shiftedNeighbours.length && shiftedNeighbours[n].dist() == shiftedNeighbours[n-1].dist()); n++)
+        if (shiftedNeighbours[0].dist() == 0.0 && (votingType == Voting.InverseDistance || votingType == Voting.InverseSquareDistance))
+        	for (int n = 0; n < shiftedNeighbours.length && shiftedNeighbours[n].dist() == 0; n++)
+        		decDistr[m_DecisionAttribute.localValueCode(shiftedNeighbours[n].neighbour().getDecision())] = 1.0;
+        else
         {
-        	int curDec = m_DecisionAttribute.localValueCode(shiftedNeighbours[n].neighbour().getDecision());
-        	switch (votingType)
+        	int noOfNeighbors = getIntProperty(K_PROPERTY_NAME);
+        	for (int n = 0; n < noOfNeighbors || (n < shiftedNeighbours.length && shiftedNeighbours[n].dist() == shiftedNeighbours[n-1].dist()); n++)
         	{
-        	case Equal:
-        		decDistr[curDec] += 1.0;
-        		break;
-        	case InverseDistance:
-        		decDistr[curDec] += 1.0 / shiftedNeighbours[n].dist();
-        		break;
-        	case InverseSquareDistance:
-        		decDistr[curDec] += 1.0 / (shiftedNeighbours[n].dist()*shiftedNeighbours[n].dist());
-        		break;
+        		int curDec = m_DecisionAttribute.localValueCode(shiftedNeighbours[n].neighbour().getDecision());
+        		switch (votingType)
+        		{
+        		case Equal:
+        			decDistr[curDec] += 1.0;
+        			break;
+        		case InverseDistance:
+        			decDistr[curDec] += 1.0 / shiftedNeighbours[n].dist();
+        			break;
+        		case InverseSquareDistance:
+        			decDistr[curDec] += 1.0 / (shiftedNeighbours[n].dist()*shiftedNeighbours[n].dist());
+        			break;
+        		}
         	}
         }
-        // restore the object values and distances for the global metric
-        for (int n = 1; n < neighbours.length; n++)
-        	neighbours[n].setDist(m_DistancesToRestore[n-1]); 
-        for (int obj = 0; obj < dataObjects.length; obj++)
-        	((DoubleDataObjectWithMemory)dataObjects[obj]).restoreSavedValues(1);
-    	if (dObj instanceof DoubleDataObjectWithMemory) dObjMem.restoreSavedValues(1);
+        // restore the distances for the global metric
+        for (int n = 1; n < m_Neighbours.length; n++)
+        	m_Neighbours[n].setDist(m_DistancesToRestore[n-1]);
+        m_Neighbours = null;
         return decDistr;
     }
     

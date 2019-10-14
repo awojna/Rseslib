@@ -397,23 +397,30 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
         {
         	throw new PropertyConfigurationException("Unknown voting method: "+getProperty(VOTING_PROPERTY_NAME));
         }
-        for (int n = 1; n < neighbours.length; n++)
+        if (neighbours[1].dist() == 0.0 && (votingType == Voting.InverseDistance || votingType == Voting.InverseSquareDistance))
         {
-        	int curDec = m_DecisionAttribute.localValueCode(neighbours[n].neighbour().getDecision());
-        	if (!checkConsistency || neighbours[n].m_bConsistent)
-        		switch (votingType)
-        		{
-        		case Equal:
-        			decDistr[curDec] += 1.0;
-        			break;
-        		case InverseDistance:
-        			decDistr[curDec] += 1.0 / neighbours[n].dist();
-        			break;
-        		case InverseSquareDistance:
-        			decDistr[curDec] += 1.0 / (neighbours[n].dist()*neighbours[n].dist());
-        			break;
-        		}
+        	for (int n = 1; n < neighbours.length && neighbours[n].dist() == 0; n++)
+        		if (!checkConsistency || neighbours[n].m_bConsistent)
+        			decDistr[m_DecisionAttribute.localValueCode(neighbours[n].neighbour().getDecision())] = 1.0;
         }
+        else
+        	for (int n = 1; n < neighbours.length; n++)
+        	{
+        		int curDec = m_DecisionAttribute.localValueCode(neighbours[n].neighbour().getDecision());
+        		if (!checkConsistency || neighbours[n].m_bConsistent)
+        			switch (votingType)
+        			{
+        			case Equal:
+        				decDistr[curDec] += 1.0;
+        				break;
+        			case InverseDistance:
+        				decDistr[curDec] += 1.0 / neighbours[n].dist();
+        				break;
+        			case InverseSquareDistance:
+        				decDistr[curDec] += 1.0 / (neighbours[n].dist()*neighbours[n].dist());
+        				break;
+        			}
+        	}
         return decDistr;
     }
 

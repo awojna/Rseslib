@@ -6,10 +6,10 @@
 PackageName=Rseslib
 
 # Version (required)
-Version=3.2.3-SNAPSHOT
+Version=3.2.3
 
 #Date
-Date=2019-06-25
+Date=2019-11-15
 
 # Title (required)
 Title=Rough Sets and Analogy-Based Reasoning
@@ -34,7 +34,7 @@ The third classifier LocalKnn is the extension of the k nearest neighbors method
 It is dedicated rather to large data sets (2000+ training instances) and improves accuracy particularly in case of data containing nominal attributes.
 
 # Package URL for obtaining the package archive (required)
-PackageURL=http://rseslib.mimuw.edu.pl/weka/Rseslib3.2.3-SNAPSHOT.zip
+PackageURL=http://rseslib.mimuw.edu.pl/weka/Rseslib3.2.3.zip
 
 # URL for further information
 URL=http://rseslib.mimuw.edu.pl

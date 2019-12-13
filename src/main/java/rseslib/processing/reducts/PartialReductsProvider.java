@@ -33,7 +33,7 @@ import rseslib.system.Configuration;
 import rseslib.system.PropertyConfigurationException;
 
 /** 
- * Constructs local and global partial decision reducts by a greedy algorithm.
+ * Constructs local and global partial decision reducts with a greedy algorithm.
  * 
  * @author Marcin Piliszczuk & Beata Zielosko
  */
@@ -52,10 +52,11 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
     long ElementsCovered = 0;//card_pcover
 
     /**
-     *  Constructor
-     * 
-     * @param DoubleDataTable 
-     * @param alpha     0 <= alpha < 1      covering precision
+     * Constructor taking a data table used to compute reducts.
+     *   
+     * @param prop 		Parameters of the algorithm.
+     * @param table		Data table used to compute reducts.
+     * @throws PropertyConfigurationException 
      */
     public PartialReductsProvider(Properties prop, DoubleDataTable table) throws PropertyConfigurationException {
     	super(prop);
@@ -65,7 +66,12 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
     }
     
     /**
-     * Returns global reduct for data table
+     * Returns a set with a single global partial reduct.
+     * The reduct is represented by a BitSet object,
+     * get(i) returns true if and only if the i-th attribute belongs to the reduct.
+     * The attribute indices are defined by the header of the data table.
+     *
+     * @return	Set with a single global partial reduct.
      */
     public Collection<BitSet> getReducts() {
         NumberOfSubsets = DataHeader.noOfAttr();
@@ -94,7 +100,13 @@ public class PartialReductsProvider extends Configuration implements GlobalReduc
     };
 
     /**
-     * Return local reduct for data object
+     * Returns a set with a single local partial reduct.
+     * Each reduct is represented by a BitSet object,
+     * get(i) returns true if and only if the i-th attribute belongs to the reduct.
+     * The attribute indices are defined by the header of the data table.
+     *
+     * @param object	Data object used to compute a local reduct.
+     * @return			Set with a single local partial reduct
      */
     public Collection<BitSet> getSingleObjectReducts(DoubleData object)
     {

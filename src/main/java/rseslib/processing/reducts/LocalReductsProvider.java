@@ -26,10 +26,21 @@ import java.util.Collection;
 import rseslib.structure.data.DoubleData;
 
 /**
- * @author Rafal Latkowski
+ * Interface for algorithms computing local reducts.
+ * A data table is provided as the argument of the constructor.
  *
+ * @author Rafal Latkowski
  */
 public interface LocalReductsProvider
 {
+    /**
+     * Returns a set of local reducts of a given data object.
+     * Each reduct is represented by a BitSet object,
+     * get(i) returns true if and only if the i-th attribute belongs to the reduct.
+     * The attribute indices are defined by the header of the data table.
+     *
+     * @param object	Data object used to compute local reducts.
+     * @return			Set of local reducts.
+     */
     public Collection<BitSet> getSingleObjectReducts(DoubleData object);
 }

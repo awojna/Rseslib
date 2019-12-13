@@ -24,10 +24,20 @@ import java.util.BitSet;
 import java.util.Collection;
 
 /**
- * @author Rafal Latkowski
+ * Interface for algorithms computing global reducts.
+ * A data table is provided as the argument of the constructor.
  *
+ * @author Rafal Latkowski
  */
 public interface GlobalReductsProvider
 {
+    /**
+     * Returns a set of global reducts.
+     * Each reduct is represented by a BitSet object,
+     * get(i) returns true if and only if the i-th attribute belongs to the reduct.
+     * The attribute indices are defined by the header of the data table.
+     *
+     * @return	Set of global reducts.
+     */
     public Collection<BitSet> getReducts();
 }

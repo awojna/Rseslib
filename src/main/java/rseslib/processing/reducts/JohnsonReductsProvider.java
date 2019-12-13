@@ -49,6 +49,13 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
     private DiscernibilityMatrixProvider m_Discernibility;
     private Header m_Header;
 
+    /**
+     * Constructor taking a data table used to compute Johnson's reduct.
+     *   
+     * @param prop 		Parameters of the algorithm.
+     * @param table		Data table used to compute Johnson's reduct.
+     * @throws PropertyConfigurationException 
+     */
     public JohnsonReductsProvider(Properties prop, DoubleDataTable table) throws PropertyConfigurationException {
         super(prop);
         m_Generate = GenerateMethod.valueOf(getProperty(s_sGenerate));
@@ -56,6 +63,14 @@ public class JohnsonReductsProvider extends Configuration implements GlobalReduc
         m_Header = table.attributes();
     }
 
+    /**
+     * Returns a set with Johnson's reduct.
+     * The reduct is represented by a BitSet object,
+     * get(i) returns true if and only if the i-th attribute belongs to the reduct.
+     * The attribute indices are defined by the header of the data table.
+     *
+     * @return	Set with Johnson's reduct.
+     */
     public Collection<BitSet> getReducts() {
         Collection<BitSet> cnf = m_Discernibility.getDiscernibilityMatrix();
         ArrayList<BitSet> bs = new ArrayList<BitSet>();

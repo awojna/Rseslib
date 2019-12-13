@@ -35,37 +35,58 @@ import rseslib.system.Configuration;
 import rseslib.system.PropertyConfigurationException;
 
 /**
+ * Exhaustive algorithm finding all local reducts
+ * in a data table for a given data object
+ * by reduction to prime implicants.
+ * 
  * @author Rafal Latkowski
- *
  */
 public class AllLocalReductsProvider extends Configuration implements LocalReductsProvider
 {
+	/** Number of attributes. */
 	private int m_nNumberOfAttributes;
+	/** Discernibility matrix computed for a given table. */
 	private DiscernibilityMatrixProvider m_Discernibility;
+	/** Algorithm finding all prime implicants given a CNF boolean formula. */
     private PrimeImplicantsProvider m_oPrimeImplicantsProvider = new KurzydlowskiPrimeImplicantsProvider(null);
-    private Collection<DoubleData> m_Objects;
 
     /**
+     * Constructor taking a data table used to compute local reducts.
+     *   
+     * @param prop 		Parameters of the algorithm.
+     * @param table		Data table used to compute local reducts.
      * @throws PropertyConfigurationException 
-     * 
      */
     public AllLocalReductsProvider(Properties prop, DoubleDataTable table) throws PropertyConfigurationException
     {
         super(prop);
         m_nNumberOfAttributes = table.attributes().noOfAttr();
         m_Discernibility = new DiscernibilityMatrixProvider(getProperties(), table);
-        m_Objects = table.getDataObjects();
     }
 
+    /**
+     * Returns a set of local reducts of a given data object.
+     * Each reduct is represented by a BitSet object,
+     * get(i) returns true if and only if the i-th attribute belongs to the reduct.
+     * The attribute indices are defined by the header of the data table.
+     *
+     * @param object	Data object used to compute local reducts.
+     * @return			Set of local reducts.
+     */
     public Collection<BitSet> getSingleObjectReducts(DoubleData object)
     {
         /* generate CNF */
         Collection<BitSet> cnf = m_Discernibility.getLocalDiscernibility(object);
         if (cnf.isEmpty()) return new ArrayList<BitSet>();
-        /* compute prime implicants */
+        /* compute all prime implicants */
         return m_oPrimeImplicantsProvider.generatePrimeImplicants(cnf, m_nNumberOfAttributes);
     }
 
+    /**
+     * Returns the indiscernibility relation used to compute the discernibility matrix.
+     *
+     * @return	Indiscernibility relation.
+     */
     public Indiscernibility getIndiscernibilityForMissing()
     {
     	return m_Discernibility.getIndiscernibilityForMissing();

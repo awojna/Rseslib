@@ -23,12 +23,26 @@ package rseslib.processing.discernibility;
 import rseslib.structure.data.DoubleData;
 
 /**
+ * Interface for implementation of a generalized decision.
+ * 
  * @author Rafal Latkowski
- *
  */
 public interface GeneralizedDecisionProvider
 {
-    public boolean haveTheSameDecision(DoubleData object1,DoubleData object2);
+	/**
+	 * Returns true if two objects have the same generalized decision.
+	 * 
+	 * @param object1	First object to be compared.
+	 * @param object2	Second object to be compared.
+	 * @return			True if two objects have the same generalized decision.
+	 */
+    public boolean haveTheSameDecision(DoubleData object1, DoubleData object2);
     
+    /**
+     * Returns a string representing the generalized decision for a given object.
+     * 
+     * @param object	Object for which a generalized decision is calculated.
+     * @return			Generalized decision for the object.
+     */
     public String getDecisionForObject(DoubleData object);
 }

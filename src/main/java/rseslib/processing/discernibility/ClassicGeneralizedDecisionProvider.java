@@ -30,19 +30,32 @@ import rseslib.structure.indiscernibility.SymmetricSimilarityIndiscernibility;
 import rseslib.structure.table.DoubleDataTable;
 
 /**
- * @author Rafal Latkowski
+ * Implementation of the generalized decision resolving inconsistencies in the data tables
+ * with objects that have different decisions and equal values on all conditional attributes.
+ * The objects having the same values of the conditional attributes
+ * get the same generalized decision represented by the set of all decisions
+ * among the objects with the same attribute values. 
  *
+ * @author Rafal Latkowski
  */
 public class ClassicGeneralizedDecisionProvider implements GeneralizedDecisionProvider
 {
+	/** Data table used to calculate the generalized decision. */
     DoubleDataTable m_data;
+    /** Indiscernibility relation type for missing values. */
     Indiscernibility m_indiscernibility;
-    HashMap<DoubleData,Integer> m_mapObjectToDecision;
+    /** Mapping between objects and their generalized decisions. */
+    HashMap<DoubleData, Integer> m_mapObjectToDecision;
+    /** Collection of all generalized decision found in the data table represented as the sets of original decisions. */
     ArrayList<HashSet<Double>> m_arrGeneralizedDecisionDict;
+    
     /**
+     * Constructor calculates the generalized decisions in a given data table.
      * 
+     * @param data				Data table used to calculate the generalized decisions.
+     * @param indiscernibility	Indiscernibility relation type for missing values.
      */
-    public ClassicGeneralizedDecisionProvider(DoubleDataTable data,Indiscernibility indiscernibility)
+    public ClassicGeneralizedDecisionProvider(DoubleDataTable data, Indiscernibility indiscernibility)
     {
         m_data=data;
         m_indiscernibility=indiscernibility;
@@ -50,6 +63,12 @@ public class ClassicGeneralizedDecisionProvider implements GeneralizedDecisionPr
         //debugMapping();
     }
 
+    /**
+     * Constructor calculates the generalized decisions in a given data table.
+     * It uses the symmetric similarity as the default indiscernibility relation type for missing values.
+     * 
+     * @param data				Data table used to calculate the generalized decisions.
+     */
     public ClassicGeneralizedDecisionProvider(DoubleDataTable data)
     {
         m_data=data;
@@ -58,14 +77,9 @@ public class ClassicGeneralizedDecisionProvider implements GeneralizedDecisionPr
         //debugMapping();
     }
     
-    void debugMapping()
-    {
-        for (DoubleData object1 : m_data.getDataObjects())
-        {
-            System.out.println(object1.toString()+" has ("+m_mapObjectToDecision.get(object1)+")"+getDecisionForObject(object1));
-        }
-    }
-    
+    /**
+     * Calculates the generalized decisions in the table provided to the constructor.
+     */
     void generateGeneralizedDecisionMapping()
     {
         m_mapObjectToDecision = new HashMap<DoubleData,Integer>();
@@ -102,11 +116,37 @@ public class ClassicGeneralizedDecisionProvider implements GeneralizedDecisionPr
         }
     }
     
-    public boolean haveTheSameDecision(DoubleData object1,DoubleData object2)
+    /**
+     * Prints the objects and their generalized decisions
+     * from the table provided to the constructor
+     * to the standard output.
+     */
+    void debugMapping()
+    {
+        for (DoubleData object1 : m_data.getDataObjects())
+        {
+            System.out.println(object1.toString()+" has ("+m_mapObjectToDecision.get(object1)+")"+getDecisionForObject(object1));
+        }
+    }
+    
+	/**
+	 * Returns true if two objects have the same generalized decision.
+	 * 
+	 * @param object1	First object to be compared.
+	 * @param object2	Second object to be compared.
+	 * @return			True if two objects have the same generalized decision.
+	 */
+    public boolean haveTheSameDecision(DoubleData object1, DoubleData object2)
     {
         return m_mapObjectToDecision.get(object1)==m_mapObjectToDecision.get(object2);
     }
     
+    /**
+     * Returns a string representing the generalized decision for a given object.
+     * 
+     * @param object	Object for which a generalized decision is calculated.
+     * @return			Generalized decision for the object.
+     */
     public String getDecisionForObject(DoubleData object)
     {
         int decidx = m_mapObjectToDecision.get(object);

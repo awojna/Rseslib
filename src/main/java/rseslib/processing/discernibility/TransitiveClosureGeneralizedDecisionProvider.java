@@ -30,24 +30,39 @@ import rseslib.structure.indiscernibility.SymmetricSimilarityIndiscernibility;
 import rseslib.structure.table.DoubleDataTable;
 
 /**
- * @author Rafal Latkowski
+ * The classic generalized decision defines usually
+ * intransitive relation between objects in a data table.
+ * This class implements a version of the generalized decision
+ * that closes transitively the classic generalized decision.
+ * The relation between data object defined
+ * by this transitively closed generalized decision
+ * is an equivalence relation.
  *
+ * @author Rafal Latkowski
  */
 public class TransitiveClosureGeneralizedDecisionProvider implements GeneralizedDecisionProvider
 {
+	/** Data table used to calculate the generalized decision. */
     DoubleDataTable m_data;
+    /** Indiscernibility relation type for missing values. */
     Indiscernibility m_indiscernibility;
+    /** Mapping between objects and their generalized decisions. */
     HashMap<DoubleData,Integer> m_mapObjectToDecision;
+    /** Collection of all transitively closed generalized decisions found in the data table represented as the sets of original decisions. */
     ArrayList<HashSet<Double>> m_arrGeneralizedDecisionDict;
 
-    DoubleData m_dataArray[];
+    /** Auxiliary structure used to keep identifiers of transitively closed clusters while computing transitive closure. */
     int m_setStructure[];
+    /** Auxiliary structure used to keep rank of transitively closed clusters while computing transitive closure. */
     int m_setRank[];
     
     /**
+     * Constructor calculates the transitively closed generalized decisions in a given data table.
      * 
+     * @param data				Data table used to calculate the transitively closed generalized decisions.
+     * @param indiscernibility	Indiscernibility relation type for missing values.
      */
-    public TransitiveClosureGeneralizedDecisionProvider(DoubleDataTable data,Indiscernibility indiscernibility)
+    public TransitiveClosureGeneralizedDecisionProvider(DoubleDataTable data, Indiscernibility indiscernibility)
     {
         m_data=data;
         m_indiscernibility=indiscernibility;
@@ -55,6 +70,12 @@ public class TransitiveClosureGeneralizedDecisionProvider implements Generalized
         //debugMapping();
     }
 
+    /**
+     * Constructor calculates the transitively closed generalized decisions in a given data table.
+     * It uses the symmetric similarity as the default indiscernibility relation type for missing values.
+     * 
+     * @param data				Data table used to calculate the transitively closed generalized decisions.
+     */
     public TransitiveClosureGeneralizedDecisionProvider(DoubleDataTable data)
     {
         m_data=data;
@@ -63,18 +84,13 @@ public class TransitiveClosureGeneralizedDecisionProvider implements Generalized
         //debugMapping();
     }
     
-    void debugMapping()
-    {
-        for (DoubleData object1 : m_data.getDataObjects())
-        {
-            System.out.println(object1.toString()+" has ("+m_mapObjectToDecision.get(object1)+")"+getDecisionForObject(object1));
-        }
-    }
-    
+    /**
+     * Calculates the transitively closed generalized decisions in the table provided to the constructor.
+     */
     void generateGeneralizedDecisionMapping()
     {
         /* prepare cluster structure */
-        m_dataArray = new DoubleData[m_data.noOfObjects()];
+    	DoubleData[] m_dataArray = new DoubleData[m_data.noOfObjects()];
         sets_Init(m_dataArray.length);
         int pos=0;
         for (DoubleData obj : m_data.getDataObjects())
@@ -138,20 +154,9 @@ public class TransitiveClosureGeneralizedDecisionProvider implements Generalized
             int gen_dec_seq = sequence.get(tempDict[m_setStructure[pos]]);
             m_mapObjectToDecision.put(m_dataArray[pos], gen_dec_seq);
         }
+        m_setStructure = null;
+        m_setRank = null;
     }
-    
-    public boolean haveTheSameDecision(DoubleData object1,DoubleData object2)
-    {
-        return m_mapObjectToDecision.get(object1)==m_mapObjectToDecision.get(object2);
-    }
-    
-    public String getDecisionForObject(DoubleData object)
-    {
-        int decidx = m_mapObjectToDecision.get(object);
-        HashSet<Double> decset = m_arrGeneralizedDecisionDict.get(decidx);
-        return decset.toString();
-    }
-    
     
     void sets_Init(int size)
     {
@@ -198,4 +203,42 @@ public class TransitiveClosureGeneralizedDecisionProvider implements Generalized
             sets_FindSet(i);
     }
 
+    
+    /**
+     * Prints to the standard output the objects
+     * and their transitively closed generalized decisions
+     * from the table provided to the constructor.
+     */
+    void debugMapping()
+    {
+        for (DoubleData object1 : m_data.getDataObjects())
+        {
+            System.out.println(object1.toString()+" has ("+m_mapObjectToDecision.get(object1)+")"+getDecisionForObject(object1));
+        }
+    }
+    
+	/**
+	 * Returns true if two objects have the same transitively closed generalized decision.
+	 * 
+	 * @param object1	First object to be compared.
+	 * @param object2	Second object to be compared.
+	 * @return			True if two objects have the same transitively closed generalized decision.
+	 */
+    public boolean haveTheSameDecision(DoubleData object1,DoubleData object2)
+    {
+        return m_mapObjectToDecision.get(object1)==m_mapObjectToDecision.get(object2);
+    }
+    
+    /**
+     * Returns a string representing the transitively closed generalized decision for a given object.
+     * 
+     * @param object	Object for which the transitively closed generalized decision is calculated.
+     * @return			Transitively closed generalized decision for the object.
+     */
+    public String getDecisionForObject(DoubleData object)
+    {
+        int decidx = m_mapObjectToDecision.get(object);
+        HashSet<Double> decset = m_arrGeneralizedDecisionDict.get(decidx);
+        return decset.toString();
+    }
 }

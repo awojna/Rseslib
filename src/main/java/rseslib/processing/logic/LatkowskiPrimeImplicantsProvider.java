@@ -33,7 +33,12 @@ import rseslib.system.Configuration;
 import rseslib.system.PropertyConfigurationException;
 
 /**
- * Prime implicants generator by Rafal Latkowski.
+ * Generator of all prime implicants
+ * from a conjunction of clauses (CNF),
+ * where each clause is a disjunction of positive literals
+ * over a set of boolean variables by Rafal Latkowski.
+ * Clauses are limited to positive literals only,
+ * this implementation does not allow negative literals.
  * 
  * @author Rafal Latkowski
  */
@@ -60,10 +65,10 @@ public class LatkowskiPrimeImplicantsProvider extends Configuration implements P
 	private boolean m_bOneLiteralClausesOptimization; 
 
 	/**
-     * Creates an empty initial prime implicants provider.
+     * Creates an instance of prime implicants provider.
 	 * 
-	 * @param prop		Properties.
-	 * @throws PropertyConfigurationException
+     * @param prop		Parameters of this prime implicant provider.
+     * @throws PropertyConfigurationException	when the parameters are incorrect or incomplete.
 	 */
     public LatkowskiPrimeImplicantsProvider(Properties prop) throws PropertyConfigurationException
     {
@@ -73,17 +78,23 @@ public class LatkowskiPrimeImplicantsProvider extends Configuration implements P
     }
 
     /**
-     * Generates prime implicants from positive cnf formula.
-     * CNF formula is represented as a concjunction of elements stored in collection.
-     * Each element of collection represents disjunction of variables stored as booleans in boolean vector.
-     * This method generates possible prime implicants by calling method
-     * generatePossiblePrimeImplicants(Collection, int) and than it removes
-     * some rare non-prime implicants by calling method removeNonPrimeImplicants(Map, int).
-     * @param cnf CNF formula
-     * @return collection of prime implicants
-     * @see rseslib.processing.logic.PrimeImplicantsProvider#generatePrimeImplicants(Collection,int)
-     * @see #generatePossiblePrimeImplicants(Collection, int)
-     * @see #removeNonPrimeImplicants(Map, int)
+     * Generates all prime implicants from a positive CNF formula.
+     * All clauses of the formula are provided as a collection.
+     * Each disjunctive clause is represented by a BitSet object,
+     * get(i) returns true if and only if
+     * the positive literal of the i-th variable occurs in this clause.
+     * The method returns collection of prime implicants of the formula.
+     * Each prime implicant is represented by a BitSet object,
+     * get(i) returns true if and only if
+     * the positive literal of the i-th variable occurs in the implicant.
+     * The method generates potential prime implicants
+     * using the method generatePossiblePrimeImplicants(Collection, int),
+     * next it removes non-prime implicants
+     * using the method removeNonPrimeImplicants(Map, int).
+     * 
+     * @param cnf 	CNF formula.
+     * @param width	Number of boolean variables used in the CNF formula.
+     * @return 		Collection of all prime implicants.
      */
     public Collection<BitSet> generatePrimeImplicants(Collection<BitSet> cnf,int width)
     {
@@ -97,13 +108,13 @@ public class LatkowskiPrimeImplicantsProvider extends Configuration implements P
     }
 
     /**
-     * Removes absorpted clauses.
+     * Removes absorbed clauses.
      * 
-     * @param cnf
-     * @param width
-     * @return
+     * @param cnf 	CNF formula.
+     * @param width	Number of boolean variables used in the CNF formula.
+     * @return 		CNF clauses with absorbed clauses removed.
      */
-    private Collection<BitSet> absorption(Collection<BitSet> cnf,int width)
+    private Collection<BitSet> absorption(Collection<BitSet> cnf, int width)
     {
         ArrayList<BitSet> sorted_cnf[] = new ArrayList[width+1];
         for (int i=0;i<=width;i++)
@@ -151,14 +162,14 @@ public class LatkowskiPrimeImplicantsProvider extends Configuration implements P
     }
     
     /**
-     * Heuristic method for generating prime implicants with blocking variables.
-     * Unfortunatelly some implicants are not prime.
+     * Heuristic method for generating possible prime implicants with blocking variables.
+     * The result may contain non-prime implicants.
      * 
-     * @param cnf CNF formula
-     * @param width number of variables in each boolean vector
-     * @return collection of possible prime implicants
+     * @param cnf 	CNF formula.
+     * @param width	Number of boolean variables used in the CNF formula.
+     * @return		Collection of possible prime implicants.
      */
-    private Map<BitSet,Integer> generatePossiblePrimeImplicants(Collection<BitSet> cnf,int width)
+    private Map<BitSet,Integer> generatePossiblePrimeImplicants(Collection<BitSet> cnf, int width)
     {
         if (cnf==null||cnf.isEmpty()) return null;
         HashMap<BitSet,Integer> final_prime_implicants = new HashMap<BitSet,Integer>();
@@ -307,13 +318,13 @@ public class LatkowskiPrimeImplicantsProvider extends Configuration implements P
     }
 
     /**
-     * Removes non-prime implicants by less than n^2/2 checkings.
+     * Removes non-prime implicants by less than n^2/2 checks.
      * 
-     * @param possible_prime_implicants collection of prime and non-prime implicants
-     * @param width number of variables in each boolean vector
-     * @return collection of prime implicants
+     * @param possible_prime_implicants	Collection of prime and non-prime implicants.
+     * @param width						Number of boolean variables occurring in the implicants.
+     * @return							Collection of prime implicants.
      */
-    private Collection<BitSet> removeNonPrimeImplicants(Map<BitSet,Integer> possible_prime_implicants,int width)
+    private Collection<BitSet> removeNonPrimeImplicants(Map<BitSet,Integer> possible_prime_implicants, int width)
     {
         LinkedList<BitSet> verified_prime_implicants = new LinkedList<BitSet>();
         LinkedList<BitSet>[] table = new LinkedList[width];

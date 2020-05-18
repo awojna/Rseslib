@@ -25,22 +25,23 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
 
-import rseslib.system.Configuration;
-import rseslib.system.PropertyConfigurationException;
-
 /**
- * Prime implicants generator by Michal Kurzydlowski.
+ * Generator of all prime implicants
+ * from a conjunction of clauses (CNF),
+ * where each clause is a disjunction of positive literals
+ * over a set of boolean variables by Michal Kurzydlowski.
+ * Clauses are limited to positive literals only,
+ * this implementation does not allow negative literals.
  * 
  * @author Michal Kurzydlowski
  */
-public class KurzydlowskiPrimeImplicantsProvider extends Configuration implements PrimeImplicantsProvider
+public class KurzydlowskiPrimeImplicantsProvider implements PrimeImplicantsProvider
 {
 
 	/**
-	 * Class for storing best attribute in the best attribute searching function
+	 * Class for storing best variable in the best variable searching function.
 	 */
 	private class BestAttr
 	{
@@ -55,15 +56,15 @@ public class KurzydlowskiPrimeImplicantsProvider extends Configuration implement
 	}
 	
 	/**
-	 * Class for storing return data from dividing cnf into two clause sets (a new clause set)
+	 * Class for storing the subset of clauses not containing a given variable after splitting a set of clauses.
 	 */
 	private class Division
 	{
-		/** Size of the set without clauses that contained choosen attribute */
+		/** Size of the subset of clauses not containing a given variable. */
 		public int newSize;
-		/** Set of clauses without clauses that contained choosen attribute */
+		/** Subset of clauses not containing a given variable. */
 		public ArrayList<BitSet>[] newSortedCnf;
-		/** Attribute statistics for the above set */
+		/** Variable statistics for the represented subset of clauses. */
 		public Map<Integer, AttrStat> newAttrStats;
 		
 		@SuppressWarnings("unchecked")
@@ -80,7 +81,7 @@ public class KurzydlowskiPrimeImplicantsProvider extends Configuration implement
 	}
 	
 	/**
-	 * Class for storing statistics regarding an attribute with method of comparing them
+	 * Class for storing statistics of a given variable with a comparison function.
 	 */
     private class AttrStat
     {
@@ -123,40 +124,32 @@ public class KurzydlowskiPrimeImplicantsProvider extends Configuration implement
         }
     }
     
-    /**
-     * Function returning the worst attribute statistic for the best attribute searching function
-     */
-    private AttrStat getMinStat()
-    {
-    	AttrStat min = new AttrStat();
-    	min.oneInClause = 0;
-    	min.twoInClause = 0;
-    	min.numOfClauses = 0;
-    	return min;
-    }
-
 	/**
-     * Creates an empty initial prime implicants provider.
-	 * 
-	 * @param prop Properties.
-	 * @throws PropertyConfigurationException
+     * Creates an instance of prime implicants provider.
 	 */
-    public KurzydlowskiPrimeImplicantsProvider(Properties prop) throws PropertyConfigurationException
+    public KurzydlowskiPrimeImplicantsProvider()
     {
-    	super(prop);
     }
 
     /**
-     * Generates prime implicants from positive CNF formula.
-     * CNF formula is represented as a concjunction of elements stored in collection.
-     * Each element of collection represents disjunction of variables stored as booleans in boolean vector.
-     * This method generates possible prime implicants by sorting cnf into table grouped by the
-     * lenght of the clauses, calculates the initial attribute statistics, calls method
-     * generatePossiblePrimeImplicants(...) and than it removes non-prime implicants by
-     * calling method removeNonPrimeImplicants(...) and finally transforms sorted cnf into a collection.
-     * @param cnf CNF formula
-     * @return collection of prime implicants
-     * @see rseslib.processing.logic.PrimeImplicantsProvider#generatePrimeImplicants(Collection,int)
+     * Generates all prime implicants from a positive CNF formula.
+     * All clauses of the formula are provided as a collection.
+     * Each disjunctive clause is represented by a BitSet object,
+     * get(i) returns true if and only if
+     * the positive literal of the i-th variable occurs in this clause.
+     * The method returns collection of prime implicants of the formula.
+     * Each prime implicant is represented by a BitSet object,
+     * get(i) returns true if and only if
+     * the positive literal of the i-th variable occurs in the implicant.
+     * The method groups the clauses by length,
+     * calculates the initial statistics of the variables
+     * and uses the method generatePossiblePrimeImplicants(...).
+     * Next, it removes non-prime implicants using the method removeNonPrimeImplicants(...),
+     * and returns the remaining implicants as a collection.
+     * 
+     * @param cnf 	CNF formula.
+     * @param width	Number of boolean variables used in the CNF formula.
+     * @return 		Collection of all prime implicants.
      */
     @SuppressWarnings("unchecked")
 	public Collection<BitSet> generatePrimeImplicants(Collection<BitSet> cnf, int width)
@@ -187,10 +180,34 @@ public class KurzydlowskiPrimeImplicantsProvider extends Configuration implement
     }
 
     /**
-     * Raises attribute statistics or adds a new attribute statistic to the map if not present
-     * @param attrStats map of attribute statistics
-     * @param attr attribute to be corrected
-     * @param level cardinality of the examined clause
+     * Calculates the initial statistics of the variables occurring in a CNF formula.
+     * 
+     * @param sortedCnf	Clauses grouped by length.
+     * @param width 	Number of boolean variables used in the CNF formula.
+     * @return 			Mapping between the variables and their statistics.
+     */
+    private Map<Integer,AttrStat> initializeAttrStats(ArrayList<BitSet> sortedCnf[], int width)
+    {
+    	Map<Integer,AttrStat> attrStats = new HashMap<Integer,AttrStat>();
+    	for (int level=1; level<=width; level++)
+    	{
+    		for (BitSet formula : sortedCnf[level])
+    		{
+    			for (int b=formula.nextSetBit(0); b>=0; b=formula.nextSetBit(b+1))
+    			{
+    				addAttrStat(attrStats, b, level);
+    			}
+    		}
+    	}
+		return attrStats;
+	}
+
+    /**
+     * Updates the statistics for a given variable.
+     * 
+     * @param attrStats Mapping between the variables and their statistics.
+     * @param attr		Variable to be updated.
+     * @param level		Length of the clause.
      */
     private void addAttrStat(Map<Integer,AttrStat> attrStats, int attr, int level)
     {
@@ -218,33 +235,58 @@ public class KurzydlowskiPrimeImplicantsProvider extends Configuration implement
     }
     
     /**
-     * Calculates the initial attribute statistics based on the CNF formula
-     * @param sortedCnf array of sorted clauses
-     * @param width number of attributes
-     * @return map from attribute to its statistic
+     * Generates potential prime implicants of a CNF formula
+     * and adds them to the array of prime implicant candidates grouped by length.
+     * 
+     * @param sortedCnf				Clauses grouped by length (to be updated).
+     * @param size					Number of input clauses.
+     * @param width					Number of boolean variables used in the CNF formula.
+     * @param attrStats				Mapping between the variables and their statistics.
+     * @param prefix				Variables selected in the previous steps.
+     * @param sortedPrimeImplicants	Potential prime implicants grouped by length.
      */
-    private Map<Integer,AttrStat> initializeAttrStats(ArrayList<BitSet> sortedCnf[], int width)
+	private void generatePossiblePrimeImplicants(ArrayList<BitSet> sortedCnf[], int size, int width,
+    		Map<Integer,AttrStat> attrStats, BitSet prefix, ArrayList<BitSet> sortedPrimeImplicants[])
     {
-    	Map<Integer,AttrStat> attrStats = new HashMap<Integer,AttrStat>();
-    	for (int level=1; level<=width; level++)
+    	if (size > 0)
     	{
-    		for (BitSet formula : sortedCnf[level])
+    		size = absorption(sortedCnf, size, width, attrStats);
+    		BestAttr bestAttr = bestAttr(attrStats);
+    		attrStats.remove(bestAttr.attr);
+    		BitSet newPrefix = (BitSet) prefix.clone();
+    		newPrefix.set(bestAttr.attr);
+    		if (bestAttr.stat.oneInClause > 0)
     		{
-    			for (int b=formula.nextSetBit(0); b>=0; b=formula.nextSetBit(b+1))
-    			{
-    				addAttrStat(attrStats, b, level);
-    			}
+    			size = shortenSortedCnf(bestAttr.attr, size, width, sortedCnf, attrStats);
+    			generatePossiblePrimeImplicants(sortedCnf, size, width, attrStats, newPrefix,
+        				sortedPrimeImplicants);
+    		}
+    		else
+    		{
+    			Division div = divideSortedCnf(bestAttr.attr, width, sortedCnf, attrStats);
+    			/** find prime implicants containg best attribute */
+    			generatePossiblePrimeImplicants(sortedCnf, size, width, attrStats, prefix,
+    					sortedPrimeImplicants);
+    			/** find prime implicants that don't contain best attribute */
+    			generatePossiblePrimeImplicants(div.newSortedCnf, div.newSize, width,
+    					div.newAttrStats, newPrefix, sortedPrimeImplicants);
     		}
     	}
-		return attrStats;
-	}
+    	else
+    	{
+    		/** add possible prime implicant */
+    		sortedPrimeImplicants[prefix.cardinality()].add(prefix);
+    	}
+    }
 
     /**
-     * Removes absorpted clauses from the sorted CNF formula and correct attribute statistics.
-     * @param sortedCnf array of sorted clauses (to be changed)
-     * @param width number of attributes
-     * @param attrStats attribute statistics (to be corrected)
-     * @return size of the corrected CNF formula
+     * Removes absorbed clauses from clauses grouped by length and updates variable statistics.
+     * 
+     * @param sortedCnf	Clauses grouped by length (to be updated).
+     * @param size		Number of clauses.
+     * @param width		Number of boolean variables used in the CNF formula.
+     * @param attrStats	Mapping between the variables and their statistics.
+     * @return			Number of the clauses remaining after absorption.
      */
     private int absorption(ArrayList<BitSet> sortedCnf[], int size, int width,
     		Map<Integer,AttrStat> attrStats)
@@ -283,59 +325,51 @@ public class KurzydlowskiPrimeImplicantsProvider extends Configuration implement
         return size;
     }
     
+	/**
+	 * Select the best variable based on the statistics of the variables.
+	 * 
+     * @param attrStats	Mapping between the variables and their statistics.
+	 * @return			Best variable (its index and statistics)
+	 */
+	private BestAttr bestAttr(Map<Integer, AttrStat> attrStats)
+	{
+    	int bestAttr = 0;
+    	AttrStat bestStat = getMinStat();
+    	for (Entry<Integer, AttrStat> entry : attrStats.entrySet())
+    	{
+    		AttrStat attrStat = entry.getValue();
+    		if (attrStat.betterThan(bestStat))
+    		{
+    			bestStat = attrStat;
+    			bestAttr = entry.getKey();
+    		}
+    	}
+		return new BestAttr(bestAttr, bestStat);
+	}
+
     /**
-     * Generates possible prime implicants of the CNF formula adding them to the sorted (almost)
-     * prime implicants array. Prefix is the set of attributes choosen in previous steps.
-     * @param sortedCnf array of sorted clauses (to be changed)
-     * @param size
-     * @param width
-     * @param attrStats
-     * @param prefix
-     * @param sortedPrimeImplicants
+     * Function returning empty statistics.
+     * 
+     * @return	Empty statistics.
      */
-	private void generatePossiblePrimeImplicants(ArrayList<BitSet> sortedCnf[], int size, int width,
-    		Map<Integer,AttrStat> attrStats, BitSet prefix, ArrayList<BitSet> sortedPrimeImplicants[])
+    private AttrStat getMinStat()
     {
-    	if (size > 0)
-    	{
-    		size = absorption(sortedCnf, size, width, attrStats);
-    		BestAttr bestAttr = bestAttr(attrStats);
-    		attrStats.remove(bestAttr.attr);
-    		BitSet newPrefix = (BitSet) prefix.clone();
-    		newPrefix.set(bestAttr.attr);
-    		if (bestAttr.stat.oneInClause > 0)
-    		{
-    			size = shortenSortedCnf(bestAttr.attr, size, width, sortedCnf, attrStats);
-    			generatePossiblePrimeImplicants(sortedCnf, size, width, attrStats, newPrefix,
-        				sortedPrimeImplicants);
-    		}
-    		else
-    		{
-    			Division div = divideSortedCnf(bestAttr.attr, width, sortedCnf, attrStats);
-    			/** find prime implicants containg best attribute */
-    			generatePossiblePrimeImplicants(sortedCnf, size, width, attrStats, prefix,
-    					sortedPrimeImplicants);
-    			/** find prime implicants that don't contain best attribute */
-    			generatePossiblePrimeImplicants(div.newSortedCnf, div.newSize, width,
-    					div.newAttrStats, newPrefix, sortedPrimeImplicants);
-    		}
-    	}
-    	else
-    	{
-    		/** add possible prime implicant */
-    		sortedPrimeImplicants[prefix.cardinality()].add(prefix);
-    	}
+    	AttrStat min = new AttrStat();
+    	min.oneInClause = 0;
+    	min.twoInClause = 0;
+    	min.numOfClauses = 0;
+    	return min;
     }
 
     /**
-     * Assume that we have choosen this attribute (it was a only attribute in a clause) and
-     * remove this attribute from clauses. Therefor shorten the CNF formula.
-     * @param attr choosen attribute
-     * @param size size of the CNF formula (to be corrected)
-     * @param width number of attributes
-     * @param sortedCnf array of sorted clauses (to be changed)
-     * @param attrStats attribute statistics (to be corrected)
-     * @return size of the shorten CNF formula
+     * Removes clauses containing a given variable from an array of clauses grouped by length.
+     * 
+     * @param attr		Index of the variable.
+     * @param size		Number of all input clauses. 
+     * @param width		Number of boolean variables used in the CNF formula.
+     * @param sortedCnf	Clauses grouped by length (to be updated).
+     * @param attrStats	Mapping between the variables and their statistics.
+     * @return			Number of the remaining clauses.
      */
     private int shortenSortedCnf(int attr, int size, int width,
 			ArrayList<BitSet>[] sortedCnf, Map<Integer, AttrStat> attrStats)
@@ -367,14 +401,18 @@ public class KurzydlowskiPrimeImplicantsProvider extends Configuration implement
 	}
 
     /**
-     * Divided the CNF formula into two sets (one assuming we have choosen this attribute and the
-     * other assuming we have rejected it). First set will be stored on the original variables and
-     * the second will be returned in the Division class object.
-     * @param attr choosen attribute
-     * @param width number of attributes
-     * @param sortedCnf array of sorted clauses (to be changed)
-     * @param attrStats attribute statistics (to be corrected)
-     * @return Division representing newly created clause set
+     * Separates clauses grouped by length into two subsets:
+     * the one with the clauses containing a given variable
+     * and the other one with the clauses without the variable.
+     * The clauses containing the variable remain in the input array
+     * and the clauses without the variable are removed from the input array
+     * and returned as a Division object.
+     * 
+     * @param attr		Index of the variable.
+     * @param width		Number of boolean variables used in the CNF formula.
+     * @param sortedCnf	Clauses grouped by length, only those containing the variable are left.
+     * @param attrStats	Mapping between the variables and their statistics.
+     * @return			Clauses without the variable.
      */
 	private Division divideSortedCnf(int attr, int width, ArrayList<BitSet>[] sortedCnf,
 			Map<Integer, AttrStat> attrStats)
@@ -428,32 +466,11 @@ public class KurzydlowskiPrimeImplicantsProvider extends Configuration implement
     	return div;
 	}
 
-	/**
-	 * Choose the best attribute using the attribute statistics and their comparison method
-	 * @param attrStats attribute statistics
-	 * @return best attribute (its number and statistics)
-	 */
-	private BestAttr bestAttr(Map<Integer, AttrStat> attrStats)
-	{
-    	int bestAttr = 0;
-    	AttrStat bestStat = getMinStat();
-    	for (Entry<Integer, AttrStat> entry : attrStats.entrySet())
-    	{
-    		AttrStat attrStat = entry.getValue();
-    		if (attrStat.betterThan(bestStat))
-    		{
-    			bestStat = attrStat;
-    			bestAttr = entry.getKey();
-    		}
-    	}
-		return new BestAttr(bestAttr, bestStat);
-	}
-
     /**
-     * Removes non-prime implicants by less than n^2/2 checkings.
-     * @param sortedCnf sorted array (by clause lenght) of prime and non-prime implicants
-     * @param width number of attributes
-     * @return sorted array containing only prime implicants
+     * Removes non-prime implicants by less than n^2/2 checks.
+     * 
+     * @param sortedCnf	Prime and non-prime implicants grouped by length.
+     * @param width		Number of boolean variables occurring in the implicants.
      */
     private void removeNonPrimeImplicants(ArrayList<BitSet>[] sortedCnf, int width)
     {

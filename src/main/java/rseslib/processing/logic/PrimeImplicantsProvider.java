@@ -25,21 +25,30 @@ import java.util.Collection;
 
 /**
  * Interface for generating prime implicants
- * from a collection of clauses (CNF).
+ * from a conjunction of clauses (CNF),
+ * where each clause is a disjunction of positive literals
+ * over a set of boolean variables.
+ * Clauses are limited to positive literals only,
+ * this interface does not allow negative literals.
  * 
  * @author Rafal Latkowski
  */
 public interface PrimeImplicantsProvider
 {
     /**
-     * Generates prime implicants from positive cnf formula.
-     * CNF formula is represented as a concjunction of elements
-     * stored in collection.
-     * Each element of collection represents disjunction of variables
-     * stored as booleans in boolean vector.
+     * Generates prime implicants from a positive CNF formula.
+     * All clauses are provided as a collection.
+     * Each disjunctive clause is represented by a BitSet object,
+     * get(i) returns true if and only if
+     * the positive literal of the i-th variable occurs in this clause.
+     * The method returns collection of prime implicants of the formula.
+     * Each prime implicant is represented by a BitSet object,
+     * get(i) returns true if and only if
+     * the positive literal of the i-th variable occurs in this implicant.
      * 
      * @param cnf 	CNF formula
+     * @param width	Number of boolean variables used in the CNF formula.
      * @return 		Collection of prime implicants.
      */
-    Collection<BitSet> generatePrimeImplicants(Collection<BitSet> cnf,int width);
+    Collection<BitSet> generatePrimeImplicants(Collection<BitSet> cnf, int width);
 }

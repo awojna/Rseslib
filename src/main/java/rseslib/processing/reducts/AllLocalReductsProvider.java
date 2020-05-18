@@ -48,7 +48,7 @@ public class AllLocalReductsProvider extends Configuration implements LocalReduc
 	/** Discernibility matrix computed for a given table. */
 	private DiscernibilityMatrixProvider m_Discernibility;
 	/** Algorithm finding all prime implicants given a CNF boolean formula. */
-    private PrimeImplicantsProvider m_oPrimeImplicantsProvider = new KurzydlowskiPrimeImplicantsProvider(null);
+    private PrimeImplicantsProvider m_oPrimeImplicantsProvider = new KurzydlowskiPrimeImplicantsProvider();
 
     /**
      * Constructor taking a data table used to compute local reducts.

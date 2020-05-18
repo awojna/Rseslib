@@ -41,46 +41,6 @@ public class KurzydlowskiPrimeImplicantsProvider implements PrimeImplicantsProvi
 {
 
 	/**
-	 * Class for storing best variable in the best variable searching function.
-	 */
-	private class BestAttr
-	{
-		public int attr;
-		public AttrStat stat;
-		
-		public BestAttr(int attr, AttrStat stat)
-		{
-			this.attr = attr;
-			this.stat = stat;
-		}
-	}
-	
-	/**
-	 * Class for storing the subset of clauses not containing a given variable after splitting a set of clauses.
-	 */
-	private class Division
-	{
-		/** Size of the subset of clauses not containing a given variable. */
-		public int newSize;
-		/** Subset of clauses not containing a given variable. */
-		public ArrayList<BitSet>[] newSortedCnf;
-		/** Variable statistics for the represented subset of clauses. */
-		public Map<Integer, AttrStat> newAttrStats;
-		
-		@SuppressWarnings("unchecked")
-		public Division(int width)
-		{
-			newSize = 0;
-    		newSortedCnf = new ArrayList[width+1];
-            for (int i=0; i<=width; i++)
-            {
-            	newSortedCnf[i] = new ArrayList<BitSet>();
-            }
-    		newAttrStats = new HashMap<Integer,AttrStat>();
-		}
-	}
-	
-	/**
 	 * Class for storing statistics of a given variable with a comparison function.
 	 */
     private class AttrStat
@@ -124,6 +84,46 @@ public class KurzydlowskiPrimeImplicantsProvider implements PrimeImplicantsProvi
         }
     }
     
+	/**
+	 * Class for storing best variable in the best variable searching function.
+	 */
+	private class BestAttr
+	{
+		public int attr;
+		public AttrStat stat;
+		
+		public BestAttr(int attr, AttrStat stat)
+		{
+			this.attr = attr;
+			this.stat = stat;
+		}
+	}
+	
+	/**
+	 * Class for storing the subset of clauses not containing a given variable after splitting a set of clauses.
+	 */
+	private class Division
+	{
+		/** Size of the subset of clauses not containing a given variable. */
+		public int newSize;
+		/** Subset of clauses not containing a given variable. */
+		public ArrayList<BitSet>[] newSortedCnf;
+		/** Variable statistics for the represented subset of clauses. */
+		public Map<Integer, AttrStat> newAttrStats;
+		
+		@SuppressWarnings("unchecked")
+		public Division(int width)
+		{
+			newSize = 0;
+    		newSortedCnf = new ArrayList[width+1];
+            for (int i=0; i<=width; i++)
+            {
+            	newSortedCnf[i] = new ArrayList<BitSet>();
+            }
+    		newAttrStats = new HashMap<Integer,AttrStat>();
+		}
+	}
+	
 	/**
      * Creates an instance of prime implicants provider.
 	 */

@@ -83,7 +83,15 @@ public class Sampler
     
 
     
-    //TODO STAWICKI uzupe�ni� opis javadoc, doda� komunikaty dla rzucanych wyj�tk�w
+    /**
+     * Returns a sample of objects with repetitions
+     * given a set of objects and their probabilities.
+     *
+     * @param data				Collection of data object to be sampled.
+     * @param dataDistribution  Object probabilities.
+     * @param sampleSize		Size of the sample.
+     * @return      			Sample of data objects.
+     */
     public static ArrayList<DoubleData> selectWithRepetitionsFromSamplesWithDistribution(
     		ArrayList<DoubleData> data, ArrayList<Double> dataDistribution, int sampleSize) {
 

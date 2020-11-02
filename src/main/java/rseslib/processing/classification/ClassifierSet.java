@@ -176,7 +176,7 @@ public class ClassifierSet implements Serializable
      */
     public Map<String,TestResult> classify(DoubleDataTable tstTable, Progress prog) throws InterruptedException
     {
-        // klasyfikacja tabeli testowej
+        // classify the test table
         if (tstTable.noOfObjects()<=0) throw new RuntimeException("Classification of an empty table");
         NominalAttribute decAttr = tstTable.attributes().nominalDecisionAttribute();
         Map<String,int[][]> mapOfConfusionMatrices = new HashMap<String,int[][]>();
@@ -211,7 +211,7 @@ public class ClassifierSet implements Serializable
             }
             prog.step();
         }
-        // przygotowanie wynikow klasyfikacji
+        // prepare classification results
         Map<String,TestResult> resultMap = new HashMap<String,TestResult>();
         for (Map.Entry<String,Classifier> cl : m_Classifiers.entrySet())
         {

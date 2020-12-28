@@ -72,14 +72,14 @@ public class CrossValidationTest extends Configuration
      */
     public Map<String,MultipleTestResult> test(DoubleDataTable table, Progress prog) throws InterruptedException
     {
-        // podzial danych na n czesci
+        // divide the test table into n parts 
         Collection<DoubleData>[] parts =  table.randomPartition(m_nNoOfFolds);
         Map<String,TestResult[]> mapOfAccuracyForClassifiers = new HashMap<String,TestResult[]>();
         Progress emptyProg = new EmptyProgress();
         prog.set("Cross-validation test", 2*parts.length);
         for (int cv = 0; cv < parts.length; cv++)
         {
-            // utworzenie tabeli treningowej i testowej
+            // create the train and test tables
             DoubleDataTable trnTable = new ArrayListDoubleDataTable(table.attributes());
             DoubleDataTable tstTable = new ArrayListDoubleDataTable(table.attributes());
             for (int part = 0; part < parts.length; part++)
@@ -89,11 +89,11 @@ public class CrossValidationTest extends Configuration
                 for (DoubleData obj : parts[part]) tab.add(obj);
             }
 
-            // wyuczenie klasyfikatorow z tabeli treningowej
+            // train the classifiers using the training part
             m_Classifiers.train(trnTable, emptyProg);
             prog.step();
 
-            // klasyfikacja tabeli testowej
+            // classify the test part
             Map<String,TestResult> classificationResults = m_Classifiers.classify(tstTable, emptyProg);
             for (Map.Entry<String,TestResult> clRes : classificationResults.entrySet())
             {
@@ -108,7 +108,7 @@ public class CrossValidationTest extends Configuration
             prog.step();
         }
 
-        // zsumowanie wynikow
+        // aggregate the results
         Map<String,MultipleTestResult> crossValidationResults = new HashMap<String,MultipleTestResult>();
         for (Map.Entry<String,TestResult[]> clRes : mapOfAccuracyForClassifiers.entrySet())
             crossValidationResults.put(clRes.getKey(), new MultipleTestResult(clRes.getValue()));

@@ -88,16 +88,16 @@ public class MultipleRandomSplitTest extends Configuration
         Progress emptyProg = new EmptyProgress();
         for (int t = 0; t < m_nNoOfTests; t++)
         {
-            // podzial danych na tabele treningowa i testowa
+            // split the table into the train part and the test part
             ArrayList<DoubleData>[] parts = table.randomSplit(m_nNoOfPartsForTraining, m_nNoOfPartsForTesting);
             DoubleDataTable trnTable = new ArrayListDoubleDataTable(parts[0]);
             DoubleDataTable tstTable = new ArrayListDoubleDataTable(parts[1]);
 
-            // wyuczenie klasyfikatorow
+            // train the classifiers
             m_Classifiers.train(trnTable, emptyProg);
             prog.step();
 
-            // klasyfikacja tabeli testowej
+            // classify the test part
             Map<String,TestResult> classificationResults = m_Classifiers.classify(tstTable, emptyProg);
             for (Map.Entry<String,TestResult> clRes : classificationResults.entrySet())
             {

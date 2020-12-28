@@ -81,7 +81,7 @@ public class MultipleCrossValidationTest extends Configuration
         Map<String,double[]> mapOfAccuracyForClassifiers = new HashMap<String,double[]>();
         for (int t = 0; t < m_nNoOfTests; t++)
         {
-            // wykonanie testu kroswalidacyjnego
+            // run single cross-validation
             Map<String,MultipleTestResult> classificationResults = m_SingleCrossValidation.test(table, new EmptyProgress());
             for (Map.Entry<String,MultipleTestResult> clRes : classificationResults.entrySet())
             {

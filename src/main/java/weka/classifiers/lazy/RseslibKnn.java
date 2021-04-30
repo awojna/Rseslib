@@ -59,7 +59,7 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 		    new Tag(MetricFactory.Weighting.AccuracyBased.ordinal(), MetricFactory.Weighting.AccuracyBased.name()),
 	  };
 	
-	  /** Tags for 'weightingMethod' option */
+	  /** Tags for 'voting' option */
 	  private static final Tag[] TAGS_VOTING = {
 		    new Tag(KnnClassifier.Voting.Equal.ordinal(), KnnClassifier.Voting.Equal.name()),
 		    new Tag(KnnClassifier.Voting.InverseDistance.ordinal(), KnnClassifier.Voting.InverseDistance.name()),

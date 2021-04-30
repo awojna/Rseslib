@@ -188,7 +188,7 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
 	public double[] distributionForInstance(Instance instance) throws Exception
 	{
     	DoubleData dObj = m_WekaInstancesConverter.convertToDoubleData(instance);
-		double[] decDistr = ((ClassifierWithDistributedDecision)getRseslibClassifier()).classifyWithDistributedDecision(dObj);
+		double[] decDistr = ((ClassifierWithDistributedDecision)m_RseslibClassifier).classifyWithDistributedDecision(dObj);
 		double sum = 0.0;
 		for(int dec = 0; dec < decDistr.length; ++dec)
 			sum += decDistr[dec];

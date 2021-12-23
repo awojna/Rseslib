@@ -285,8 +285,13 @@ public class RseslibDoubleDataInput implements DoubleDataInput
                         double doubleValue = ((NominalAttribute)m_Header.attribute(attrIndex)).globalValueCode(value);
                         dObject.set(attrIndex, doubleValue);
                     }
-                    else if (m_Header.isNumeric(attrIndex))
-                        dObject.set(attrIndex, Double.parseDouble(value));
+                    else if (m_Header.isNumeric(attrIndex)) {
+                    	try {
+                    		dObject.set(attrIndex, Double.parseDouble(value));
+                    	} catch (NumberFormatException e) {
+                    		throw new DataFormatException("Attribute "+(att+1)+": "+m_Header.name(att)+" defined as numeric but the value '"+value+"' in the data line "+m_DataReader.getLineNumber()+" is not a number");
+                    	}
+                    }
                 }
                 else if (m_Header.isText(attrIndex))
                     dObject.set(attrIndex, ((NominalAttribute)m_Header.attribute(attrIndex)).globalValueCode(value));

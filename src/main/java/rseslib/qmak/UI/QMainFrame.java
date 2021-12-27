@@ -878,11 +878,11 @@ public class QMainFrame extends JFrame implements ActionListener {
 			} catch (InterruptedException g) {
 				QmakMain.Log.error(g.toString());
 			} catch (BadHeaderException b) {
-				QmakMain.Log.error(messages.getString("ErrWrongHeader"));
+				QmakMain.Log.error(messages.getString("ErrWrongHeader")+": "+b.getMessage());
 			} catch (HeaderFormatException f) {
-				QmakMain.Log.error(messages.getString("ErrWrongHeader"));
+				QmakMain.Log.error(messages.getString("ErrWrongHeader")+": "+f.getMessage());
 			} catch (DataFormatException f) {
-				QmakMain.Log.error(messages.getString("ErrWrongData"));
+				QmakMain.Log.error(messages.getString("ErrWrongData")+": "+f.getMessage());
 			}
 		}
 		return null;

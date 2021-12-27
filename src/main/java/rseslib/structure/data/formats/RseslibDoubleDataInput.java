@@ -275,7 +275,10 @@ public class RseslibDoubleDataInput implements DoubleDataInput
             else while (sepIndex < m_Line.length() && !Character.isWhitespace(m_Line.charAt(sepIndex))) sepIndex++;
             if (m_Header.attrInFileLoaded(att))
             {
-                String value = m_Line.substring(valueIndex, sepIndex);
+            	int valueEnd = sepIndex;
+            	if (valueEnd > 0)
+            		while (Character.isWhitespace(m_Line.charAt(valueEnd - 1))) valueEnd--;
+                String value = m_Line.substring(valueIndex, valueEnd);
                 if (m_Header.isInterpretable(attrIndex))
                 {
                     if (m_Header.isMissing(value))

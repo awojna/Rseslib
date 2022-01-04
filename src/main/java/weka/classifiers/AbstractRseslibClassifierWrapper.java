@@ -141,6 +141,7 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
 	 */
     public void buildClassifier(Instances data) throws Exception
     {
+    	getCapabilities().testWithFail(data);
     	m_WekaDecAttribute = data.classAttribute();
     	m_WekaInstancesConverter = new ArffDoubleDataInput(data);
     	ArrayList<DoubleData> objects = new ArrayList<DoubleData>();

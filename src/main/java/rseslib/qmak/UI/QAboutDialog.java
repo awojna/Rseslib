@@ -66,6 +66,9 @@ public class QAboutDialog extends JDialog implements ActionListener {
   JLabel jLabel13 = new JLabel();
   JLabel jLabel14 = new JLabel();
   JLabel jLabel15 = new JLabel();
+  JLabel jLabel16 = new JLabel();
+  JLabel jLabel17 = new JLabel();
+  JLabel jLabel18 = new JLabel();
 
   public QAboutDialog(Frame parent) {
     super(parent);
@@ -108,18 +111,21 @@ public class QAboutDialog extends JDialog implements ActionListener {
     gridLayout2.setRows(6);
     jLabel2.setText("Arkadiusz Wojna");
     jLabel3.setText("Katarzyna Jachim");
-    jLabel4.setText("Damian Manski");
-    jLabel5.setText("Michal Manski");
-    jLabel6.setText("Krzysztof Mroczek");
-    jLabel7.setText("Robert Piszczatowski");
-    jLabel8.setText("Maciej Prochniak");
-    jLabel9.setText("Tomasz Romanczuk");
-    jLabel10.setText("Piotr Skibinski");
-    jLabel11.setText("Marcin Staszczyk");
-    jLabel12.setText("Michal Szostakiewicz");
-    jLabel13.setText("Leszek Tur");
-    jLabel14.setText("Damian Wojcik");
-    jLabel15.setText("Maciej Zuchniak");
+    jLabel4.setText("Lukasz Kosson");
+    jLabel5.setText("Lukasz Kowalski");
+    jLabel6.setText("Damian Manski");
+    jLabel7.setText("Michal Manski");
+    jLabel8.setText("Krzysztof Mroczek");
+    jLabel9.setText("Krzysztof Niemkiewicz");
+    jLabel10.setText("Robert Piszczatowski");
+    jLabel11.setText("Maciej Prochniak");
+    jLabel12.setText("Tomasz Romanczuk");
+    jLabel13.setText("Piotr Skibinski");
+    jLabel14.setText("Marcin Staszczyk");
+    jLabel15.setText("Michal Szostakiewicz");
+    jLabel16.setText("Leszek Tur");
+    jLabel17.setText("Damian Wojcik");
+    jLabel18.setText("Maciej Zuchniak");
     insetsPanel2.add(imageLabel, null);
     panel2.add(insetsPanel2, BorderLayout.WEST);
     this.getContentPane().add(panel1, null);
@@ -143,6 +149,9 @@ public class QAboutDialog extends JDialog implements ActionListener {
     authorNames.add(jLabel13);
     authorNames.add(jLabel14);
     authorNames.add(jLabel15);
+    authorNames.add(jLabel16);
+    authorNames.add(jLabel17);
+    authorNames.add(jLabel18);
     panel2.add(insetsPanel3, BorderLayout.CENTER);
     insetsPanel1.add(buttonOk, null);
     panel1.add(insetsPanel1, BorderLayout.SOUTH);

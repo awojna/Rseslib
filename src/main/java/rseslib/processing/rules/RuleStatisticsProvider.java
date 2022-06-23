@@ -31,48 +31,56 @@ import rseslib.structure.rule.*;
 import rseslib.structure.table.DoubleDataTable;
 import rseslib.structure.vector.Vector;
 
-
 /**
- * @author Rafal Latkowski
+ * RuleStatisticsProvider calculates the decision distribution and the support
+ * of the rules from a given rule collection.
  *
+ * @author Rafal Latkowski
  */
 public class RuleStatisticsProvider
 {
+    /**
+     * Constructor.
+     */
     public RuleStatisticsProvider()
     {
     }
 
-    public void calculateStatistics(Collection<Rule> rules,DoubleDataTable table)
+    /**
+     * This method calculates the decision distribution and the support for given rules.
+     * 
+     * @param rules		Rules for which the decision distribution and the support are calculated.
+     * @param table		Table used to calculate the statistics of the rules.
+     */
+    public void calculateStatistics(Collection<Rule> rules, DoubleDataTable table)
     {
         int dec_attr = table.attributes().decision();
         NominalAttribute decAttr = table.attributes().nominalDecisionAttribute();
         HashMap<Integer,Integer> dec_mapping = new HashMap<Integer,Integer>();
         HashSet<Rule> removed_rules = new HashSet<Rule>();
-        for (int i=0;i<decAttr.noOfValues();i++)
-        {
-            dec_mapping.put((int)decAttr.globalValueCode(i),i);
-        }
+        for (int i=0; i<decAttr.noOfValues(); i++)
+            dec_mapping.put((int)decAttr.globalValueCode(i), i);
         for (Rule rule : rules)
         {
             int support = 0;
             int[] decs = new int[decAttr.noOfValues()];
-            Arrays.fill(decs,0);
-            //System.out.println("Rule "+rule.toString());
+            Arrays.fill(decs, 0);
             for (DoubleData object : table.getDataObjects())
             {
                 if (rule.matches(object))
                 {
                     support++;
-                    int dec_idx=dec_mapping.get((int)object.get(dec_attr));
+                    int dec_idx = dec_mapping.get((int)object.get(dec_attr));
                     decs[dec_idx]++;
-                    //System.out.println("matches object "+object.toString());
                 }
             }
-            if (support==0) removed_rules.add(rule);
+            if (support==0)
+            	removed_rules.add(rule);
             ((AbstractDistrDecRuleWithStatistics)rule).setSupport(support);
             Vector dv = new Vector(decs.length);
-            for (int i=0;i<decs.length;i++) dv.set(i,decs[i]);
-            ((AbstractDistrDecRuleWithStatistics)rule).setDecisionVector(dv,decAttr);
+            for (int i=0; i<decs.length; i++)
+            	dv.set(i, decs[i]);
+            ((AbstractDistrDecRuleWithStatistics)rule).setDecisionVector(dv, decAttr);
         }
         rules.removeAll(removed_rules);
     }

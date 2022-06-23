@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>pl.edu.mimuw.rseslib</groupId>
   <artifactId>rseslib</artifactId>
-  <version>3.2.4</version>
+  <version>3.2.5-SNAPSHOT</version>
   <name>Rseslib</name>
   <description>Rough set and machine learning data structures and algorithms</description>
   <dependencies>

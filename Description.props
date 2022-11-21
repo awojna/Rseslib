@@ -6,10 +6,10 @@
 PackageName=Rseslib
 
 # Version (required)
-Version=3.2.5-SNAPSHOT
+Version=3.2.5
 
 #Date
-Date=2022-03-11
+Date=2022-11-21
 
 # Title (required)
 Title=Rough Sets and Analogy-Based Reasoning

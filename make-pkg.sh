@@ -19,7 +19,7 @@ rm -rf target/rseslib-$version
 rm -rf target/weka
 rm -rf target/rseslib-$version-src.zip
 rm -rf target/rseslib-$version.zip
-rm -rf target/Rseslib$version.zip
+rm -rf target/rseslib-$version-weka.zip
 
 # make sources
 git archive --format zip --prefix=rseslib-$version-src/ --output target/rseslib-$version-src.zip master
@@ -45,4 +45,4 @@ zip -r rseslib-$version.zip rseslib-$version
 # make weka package
 cp rseslib-$version.jar weka/rseslib.jar
 cd weka
-zip -r ../Rseslib$version.zip *
+zip -r ../rseslib-$version-weka.zip *

@@ -47,7 +47,7 @@ import rseslib.util.random.RandomSelection;
  * Table of data objects with double values
  * implemented with use of java.lang.ArrayList.
  *
- * @author      Arkadiusz Wojna
+ * @author      Arkadiusz Wojna, Grzegorz Gora
  */
 public class ArrayListDoubleDataTable implements DoubleDataTable
 {
@@ -66,7 +66,6 @@ public class ArrayListDoubleDataTable implements DoubleDataTable
      * It is null if the decision distribution has not been requested yet.
      */
     private int[][] m_ValueDistribution = null;
-
 
     /**
      * Constructor reading data from a file.
@@ -99,6 +98,7 @@ public class ArrayListDoubleDataTable implements DoubleDataTable
             DoubleData dObject = doi.readDoubleData();
             m_DataObjects.add(dObject);
         }
+        setMinorityDecision();
     }
 
     /**
@@ -135,6 +135,7 @@ public class ArrayListDoubleDataTable implements DoubleDataTable
             DoubleData dObject = doi.readDoubleData();
             m_DataObjects.add(dObject);
         }
+        setMinorityDecision();
     }
 
     /**
@@ -176,6 +177,7 @@ public class ArrayListDoubleDataTable implements DoubleDataTable
         if (objects.length <= 0) throw new RuntimeException("Data table initialized with empty set of objects");
         m_arrAttributes = objects[0].attributes();
         for (int obj = 0; obj < objects.length; obj++) m_DataObjects.add(objects[obj]);
+        setMinorityDecision();
     }
 
     /**
@@ -188,6 +190,7 @@ public class ArrayListDoubleDataTable implements DoubleDataTable
         if (objects.size() <= 0) throw new RuntimeException("Data table initialized with empty set of objects");
         m_arrAttributes = objects.get(0).attributes();
         m_DataObjects = objects;
+        setMinorityDecision();
     }
 
     /**
@@ -294,6 +297,40 @@ public class ArrayListDoubleDataTable implements DoubleDataTable
     }
 
     /**
+     * Identifies and sets the minority decision.
+     * The minority decision is set only in case
+     * when this table has two decision classes.
+     */
+    public void setMinorityDecision()
+    {
+    	try
+    	{
+    		NominalAttribute decAttr = m_arrAttributes.nominalDecisionAttribute();
+    		if(!decAttr.isMinorityValueSet() && decAttr.noOfValues() == 2)
+    		{
+    			int[] decisionDistribution = getDecisionDistribution();
+    			int minDec = (decisionDistribution[0] <= decisionDistribution[1] ? 0 : 1);
+    			decAttr.setMinorityValueGlobalCode(decAttr.globalValueCode(minDec));
+    		}
+    	} catch (Exception e) { }
+    }
+
+    /**
+     * Assigns the minority decision in this table the same as in a given table.
+     * 
+     * @param table  Table providing the minority decision to be set.
+     */
+    public void takeMinorityDecisionFrom(DoubleDataTable table)
+    {
+    	try
+    	{
+    		NominalAttribute fromDecAttr = table.attributes().nominalDecisionAttribute();
+    		double minorityDec = (fromDecAttr.isMinorityValueSet() ? fromDecAttr.getMinorityValueGlobalCode() : -1);
+    		m_arrAttributes.nominalDecisionAttribute().setMinorityValueGlobalCode(minorityDec);
+    	} catch (Exception e) { }
+    }
+    
+    /**
      * Returns collection of all objects from this table.
      *
      * @return Collection of all objects from this table.
@@ -329,6 +366,19 @@ public class ArrayListDoubleDataTable implements DoubleDataTable
     	return getValueDistribution(m_arrAttributes.decision());
     }
 
+    /**
+     * Returns the fraction of the minority decision in this table.
+     *
+     * @return Fraction of the minority decision in this table.
+     */
+    public double getPercentOfMinorityDecision()
+    {
+    	NominalAttribute decAttr = m_arrAttributes.nominalDecisionAttribute();
+    	int minLocalCode = decAttr.localValueCode(decAttr.getMinorityValueGlobalCode());
+    	int[] decDistr = getDecisionDistribution();
+    	return ((double)decDistr[minLocalCode]) / m_DataObjects.size();
+    }    
+    
     /**
      * Returns the distribution of values in this table for a nominal attribute.
      * Array indices correspond to local value codes for a given attibute.
@@ -473,10 +523,18 @@ public class ArrayListDoubleDataTable implements DoubleDataTable
         {
             int[] decDistr = getDecisionDistribution();
             NominalAttribute decAttr = m_arrAttributes.nominalDecisionAttribute();
+            int minorityDec = -1;
+            if(decAttr.isMinorityValueSet())
+            	minorityDec = decAttr.localValueCode(decAttr.getMinorityValueGlobalCode());
             buf.append("Decisions:"+Report.lineSeparator);
             for (int i = 0; i < decDistr.length; i++)
                 if (decDistr[i] > 0)
-                    buf.append("   number of objects with the decision " + NominalAttribute.stringValue(decAttr.globalValueCode(i)) + " is " + decDistr[i]+Report.lineSeparator);
+                {
+                    buf.append("   number of objects with the decision " + NominalAttribute.stringValue(decAttr.globalValueCode(i)) + " is " + decDistr[i]);
+                    if (i == minorityDec)
+                    	buf.append(" (minority)");
+                    buf.append(Report.lineSeparator);
+                }
         }
         return buf.toString();
     }
@@ -509,6 +567,7 @@ public class ArrayListDoubleDataTable implements DoubleDataTable
         		if (m_NumStats[att]!=null)
         			tab.m_NumStats[att] = (NumericalStatistics)m_NumStats[att].clone();
         }
+        tab.setMinorityDecision();
         return tab;
     }
 }

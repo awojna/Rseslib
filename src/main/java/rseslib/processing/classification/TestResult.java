@@ -21,9 +21,9 @@
 package rseslib.processing.classification;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Properties;
-
 
 import rseslib.structure.attribute.NominalAttribute;
 import rseslib.system.Report;
@@ -33,12 +33,12 @@ import rseslib.system.Report;
  * and for particular decision classes
  * and confusion matrix.
  *
- * @author      Arkadiusz Wojna
+ * @author      Arkadiusz Wojna, Grzegorz Gora
  */
 public class TestResult implements Serializable
 {
 	/** Serialization version. */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	/** Dictionary of statistics specific to a classifier. */
     private Properties m_Statistics;
@@ -48,12 +48,16 @@ public class TestResult implements Serializable
     private int[] m_arrDecDistr;
     /** Confusion matrix obtained in classification. */
     private int[][] m_arrConfusionMatrix;
+    /** Decision distribution obtained in classification. */
+    private int[] m_arrPredictedDecDistr;
     /** Number of all objects tested. */
     private int m_nAll = 0;
     /** Number of objects that are assigned with a decision by a classifier. */
     private int m_nCovered = 0;
-    /** Number of correctly classfied objects. */
+    /** Number of correctly classified objects. */
     private int m_nCorrect = 0;
+    /** Local code of minority decision. */
+    private int m_nLocalMinorityDec = -1;
 
     /**
      * Constructor.
@@ -72,6 +76,13 @@ public class TestResult implements Serializable
         m_DecisionAttribute = decAttr;
         m_arrDecDistr = decDistr;
         m_arrConfusionMatrix = confusionMatrix;
+        m_arrPredictedDecDistr = new int[m_DecisionAttribute.noOfValues()];
+        for (int predictedDec = 0; predictedDec < m_arrPredictedDecDistr.length; predictedDec++)
+        {
+        	m_arrPredictedDecDistr[predictedDec] = 0;
+            for (int dec = 0; dec < m_arrDecDistr.length; dec++)
+            	m_arrPredictedDecDistr[predictedDec] += m_arrConfusionMatrix[dec][predictedDec];
+        }
         for (int dec = 0; dec < m_arrDecDistr.length; dec++)
         {
             m_nAll += m_arrDecDistr[dec];
@@ -79,8 +90,20 @@ public class TestResult implements Serializable
             for (int clDec = 0; clDec < m_arrConfusionMatrix[dec].length; clDec++)
             	m_nCovered += m_arrConfusionMatrix[dec][clDec];
         }
+        if (m_DecisionAttribute.isMinorityValueSet())
+        	m_nLocalMinorityDec = m_DecisionAttribute.localValueCode(m_DecisionAttribute.getMinorityValueGlobalCode());
     }
-
+    
+    /**
+     * Returns true if this result provides measures for imbalanced data.
+     * 
+     * @return  True if this result provides measures for imbalanced data.
+     */
+    public boolean hasMeasuresForImbalanced()
+    {
+    	return m_DecisionAttribute.isMinorityValueSet();
+    }
+    
     /**
      * Returns the information about the decision attribute.
      * 
@@ -115,6 +138,69 @@ public class TestResult implements Serializable
     }
 
     /**
+     * Returns sensitivity (recall, true positive rate) counted for minority decision class.
+     *
+     * @return  Sensitivity for minority decision class.
+     */
+    public double getSensitivity()
+    {
+    	if(m_nLocalMinorityDec == -1) throw new RuntimeException("The result does not provide measures for imbalanced data");
+    	return getLocalDecAccuracy(m_nLocalMinorityDec);
+    }
+    
+    /**
+     * Returns specificity (true negative rate), i.e. accuracy for majority decision class.
+     *
+     * @return  Specificity for majority decision class.
+     */
+    public double getSpecificity()
+    {
+    	if(m_nLocalMinorityDec == -1) throw new RuntimeException("The result does not provide measures for imbalanced data");
+    	return getLocalDecAccuracy(1 - m_nLocalMinorityDec);
+    }
+    
+    /**
+     * Returns precision (positive predictive value) counted for minority decision class.
+     *
+     * @return  Precision for minority decision class.
+     */
+    public double getPrecision()
+    {
+    	if(m_nLocalMinorityDec == -1) throw new RuntimeException("The result does not provide measures for imbalanced data");
+        if (m_arrDecDistr[m_nLocalMinorityDec]==0) return 0.0;
+        else return (double)m_arrConfusionMatrix[m_nLocalMinorityDec][m_nLocalMinorityDec]/(double)m_arrPredictedDecDistr[m_nLocalMinorityDec];
+    }
+  
+    /**
+     * Returns G-mean classification measure.
+     *
+     * @return  G-mean classification measure.
+     */
+    public double getGmean()
+    {
+    	if (m_DecisionAttribute.noOfValues() != 2) throw new RuntimeException("G-mean is defined only for classification with two decision classes");
+    	double productOfValues = 1;
+    	for (int dec = 0; dec < m_DecisionAttribute.noOfValues(); dec++)
+        	productOfValues *= getLocalDecAccuracy(dec);
+    	return Math.sqrt(productOfValues);
+    }
+    
+    /**
+     * Returns F-measure counted for minority class.
+     * 
+     * @return  F-measure counted for minority class.
+     */
+    public double getFmeasure()
+    {
+    	if(m_nLocalMinorityDec == -1) throw new RuntimeException("The result does not provide measures for imbalanced data");
+    	double recall = getSensitivity();
+    	double precision = getPrecision();
+    	double Fmeasure = 2 * (precision * recall) / (precision + recall);
+    	if (Double.isNaN(Fmeasure)) return 0;
+    	return Fmeasure;
+    }
+    
+    /**
      * Returns the number of objects with the real decision realDec
      * that were classified with the decision assignedDec.
      *
@@ -127,6 +213,18 @@ public class TestResult implements Serializable
         return m_arrConfusionMatrix[m_DecisionAttribute.localValueCode(realDec)][m_DecisionAttribute.localValueCode(assignedDec)];
     }
 
+    /**
+     * Returns classification accuracy for a decision class with a given local code.
+     *
+     * @param decLocCode   Local code of a decision class.
+     * @return             Classification accuracy for a decision class with a given local code.
+     */
+    private double getLocalDecAccuracy(int decLocCode)
+    {
+        if (m_arrDecDistr[decLocCode]==0) return 0.0;
+        else return (double)m_arrConfusionMatrix[decLocCode][decLocCode]/(double)m_arrDecDistr[decLocCode];
+    }
+    
     /**
      * Returns string representation of classification results.
      *
@@ -156,9 +254,50 @@ public class TestResult implements Serializable
             if (10000*decAccuracy-100*(int)(100*decAccuracy) < 10) sbuf.append("0");
             sbuf.append((int)(10000*decAccuracy-100*(int)(100*decAccuracy))+"%"+Report.lineSeparator);
         }
+        if (m_nLocalMinorityDec != -1)
+        {
+        	sbuf.append("  F-measure: " + getFmeasure() + Report.lineSeparator);
+        	sbuf.append("  G-mean: " + getGmean() + Report.lineSeparator);
+        	sbuf.append("  Sensitivity: " + getSensitivity() + Report.lineSeparator);
+        }
         return sbuf.toString();
     }
-    
+
+    /**
+     * Returns string representation of classification measures for imbalanced data. 
+     *
+     * @return  String representation of classification measures for imbalanced data.
+     */
+    public String toStringStats()
+    {
+    	StringBuffer sbuf = new StringBuffer();
+    	sbuf.append("true positive rate (sensitivity, recall)=" + getSensitivity() + Report.lineSeparator);
+    	sbuf.append("positive predictive value (precision)=" + getPrecision() + Report.lineSeparator);
+    	sbuf.append("dec distribution=" + Arrays.toString(m_arrDecDistr) + Report.lineSeparator);
+    	sbuf.append("predicted dec distribution=" + Arrays.toString(m_arrPredictedDecDistr) + Report.lineSeparator);
+    	sbuf.append("G-mean=" + getGmean() + Report.lineSeparator);
+    	sbuf.append("F-measure=" + getFmeasure() + Report.lineSeparator);
+    	return sbuf.toString();
+    }    
+
+    /**
+     * Returns string representation of confusion matrix.
+     *
+     * @return  String representation of confusion matrix.
+     */
+    public String toStringConfusionMatrix()
+    {
+        StringBuffer sbuf = new StringBuffer();
+        for (int dec = 0; dec < m_DecisionAttribute.noOfValues(); dec++) {
+        	sbuf.append("real dec=" + dec + "\t(" + NominalAttribute.stringValue(m_DecisionAttribute.globalValueCode(dec)) + ")\t");
+            for (int decClassified = 0; decClassified < m_DecisionAttribute.noOfValues(); decClassified++) {
+            	sbuf.append(m_arrConfusionMatrix[dec][decClassified] + "\t");
+            }
+            sbuf.append(Report.lineSeparator);
+        }
+        return sbuf.toString();
+    }
+
     /**
      * Returns statistics.
      *

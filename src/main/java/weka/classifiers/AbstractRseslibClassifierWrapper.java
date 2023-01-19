@@ -97,6 +97,16 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
 	}
 	
 	/**
+	 * Returns true if the classifier supports binary decision only.
+	 * 
+	 * @return	True if the classifier supports binary decision only.
+	 */
+	protected boolean binaryDecisionOnly()
+	{
+		return false;
+	}
+	
+	/**
 	 * Returns an instance of a TechnicalInformation object, containing 
 	 * detailed information about the technical background of this class,
 	 * e.g., paper reference or book this class is based on.
@@ -128,7 +138,10 @@ public abstract class AbstractRseslibClassifierWrapper extends weka.classifiers.
 		result.enable(Capability.NUMERIC_ATTRIBUTES);
 		result.enable(Capability.MISSING_VALUES);
 		// class
-		result.enable(Capability.NOMINAL_CLASS);
+		if(binaryDecisionOnly())
+			result.enable(Capability.BINARY_CLASS);
+		else
+			result.enable(Capability.NOMINAL_CLASS);
 		return result;
 	}
 	

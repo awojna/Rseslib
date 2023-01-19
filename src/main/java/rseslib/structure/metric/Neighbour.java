@@ -25,9 +25,9 @@ import rseslib.structure.data.DoubleDataWithDecision;
 /**
  * Information about a neighbour of a data object.
  * It contains the data of this neighbour, the distance
- * to the reference data object and other information.
+ * to the reference data object and consistency information.
  *
- * @author      Arkadiusz Wojna
+ * @author      Arkadiusz Wojna, Grzegorz Gora
  */
 public class Neighbour implements Comparable
 {
@@ -39,12 +39,15 @@ public class Neighbour implements Comparable
     int m_nId;
     /** Flag indicating whether this neighbour is consistent with the reference data object. */
     public boolean m_bConsistent;
+    /** Array of flags indicating consistency of this neighbour with the reference data object on different levels. */
+    public boolean[] m_bConsistentOnLevel = null;
 
     /**
      * Constructor.
      *
      * @param neighbour     Data of this neighbour.
      * @param neighbourDist The distance to the reference data object.
+     * @param id			Identifier of this neighbour.
      */
     public Neighbour(DoubleDataWithDecision neighbour, double neighbourDist, int id)
     {
@@ -83,6 +86,25 @@ public class Neighbour implements Comparable
         m_nNeighbourDist = neighbourDist;
     }
 
+    /**
+     * Checks consistency of this neighbour on the level selected in dependence on
+     * whether the decision of the neighbour is the same as indicated by the parameter.
+     * 
+     * @param decision			Decision value.
+     * @param levelForSameDec	Level used if the decision of this neighbour is the same as the 'decision' parameter. 
+     * @param levelForOtherDec	Level used if the decision of this neighbour is different from the 'decision' parameter.
+     * @return					True if this neighbour is consistent with the reference object on a given level.					
+     */
+    public boolean isConsistentOnLevel(double decision, int levelForSameDec, int levelForOtherDec) {
+    	return m_bConsistentOnLevel[m_Neighbour.getDecision() == decision ? levelForSameDec : levelForOtherDec];
+    }
+    
+    /**
+     * Indicates whether some other object is "equal to" this one.
+     * 
+     * @param obj	Object to be compared.
+     * @return 		True if the other object is equal to this one.
+     */
     public boolean equals(Object obj)
     {
         boolean result = false;
@@ -108,5 +130,14 @@ public class Neighbour implements Comparable
         if (((Neighbour)o).m_nId > m_nId) return -1;
         if (((Neighbour)o).m_nId < m_nId) return 1;
         return 0;
+    }
+    
+    /**
+     * Returns string representation of this neighbour.
+     *
+     * @return  String representation of this neighbour.
+     */
+    public String toString() {
+    	return m_Neighbour.toString() + ", dist=" + m_nNeighbourDist;
     }
 }

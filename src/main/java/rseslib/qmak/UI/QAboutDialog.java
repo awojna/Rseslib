@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2022 The Rseslib Contributors
+ * Copyright (C) 2002 - 2023 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -46,7 +46,7 @@ public class QAboutDialog extends JDialog implements ActionListener {
   private FlowLayout flowLayout1 = new FlowLayout();
   private GridLayout gridLayout1 = new GridLayout();
   private String product = "QMAK 3.3.0-SNAPSHOT";
-  private String copyright = "Copyright (C) 2005 - 2022";
+  private String copyright = "Copyright (C) 2005 - 2023";
   private TitledBorder titledBorder2;
   JPanel panelAuthors = new JPanel();
   JPanel authorNames = new JPanel();

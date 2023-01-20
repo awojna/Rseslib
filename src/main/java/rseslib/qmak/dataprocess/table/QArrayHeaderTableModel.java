@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2022 The Rseslib Contributors
+ * Copyright (C) 2002 - 2023 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -28,14 +28,8 @@ import rseslib.structure.attribute.*;
 import rseslib.structure.attribute.formats.*;
 
 /**
- * <p>Title: TArrayHeaderTableModel</p>
+ * Class storing header data for header editing and creating.
  *
- * <p>Description: Class storing header data for header editing and creating.
- * </p>
- *
- * <p>Copyright: Copyright (c) 2005</p>
- *
- * @version 1.0
  * @author Piotr Skibinski
  */
 public class QArrayHeaderTableModel extends AbstractTableModel

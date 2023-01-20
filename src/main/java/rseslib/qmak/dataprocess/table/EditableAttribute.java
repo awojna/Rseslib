@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2022 The Rseslib Contributors
+ * Copyright (C) 2002 - 2023 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -23,17 +23,9 @@ package rseslib.qmak.dataprocess.table;
 import rseslib.structure.attribute.Attribute;
 
 /**
- * <p>Title: </p>
- *
- * <p>Description: </p> Extended Attribute for creating and editing table header
- * purposes.
- *
- * <p>Copyright: Copyright (c) 2005</p>
- *
- * <p>Company: </p>
+ * Extended Attribute for creating and editing table header purposes.
  *
  * @author Piotr Skibinski
- * @version 1.0
  */
 public class EditableAttribute
     extends Attribute

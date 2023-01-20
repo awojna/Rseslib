@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2022 The Rseslib Contributors
+ * Copyright (C) 2002 - 2023 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *
@@ -42,18 +42,6 @@ import java.awt.Insets;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Copyright: Copyright (c) 2005</p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public class QDataTableNewDialog
     extends JDialog
 {

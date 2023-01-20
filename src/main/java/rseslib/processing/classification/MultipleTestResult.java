@@ -144,6 +144,16 @@ public class MultipleTestResult implements Serializable
     }
     
     /**
+     * Returns the standard deviation of accuracy.
+     *
+     * @return Standard deviation of accuracy.
+     */
+    public double getAccuracyStandardDeviation()
+    {
+        return m_AccuracyStat.getStandardDeviation();
+    }
+
+    /**
      * Returns the average F-measure.
      *
      * @return Average F-measure.

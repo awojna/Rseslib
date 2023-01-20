@@ -866,4 +866,14 @@ public class QDataTable extends AbstractTableModel implements iQDataTable, FileS
 	public String getDescriptionFileExtension() {
 		return extension;
 	}
+	
+    public void setMinorityDecision() {
+    }
+
+    public void takeMinorityDecisionFrom(DoubleDataTable table) {
+    }
+
+    public double getPercentOfMinorityDecision() {
+    	return Double.NaN;
+    }
 }

@@ -112,8 +112,8 @@ public class QMultipleTestResult implements iQProjectElement, iQXMLstoreable, Fi
 		
 		for (Iterator it = keys.iterator(); it.hasNext(); ) {
 			data[j][0] = it.next();
-			data[j][1] = wyniki.get(data[j][0]).getAverage();
-			data[j][2] = wyniki.get(data[j][0]).getStandardDeviation();
+			data[j][1] = wyniki.get(data[j][0]).getAvgAccuracy();
+			data[j][2] = wyniki.get(data[j][0]).getAccuracyStandardDeviation();
 			
 			j++;
 		}

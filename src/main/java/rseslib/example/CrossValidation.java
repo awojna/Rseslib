@@ -75,7 +75,8 @@ public class CrossValidation
         classifiers.addClassifier("Rough Set", rseslib.processing.classification.rules.roughset.RoughSetRuleClassifier.class);
         classifiers.addClassifier("KNN", rseslib.processing.classification.parameterised.knn.KnnClassifier.class);
         classifiers.addClassifier("Local KNN", rseslib.processing.classification.parameterised.knn.LocalKnnClassifier.class);
-        classifiers.addClassifier("RIONIDA", rseslib.processing.classification.parameterised.knn.rionida.RIONIDA.class);
+        if (table.attributes().nominalDecisionAttribute().noOfValues()==2)
+        	classifiers.addClassifier("RIONIDA", rseslib.processing.classification.parameterised.knn.rionida.RIONIDA.class);
         classifiers.addClassifier("C4.5", rseslib.processing.classification.tree.c45.C45.class);
         classifiers.addClassifier("AQ15", rseslib.processing.classification.rules.AQ15Classifier.class);
         classifiers.addClassifier("Neural Network", rseslib.processing.classification.neural.NeuronNetwork.class);

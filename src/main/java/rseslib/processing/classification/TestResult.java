@@ -21,6 +21,7 @@
 package rseslib.processing.classification;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -39,6 +40,8 @@ public class TestResult implements Serializable
 {
 	/** Serialization version. */
 	private static final long serialVersionUID = 2L;
+	/** Definition of statistics formatting. */
+	private static final DecimalFormat df = new DecimalFormat("0.0000");
 
 	/** Dictionary of statistics specific to a classifier. */
     private Properties m_Statistics;
@@ -242,23 +245,17 @@ public class TestResult implements Serializable
                 sbuf.append(resultName+" = "+m_Statistics.getProperty(resultName)+Report.lineSeparator);
             }
         }
-        double accuracy = getAccuracy();
-        sbuf.append("  Accuracy: "+(int)(100*accuracy)+".");
-        if (10000*accuracy-100*(int)(100*accuracy) < 10) sbuf.append("0");
-        sbuf.append((int)(10000*accuracy-100*(int)(100*accuracy))+"%"+Report.lineSeparator);
+        sbuf.append("Accuracy: "+df.format(getAccuracy())+Report.lineSeparator);
         for (int dec = 0; dec < m_DecisionAttribute.noOfValues(); dec++)
         {
         	double decCode = m_DecisionAttribute.globalValueCode(dec);
-        	double decAccuracy = getDecAccuracy(decCode); 
-            sbuf.append("  Decision "+NominalAttribute.stringValue(decCode)+": "+(int)(100*decAccuracy)+".");
-            if (10000*decAccuracy-100*(int)(100*decAccuracy) < 10) sbuf.append("0");
-            sbuf.append((int)(10000*decAccuracy-100*(int)(100*decAccuracy))+"%"+Report.lineSeparator);
+            sbuf.append("  Decision "+NominalAttribute.stringValue(decCode)+": "+df.format(getDecAccuracy(decCode))+Report.lineSeparator);
         }
         if (m_nLocalMinorityDec != -1)
         {
-        	sbuf.append("  F-measure: " + getFmeasure() + Report.lineSeparator);
-        	sbuf.append("  G-mean: " + getGmean() + Report.lineSeparator);
-        	sbuf.append("  Sensitivity: " + getSensitivity() + Report.lineSeparator);
+        	sbuf.append("F-measure: " + df.format(getFmeasure()) + Report.lineSeparator);
+        	sbuf.append("G-mean: " + df.format(getGmean()) + Report.lineSeparator);
+        	sbuf.append("Sensitivity: " + df.format(getSensitivity()) + Report.lineSeparator);
         }
         return sbuf.toString();
     }

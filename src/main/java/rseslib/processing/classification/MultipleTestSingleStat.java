@@ -20,6 +20,7 @@
 package rseslib.processing.classification;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 
 /**
  * Aggregated classification statistic from a number of tests.
@@ -30,6 +31,8 @@ public class MultipleTestSingleStat implements Serializable
 {
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
+	/** Definition of statistics formatting. */
+	private static final DecimalFormat df = new DecimalFormat("0.0000");
 
 	/** Name of statistic. */
     private String m_statisticName;
@@ -106,14 +109,7 @@ public class MultipleTestSingleStat implements Serializable
      */
     public String toString()
     {
-        StringBuffer sbuf = new StringBuffer();
-        sbuf.append(m_statisticName + ": "+(int)(100*m_nAverageStatistic)+".");
-        if (10000*m_nAverageStatistic-100*(int)(100*m_nAverageStatistic) < 10) sbuf.append("0");
-        sbuf.append((int)(10000*m_nAverageStatistic-100*(int)(100*m_nAverageStatistic))+"%");
-        sbuf.append("   Std.dev.: "+(int)(100*m_nStdDev)+".");
-        if (10000*m_nStdDev-100*(int)(100*m_nStdDev) < 10) sbuf.append("0");
-        sbuf.append((int)(10000*m_nStdDev-100*(int)(100*m_nStdDev))+"%");
-        return sbuf.toString();
+   		return m_statisticName + ": " + df.format(m_nAverageStatistic) + "   Std.dev.: " + df.format(m_nStdDev);
     }
 
     /**

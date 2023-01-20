@@ -20,9 +20,10 @@
 
 package rseslib.qmak.UI.Progress;
 
-import java.awt.Point;
+import javax.swing.JOptionPane;
 
 import rseslib.qmak.QmakMain;
+import rseslib.qmak.UI.QMainFrame;
 import rseslib.qmak.UI.Progress.QVisualProgress;
 import rseslib.qmak.dataprocess.classifier.iQClassifier;
 import rseslib.qmak.dataprocess.table.QDataTable;
@@ -46,7 +47,10 @@ public class QClassifyThread extends Thread {
 		QVisualProgress progres = new QVisualProgress();
 		progres.show();
 		Classifier.trainOnTableWithProgress(tab.getDataTable(), progres);
-		if (Classifier != null && !progres.Cancel)
+		if (progres.errMsg != null) {
+			progres.HideOkno();
+			JOptionPane.showMessageDialog(QMainFrame.getMainFrame(), progres.errMsg);
+		} else if (Classifier != null && !progres.Cancel)
 			QmakMain.getMainFrame().jMainWindow.wstawSklasyfikowanyElementDoProjektu(Classifier);
 	}
 }

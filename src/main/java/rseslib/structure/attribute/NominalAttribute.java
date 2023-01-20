@@ -30,12 +30,12 @@ import java.util.Map;
 /**
  * Nominal attribute information.
  *
- * @author      Arkadiusz Wojna
+ * @author      Arkadiusz Wojna, Grzegorz Gora
  */
 public class NominalAttribute extends Attribute
 {
     /** Serialization version. */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	/** Map between string and global double code of nominal values. */
     private static Map<String,Integer> s_StringValueToGlobalValueCodeMap = new HashMap<String,Integer>();
     /** Map between global double codes and string representation of nominal values. */
@@ -45,6 +45,8 @@ public class NominalAttribute extends Attribute
     private int m_nNoOfValues = 0;
     /** Map between local integer and global double codes of nominal values. */
     private int[] m_LocalToGlobalValueCodeMap = new int[2];
+    /** Global code of the least frequent value of this attribute. Can be used only in the attributes with 2 values, -1 in the attributes with more than 2 values. */
+    private double m_dMinorityValueGlobalCode = -1;
 
     /**
      * Constructor initialises mapping
@@ -71,6 +73,7 @@ public class NominalAttribute extends Attribute
         super(attrType, (attrType!=Type.text)?ValueSet.nominal:ValueSet.nonapplicable, attr.name());
         m_nNoOfValues = attr.m_nNoOfValues;
         m_LocalToGlobalValueCodeMap = attr.m_LocalToGlobalValueCodeMap;
+        m_dMinorityValueGlobalCode = attr.m_dMinorityValueGlobalCode;
     }
 
     /**
@@ -84,6 +87,10 @@ public class NominalAttribute extends Attribute
     	out.writeInt(m_nNoOfValues);
     	for (int v = 0; v < m_nNoOfValues; v++)
     		out.writeObject(stringValue(m_LocalToGlobalValueCodeMap[v]));
+    	if(m_dMinorityValueGlobalCode == -1)
+    		out.writeObject((String)null);
+    	else
+    		out.writeObject(stringValue(m_dMinorityValueGlobalCode));
     }
 
     /**
@@ -99,6 +106,11 @@ public class NominalAttribute extends Attribute
     	int noOfValues = in.readInt();
     	for (int v = 0; v < noOfValues; v++)
     		globalValueCode((String)in.readObject());
+    	String minorityValue = (String)in.readObject();
+    	if(minorityValue==null)
+    		m_dMinorityValueGlobalCode = -1;
+    	else
+    		m_dMinorityValueGlobalCode = globalValueCode(minorityValue);
     }
 
     /**
@@ -114,7 +126,7 @@ public class NominalAttribute extends Attribute
     /**
      * Converts the string representation of a nominal value to a double value
      * that is unique for the whole system.
-     * Global codes are succesive integer numbers.
+     * Global codes are successive integer numbers.
      *
      * @param valueName String representation of a nominal value.
      * @return          Global double code of the nominal value.
@@ -159,6 +171,23 @@ public class NominalAttribute extends Attribute
         return (String)s_StringValueList.get(intGlobalValue);
     }
 
+    
+    /**
+     * Checks whether a value occurs on this nominal attribute.
+     *
+     * @param valueName Name of a value to be examined.
+     * @return          True if the value occurs on this attribute.
+     */
+    public boolean valueOccurs(String valueName) {
+    	Integer value = (Integer)s_StringValueToGlobalValueCodeMap.get(valueName);
+    	if (value==null)
+    		return false;
+    	for (int v = 0; v < m_nNoOfValues; v++)
+    		if (m_LocalToGlobalValueCodeMap[v]==value.intValue())
+    			return true;
+    	return false;
+    }
+
     /**
      * Converts the global double code of a nominal value
      * to a local integer code that is unique only
@@ -193,6 +222,36 @@ public class NominalAttribute extends Attribute
         return m_LocalToGlobalValueCodeMap[localValueCode];
     }
 
+    /**
+     * Sets the least frequent value in this attribute.
+     * 
+     * @param minorityValueGlobalCode Global code of the least frequent value.
+     */
+    public void setMinorityValueGlobalCode(double minorityValueGlobalCode)
+    {
+    	m_dMinorityValueGlobalCode = minorityValueGlobalCode;
+    }
+
+    /**
+     * Returns true if the attribute provides information about the least frequent value.
+     * 
+     * @return True if the attribute provides information about the least frequent value.
+     */
+    public boolean isMinorityValueSet()
+    {
+    	return (m_dMinorityValueGlobalCode != -1);
+    }
+
+    /**
+     * Returns the least frequent value in this attribute.
+     * 
+     * @return Global code of the least frequent value.
+     */
+    public double getMinorityValueGlobalCode() {
+    	if (m_dMinorityValueGlobalCode == -1) throw new RuntimeException("An attempt to get the minority value when it is not set in the attribute");
+    	return m_dMinorityValueGlobalCode;
+    }
+    
      /**
       * Constructs string representation of this attribute.
       *

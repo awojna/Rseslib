@@ -48,6 +48,7 @@ import rseslib.qmak.dataprocess.project.iQProject;
 import rseslib.qmak.dataprocess.project.iQProjectElement;
 import rseslib.qmak.dataprocess.project.iQXMLstoreable;
 import rseslib.structure.attribute.NominalAttribute;
+import rseslib.system.Report;
 import rseslib.system.progress.Progress;
 
 /**
@@ -162,11 +163,15 @@ public class QTestResult implements iQProjectElement, iQXMLstoreable, FileStorea
 	}
 	
 	public void showResults(){
-		String str = wyniki.toString();
-		if (str.length() > 2) {
-			str = str.substring(1, str.length() - 1);
-		}
-		JOptionPane.showMessageDialog(QMainFrame.getMainFrame(), str, getName(), JOptionPane.PLAIN_MESSAGE);
+		StringBuffer buf = new StringBuffer();
+        for (Object par : wyniki.entrySet())
+        {
+            buf.append(((Map.Entry)par).getKey());
+            buf.append(Report.lineSeparator);
+            buf.append(((Map.Entry)par).getValue());
+            buf.append(Report.lineSeparator);
+        }
+		JOptionPane.showMessageDialog(QMainFrame.getMainFrame(), buf.toString(), getName(), JOptionPane.PLAIN_MESSAGE);
 	}
 
 	

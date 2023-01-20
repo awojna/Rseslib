@@ -39,12 +39,15 @@ public class QVisualProgress extends AbstractProgress
     /** Time when the progress started. */
     long m_nStartTime;
     public boolean Cancel = false;
+    public String errMsg = null;
     QProgress okno;
 
     public QVisualProgress(){
     	okno = new QProgress(this);
     }
     public void setCancel() {Cancel = true;}
+    
+    public void setErrorMessage(String msg) { errMsg = msg; }
     
     public void show() {
     	okno.pokaz();

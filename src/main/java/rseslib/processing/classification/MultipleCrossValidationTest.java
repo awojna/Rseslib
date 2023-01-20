@@ -35,7 +35,7 @@ import rseslib.system.progress.Progress;
  * In each test a given table is tested
  * with the cross-validation test.
  *
- * @author      Arkadiusz Wojna
+ * @author      Arkadiusz Wojna, Grzegorz Gora
  */
 public class MultipleCrossValidationTest extends Configuration
 {
@@ -78,25 +78,25 @@ public class MultipleCrossValidationTest extends Configuration
     public Map<String,MultipleTestResult> test(DoubleDataTable table, Progress prog) throws InterruptedException
     {
         prog.set("Multiple cross-validation test", m_nNoOfTests);
-        Map<String,double[]> mapOfAccuracyForClassifiers = new HashMap<String,double[]>();
+        Map<String,MultipleTestResult[]> mapOfAccuracyForClassifiers = new HashMap<String,MultipleTestResult[]>();
         for (int t = 0; t < m_nNoOfTests; t++)
         {
             // run single cross-validation
             Map<String,MultipleTestResult> classificationResults = m_SingleCrossValidation.test(table, new EmptyProgress());
             for (Map.Entry<String,MultipleTestResult> clRes : classificationResults.entrySet())
             {
-                double[] results = (double[])mapOfAccuracyForClassifiers.get(clRes.getKey());
-                if (results==null)
-                {
-                    results = new double[m_nNoOfTests];
-                    mapOfAccuracyForClassifiers.put(clRes.getKey(), results);
-                }
-                results[t] = clRes.getValue().getAverage();
+            	MultipleTestResult[] results = (MultipleTestResult[])mapOfAccuracyForClassifiers.get(clRes.getKey());
+            	if (results==null)
+            	{
+            		results = new MultipleTestResult[m_nNoOfTests];
+            		mapOfAccuracyForClassifiers.put(clRes.getKey(), results);
+            	}
+              results[t] = clRes.getValue();
             }
             prog.step();
         }
         Map<String,MultipleTestResult> multipleCrossValidationTestResults = new HashMap<String,MultipleTestResult>();
-        for (Map.Entry<String,double[]> clRes : mapOfAccuracyForClassifiers.entrySet())
+        for (Map.Entry<String,MultipleTestResult[]> clRes : mapOfAccuracyForClassifiers.entrySet())
         {
             multipleCrossValidationTestResults.put(clRes.getKey(), new MultipleTestResult(clRes.getValue()));
         }

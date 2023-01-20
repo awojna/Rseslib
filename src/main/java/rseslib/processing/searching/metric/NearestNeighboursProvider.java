@@ -167,7 +167,8 @@ public class NearestNeighboursProvider
      */
     public void getKNearest(Metric metr, DoubleData dObj, DoubleData[] objectArray, int noOfNearest, TreeSet<Neighbour> nearest)
     {
-        for (int obj = 0; obj < objectArray.length; obj++)
+    	if (noOfNearest == 0) return;
+    	for (int obj = 0; obj < objectArray.length; obj++)
         {
             double dist = metr.dist(dObj, objectArray[obj]);
             Neighbour last = null;

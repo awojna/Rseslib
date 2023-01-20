@@ -96,7 +96,7 @@ public class MultipleCrossValidationTestForParameterised extends Configuration
                     results = new double[m_nNoOfTests];
                     mapOfAccuracyForClassifiers.put(clRes.getKey(), results);
                 }
-                results[t] = clRes.getValue().getAverage();
+                results[t] = clRes.getValue().getAvgAccuracy();
             }
             for (Map.Entry<String,ParameterisedMultiTestResult> clRes : ((Map<String,ParameterisedMultiTestResult>)classificationResults[1]).entrySet())
             {
@@ -108,7 +108,7 @@ public class MultipleCrossValidationTestForParameterised extends Configuration
                 }
                 results[t] = new double[clRes.getValue().parameterRange()];
                 for (int parValue = 0; parValue < results[t].length; parValue++)
-                    results[t][parValue] = clRes.getValue().getResultForParameterValue(parValue).getAverage();
+                    results[t][parValue] = clRes.getValue().getResultForParameterValue(parValue).getAvgAccuracy();
                 if (t==0) mapOfParameterNamesForParameterisedClassifiers.put(clRes.getKey(), clRes.getValue().getParameterName());
             }
             prog.step();

@@ -37,7 +37,7 @@ import rseslib.system.progress.EmptyProgress;
 import rseslib.system.progress.Progress;
 
 /**
- * Input stream for data in the rses format.
+ * Input stream for data in the ARFF format.
  *
  * @author      Arkadiusz Wojna
  */

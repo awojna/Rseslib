@@ -25,94 +25,160 @@ import java.io.Serializable;
 import rseslib.system.Report;
 
 /**
- * Classification accuracy for a number of tests.
+ * Classification measures: Accuracy, F-measure, G-mean and Sensitivity
+ * for a number of tests.
  *
- * @author      Arkadiusz Wojna
+ * @author      Arkadiusz Wojna, Grzegorz Gora
  */
 public class MultipleTestResult implements Serializable
 {
     /** Serialization version. */
-	private static final long serialVersionUID = 1L;
-
-	/** Array of accuracy for particular tests. */
-    private double[] m_Accuracy;
-    /** Accuracy averaged over all tests. */
-    private double m_nAverageAccuracy;
-    /** Standard deviation of accuracy. */
-    private double m_nStdDev;
+	private static final long serialVersionUID = 2L;
+	/** Name of accuracy measure. */
+	private static final String ACCURACY_NAME = "Accuracy";
+	/** Name of F-measure. */
+	private static final String F_MEASURE_NAME = "F-measure";
+	/** Name of G-mean measure. */
+	private static final String G_MEAN_NAME = "G-mean";
+	/** Name of sensitivity measure. */
+	private static final String SENSITIVITY_NAME = "Sensitivity";
+	
+	/** Number of tests run. */
+	private int m_nNoOfTests;
+	/** Aggregated accuracy. */
+	private MultipleTestSingleStat m_AccuracyStat;
+	/** Aggregated F-measure. */
+	private MultipleTestSingleStat m_FmeasureStat;
+	/** Aggregated G-mean. */
+	private MultipleTestSingleStat m_GmeanStat;
+	/** Aggregated sensitivity. */
+	private MultipleTestSingleStat m_SensitivityStat;
 
     /**
-     * Constructor.
+     * Constructor without measures for imbalanced data.
      *
-     * @param accuracy Array of accuracy for particular tess.
+     * @param accuracy Array of accuracy for particular tests.
      */
     public MultipleTestResult(double[] accuracy)
     {
-        m_Accuracy = accuracy;
-        computeAverage();
-        computeStdDev();
+    	m_nNoOfTests = accuracy.length;
+        m_AccuracyStat = new MultipleTestSingleStat(ACCURACY_NAME, accuracy);
     }
 
     /**
-     * Constructor.
+     * Constructor aggregating results from individual tests.
      *
      * @param results Array of results for particular tests.
      */
     public MultipleTestResult(TestResult[] results)
     {
-        m_Accuracy = new double[results.length];
-        for (int run = 0; run < m_Accuracy.length; run++)
-            m_Accuracy[run] = results[run].getAccuracy();
-        computeAverage();
-        computeStdDev();
+    	m_nNoOfTests = results.length;
+    	double[] arrAccuracy = new double[m_nNoOfTests];
+    	for (int run = 0; run < m_nNoOfTests; run++)
+    		arrAccuracy[run] = results[run].getAccuracy();
+    	m_AccuracyStat = new MultipleTestSingleStat(ACCURACY_NAME, arrAccuracy);
+    	if(results[0].hasMeasuresForImbalanced())
+    	{
+    		double[] arrFmeasure = new double[m_nNoOfTests];
+    		double[] arrGmean = new double[m_nNoOfTests];
+    		double[] arrSensitivity = new double[m_nNoOfTests];
+    		for (int run = 0; run < m_nNoOfTests; run++)
+    		{
+    			arrFmeasure[run] = results[run].getFmeasure();
+    			arrGmean[run] = results[run].getGmean();
+    			arrSensitivity[run] = results[run].getSensitivity();
+    		}
+    		m_FmeasureStat = new MultipleTestSingleStat(F_MEASURE_NAME, arrFmeasure);
+    		m_GmeanStat = new MultipleTestSingleStat(G_MEAN_NAME, arrGmean);
+    		m_SensitivityStat = new MultipleTestSingleStat(SENSITIVITY_NAME, arrSensitivity);
+    	}
     }
 
     /**
-     * Computes accuracy avereged over all tests.
+     * Constructor aggregating results one level up. 
+     *
+     * @param lowerLevelResults Results from tests aggregated on the lower level.
      */
-    private void computeAverage()
+    public MultipleTestResult(MultipleTestResult[] lowerLevelResults)
     {
-        m_nAverageAccuracy = 0.0;
-        for (int run = 0; run < m_Accuracy.length; run++)
-            m_nAverageAccuracy += m_Accuracy[run];
-        m_nAverageAccuracy /= m_Accuracy.length;
+    	m_nNoOfTests = lowerLevelResults.length;
+    	double[] arrAccuracy = new double[m_nNoOfTests];
+    	for (int run = 0; run < m_nNoOfTests; run++)
+    		arrAccuracy[run] = lowerLevelResults[run].m_AccuracyStat.getAverage();
+    	m_AccuracyStat = new MultipleTestSingleStat(ACCURACY_NAME, arrAccuracy);
+    	if(lowerLevelResults[0].hasMeasuresForImbalanced())
+    	{
+    		double[] arrFmeasure = new double[m_nNoOfTests];
+    		double[] arrGmean = new double[m_nNoOfTests];
+    		double[] arrSensitivity = new double[m_nNoOfTests];
+    		for (int run = 0; run < m_nNoOfTests; run++)
+    		{
+    			arrFmeasure[run] = lowerLevelResults[run].m_FmeasureStat.getAverage();
+    			arrGmean[run] = lowerLevelResults[run].m_GmeanStat.getAverage();
+    			arrSensitivity[run] = lowerLevelResults[run].m_SensitivityStat.getAverage();
+    		}
+    		m_FmeasureStat = new MultipleTestSingleStat(F_MEASURE_NAME, arrFmeasure);
+    		m_GmeanStat = new MultipleTestSingleStat(G_MEAN_NAME, arrGmean);
+    		m_SensitivityStat = new MultipleTestSingleStat(SENSITIVITY_NAME, arrSensitivity);
+    	}
+    }
+    
+    /**
+     * Returns true if this result has classification measures for imbalanced data.
+     * 
+     * @return  True if this result has classification measures for imbalanced data.
+     */
+    private boolean hasMeasuresForImbalanced()
+    {
+    	return (m_FmeasureStat != null && m_GmeanStat != null && m_SensitivityStat != null);
     }
 
     /**
-     * Returns the average accuracy.
+     * Returns the average classification accuracy.
      *
      * @return Average accuracy.
      */
-    public double getAverage()
+    public double getAvgAccuracy()
     {
-        return m_nAverageAccuracy;
+        return m_AccuracyStat.getAverage();
     }
-
+    
     /**
-     * Computes the standard deviation of accuracy.
-     */
-    private void computeStdDev()
-    {
-        m_nStdDev = 0.0;
-        for (int run = 0; run < m_Accuracy.length; run++)
-        {
-            double diff = m_Accuracy[run] - m_nAverageAccuracy;
-            m_nStdDev += (diff*diff);
-        }
-        m_nStdDev /= m_Accuracy.length;
-        m_nStdDev = Math.sqrt(m_nStdDev);
-    }
-
-    /**
-     * Returns the standard deviation of accuracy.
+     * Returns the average F-measure.
      *
-     * @return Standard deviation of accuracy.
+     * @return Average F-measure.
      */
-    public double getStandardDeviation()
+    public double getAvgFmeasure()
     {
-        return m_nStdDev;
+    	if(m_FmeasureStat == null)
+    		return Double.NaN;
+        return m_FmeasureStat.getAverage();
     }
-
+    
+    /**
+     * Returns the average G-mean.
+     *
+     * @return Average G-mean.
+     */
+    public double getAvgGmean()
+    {
+    	if(m_GmeanStat == null)
+    		return Double.NaN;
+        return m_GmeanStat.getAverage();
+    }
+    
+    /**
+     * Returns the average sensitivity.
+     *
+     * @return Average sensitivity.
+     */
+    public double getAvgSensitivity()
+    {
+    	if(m_SensitivityStat == null)
+    		return Double.NaN;
+        return m_SensitivityStat.getAverage();
+    }
+    
     /**
      * Returns string representation of results.
      *
@@ -121,13 +187,34 @@ public class MultipleTestResult implements Serializable
     public String toString()
     {
         StringBuffer sbuf = new StringBuffer();
-        sbuf.append("Accuracy: "+(int)(100*m_nAverageAccuracy)+".");
-        if (10000*m_nAverageAccuracy-100*(int)(100*m_nAverageAccuracy) < 10) sbuf.append("0");
-        sbuf.append((int)(10000*m_nAverageAccuracy-100*(int)(100*m_nAverageAccuracy))+"%");
-        sbuf.append("   Std.dev.: "+(int)(100*m_nStdDev)+".");
-        if (10000*m_nStdDev-100*(int)(100*m_nStdDev) < 10) sbuf.append("0");
-        sbuf.append((int)(10000*m_nStdDev-100*(int)(100*m_nStdDev))+"%");
-        sbuf.append("   Tests: "+m_Accuracy.length+Report.lineSeparator);
+        sbuf.append(m_AccuracyStat.toString()+Report.lineSeparator);
+        if (m_FmeasureStat != null)
+        	sbuf.append(m_FmeasureStat.toString()+Report.lineSeparator);
+        if (m_GmeanStat != null)
+        	sbuf.append(m_GmeanStat.toString()+Report.lineSeparator);
+        if (m_SensitivityStat != null)
+        	sbuf.append(m_SensitivityStat.toString()+Report.lineSeparator);
+        sbuf.append("Tests: "+m_nNoOfTests+Report.lineSeparator);
         return sbuf.toString();
     }
+    
+    /**
+     * Returns string representation of results including partial results.
+     *
+     * @return  String representation of results including partial results.
+     */
+    public String toStringDetails()
+    {
+        StringBuffer sbuf = new StringBuffer();
+        sbuf.append(m_AccuracyStat.toStringDetails()+Report.lineSeparator);
+        if (m_FmeasureStat != null)
+        	sbuf.append(m_FmeasureStat.toStringDetails()+Report.lineSeparator);
+        if (m_GmeanStat != null)
+        	sbuf.append(m_GmeanStat.toStringDetails()+Report.lineSeparator);
+        if (m_SensitivityStat != null)
+        	sbuf.append(m_SensitivityStat.toStringDetails()+Report.lineSeparator);
+        sbuf.append("Tests: "+m_nNoOfTests+Report.lineSeparator);
+        return sbuf.toString();
+    }
+
 }

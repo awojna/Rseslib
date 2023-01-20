@@ -165,7 +165,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
         }
         // store information required in classification 
         if (m_Metric instanceof AbstractWeightedMetric)
-        	m_NeighboursFilter = new CubeBasedNeighboursFilter((AbstractWeightedMetric)m_Metric);
+        	m_NeighboursFilter = new CubeBasedNeighboursFilter((AbstractWeightedMetric)m_Metric, m_Transformer!=null);
         m_nMaxK = getIntProperty(MAXIMAL_K_PROPERTY_NAME);
         m_DecisionAttribute = trainTable.attributes().nominalDecisionAttribute();
         m_nDefaultDec = 0;
@@ -201,7 +201,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
         m_VicinityProvider = new IndexingTreeVicinityProvider(null, metric, indexingTree);
         m_nMaxK = getIntProperty(MAXIMAL_K_PROPERTY_NAME);
         if (metric instanceof AbstractWeightedMetric)
-        	m_NeighboursFilter = new CubeBasedNeighboursFilter((AbstractWeightedMetric)metric);
+        	m_NeighboursFilter = new CubeBasedNeighboursFilter((AbstractWeightedMetric)metric, true);
         m_DecisionAttribute = trainTable.attributes().nominalDecisionAttribute();
         m_nDefaultDec = 0;
         for (int dec = 1; dec < trainTable.getDecisionDistribution().length; dec++)
@@ -292,7 +292,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
     	m_bSelfLearning = false;
     	m_nMaxK = in.readInt();
         if (m_Metric instanceof AbstractWeightedMetric)
-        	m_NeighboursFilter = new CubeBasedNeighboursFilter((AbstractWeightedMetric)m_Metric);
+        	m_NeighboursFilter = new CubeBasedNeighboursFilter((AbstractWeightedMetric)m_Metric, m_Transformer!=null);
     	m_DecisionAttribute = (NominalAttribute)in.readObject();
     	m_nDefaultDec = in.readInt();
     }

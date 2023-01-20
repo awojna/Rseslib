@@ -20,7 +20,11 @@
 
 package rseslib.system;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import rseslib.system.output.Output;
@@ -323,4 +327,19 @@ public class Report
         s_bDisplayDebug = false;
     }
 
+    /**
+     * Writes text to a separate file.
+     *
+     * @param fileName	Path to the file.
+     * @param text		Text to be written.
+     * @throws FileNotFoundException
+     */
+    public static void printToFile(String fileName, String text) throws FileNotFoundException
+    {
+  		FileOutputStream fos = new FileOutputStream(fileName);
+  	    OutputStreamWriter osw = new OutputStreamWriter(fos);
+  	    PrintWriter pw = new PrintWriter(osw);
+  	    pw.print(text);
+  	    pw.close();
+    }
 }

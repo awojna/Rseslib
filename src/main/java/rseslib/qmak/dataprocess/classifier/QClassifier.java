@@ -26,6 +26,7 @@ import java.util.*;
 
 import rseslib.processing.classification.Classifier;
 import rseslib.qmak.XmlClassifierOpener;
+import rseslib.qmak.UI.Progress.QVisualProgress;
 import rseslib.qmak.dataprocess.project.iQXMLstoreable;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.table.DoubleDataTable;
@@ -126,23 +127,19 @@ public class QClassifier implements iQClassifier, iQXMLstoreable {
 			Configuration conf = (Configuration)klasyfikator;
 			for(String key : wlasciwosci.stringPropertyNames())
 				wlasciwosci.setProperty(key, conf.getProperty(key));
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			wytrenowany = true;
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (PropertyConfigurationException e) {
-			e.printStackTrace();
+			if (progres instanceof QVisualProgress)
+				((QVisualProgress)progres).setErrorMessage(e.getTargetException().getMessage());
+			else
+				e.printStackTrace();
+		} catch (Exception e) {
+			if (progres instanceof QVisualProgress)
+				((QVisualProgress)progres).setErrorMessage(e.getMessage());
+			else
+				e.printStackTrace();
 		}
 
-		wytrenowany = true;
 		return 0;
 	}
 

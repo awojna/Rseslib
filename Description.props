@@ -26,12 +26,14 @@ Maintainer=Arkadiusz Wojna <wojna@mimuw.edu.pl>
 License=GPL 3.0
 
 # Description (required)
-Description=The package provides 3 classifiers. The rule classifier RoughSet uses the concepts of discernibility matrix, reducts and rules generated from reducts. \
+Description=The package provides 4 classifiers. The rule classifier RoughSet uses the concepts of discernibility matrix, reducts and rules generated from reducts. \
 It provides variety of algorithms generating reducts including giving more general rules local reducts and has modes to work with incomplete data and inconsistent data. \
 The k nearest neighbors classifier RseslibKnn provides variety of distance measures that can work also for data with both numeric and nominal attributes and has built-in k optimization. \
 It implements a fast neighbors searching algorithm making the classifier work for very large data sets. The classifier has also the mode to work as RIONA algorithm. \
-The third classifier LocalKnn is the extension of the k nearest neighbors method that induces a local metric for each classified object. \
-It is dedicated rather to large data sets (2000+ training instances) and improves accuracy particularly in case of data containing nominal attributes.
+The LocalKnn classifier is the extension of the k nearest neighbors method that induces a local metric for each classified object. \
+It is dedicated rather to large data sets (2000+ training instances) and improves accuracy particularly in case of data containing nominal attributes. \
+The RIONIDA classifier dedicated to imbalanced data with two decision classes combines instance-based learning with rule induction. It enables to differentiate the importance of the decisions \
+and to control the impact of rules on the decision selection process and applies multi-dimensional optimization of classification measures relevant for imbalanced data.  
 
 # Package URL for obtaining the package archive (required)
 PackageURL=https://github.com/awojna/Rseslib/releases/download/v3.2.5/rseslib-3.2.5-weka.zip

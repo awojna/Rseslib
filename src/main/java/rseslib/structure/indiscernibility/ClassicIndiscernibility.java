@@ -21,8 +21,10 @@
 package rseslib.structure.indiscernibility;
 
 /**
+ * In this indiscernibility relation the missing value is treated like any other value:
+ * missing values are similar to each other and are different from any defined value.
+ *   
  * @author Rafal Latkowski
- * 
  */
 public class ClassicIndiscernibility extends AbstractIndiscernibility
 {
@@ -30,18 +32,16 @@ public class ClassicIndiscernibility extends AbstractIndiscernibility
 	private static final long serialVersionUID = 1L;
 
     /**
-     * 
-     */
-    public ClassicIndiscernibility()
-    {
-    }
-
-    /**
-     * @see rseslib.structure.indiscernibility.AbstractIndiscernibility#similar(double, double, int)
+	 * Defines the indiscernibility between two values of an attribute.
+	 * 
+	 * @param value1	First value to be compared.
+	 * @param value2	Second value to be compared.
+	 * @param attribute	Attribute index.
+	 * @return			True if the values are indiscernible false otherwise.
      */
     public boolean similar(double value1, double value2, int attribute)
     {
-        return value1==value2||(Double.isNaN(value1)&&Double.isNaN(value2));
+        return value1==value2 || (Double.isNaN(value1) && Double.isNaN(value2));
     }
 
     public boolean equals(Object o)

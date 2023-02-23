@@ -21,28 +21,26 @@
 package rseslib.structure.indiscernibility;
 
 /**
+ * In this indiscernibility relation a missing value is indistinguishable from any other value.
+ *   
  * @author Rafal Latkowski
- *
  */
-public class SymmetricSimilarityIndiscernibility extends
-        AbstractIndiscernibility
+public class SymmetricSimilarityIndiscernibility extends AbstractIndiscernibility
 {
 	/** Serialization version. */
 	private static final long serialVersionUID = 1L;
 
     /**
-     * 
-     */
-    public SymmetricSimilarityIndiscernibility()
-    {
-    }
-
-    /**
-     * @see rseslib.structure.indiscernibility.AbstractIndiscernibility#similar(double, double, int)
+	 * Defines the indiscernibility between two values of an attribute.
+	 * 
+	 * @param value1	First value to be compared.
+	 * @param value2	Second value to be compared.
+	 * @param attribute	Attribute index.
+	 * @return			True if the values are indiscernible false otherwise.
      */
     public boolean similar(double value1, double value2, int attribute)
     {
-        return (value1==value2)||Double.isNaN(value1)||Double.isNaN(value2);
+        return (value1==value2) || Double.isNaN(value1) || Double.isNaN(value2);
     }
 
     public boolean equals(Object o)

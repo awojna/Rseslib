@@ -21,14 +21,13 @@
 package rseslib.structure.function.doubleval;
 
 import rseslib.structure.data.DoubleData;
-import rseslib.structure.function.Function;
 
 /**
  * Interface for a numeric function on double data.
  *
  * @author      Arkadiusz Wojna
  */
-public interface DoubleFunction extends Function
+public interface DoubleFunction
 {
     /**
      * Returns the value of this function for a given double data.

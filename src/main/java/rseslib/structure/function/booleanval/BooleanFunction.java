@@ -21,14 +21,13 @@
 package rseslib.structure.function.booleanval;
 
 import rseslib.structure.data.DoubleData;
-import rseslib.structure.function.Function;
 
 /**
  * Interface for a boolean function on double data.
  *
  * @author      Arkadiusz Wojna
  */
-public interface BooleanFunction extends Function
+public interface BooleanFunction
 {
     /**
      * Returns the value of this function for a given double data.

@@ -21,7 +21,6 @@
 package rseslib.structure.function.vector;
 
 import rseslib.structure.data.DoubleData;
-import rseslib.structure.function.Function;
 import rseslib.structure.vector.Vector;
 
 /**
@@ -29,7 +28,7 @@ import rseslib.structure.vector.Vector;
  *
  * @author      Arkadiusz Wojna
  */
-public interface VectorFunction extends Function
+public interface VectorFunction
 {
     /**
      * Returns the value of this function for a given double data.

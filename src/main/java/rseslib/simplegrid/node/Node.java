@@ -191,7 +191,6 @@ public class Node
             catch (InterruptedException e) { }
         }
         m_nLastActionType=action;
-        System.out.println("Action = "+action);
         String answer = null;
         DatagramSocket dsoc = null;
         try
@@ -227,7 +226,6 @@ public class Node
                 System.out.println();
         }
        
-        System.out.println("Answer = "+answer);
         if (answer == null)
         {
             m_nChannelFound = false;

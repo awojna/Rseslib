@@ -52,10 +52,10 @@ public class DiscretizationFactory
 		EqualFrequency(HistogramDiscretizationProvider.class),
 		OneRule(OneRuleDiscretizationProvider.class),
 		EntropyMinimizationStatic(EntropyMinStaticDiscretizationProvider.class),
-		EntropyMinimizationDynamic(null),
+		EntropyMinimizationDynamic(EntropyMinDynamicDiscretizationProvider.class),
 		ChiMerge(ChiMergeDiscretizationProvider.class),
-		MaximalDiscernibilityHeuristicGlobal(null),
-		MaximalDiscernibilityHeuristicLocal(null);
+		MaximalDiscernibilityHeuristicGlobal(MDGlobalDiscretizationProvider.class),
+		MaximalDiscernibilityHeuristicLocal(MDLocalDiscretizationProvider.class);
 
 	    /** The class of this discretization type. */
 		private final Class classobj;

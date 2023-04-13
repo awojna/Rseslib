@@ -63,6 +63,7 @@ public class Node
     ArrayList<InetAddress> m_aRelays;
     
     int m_nTimeoutMillis = 5*1000;
+    int m_nLastActionType = -1; /* Stores last action to sleep for too-many "3" = get new task */
     boolean m_nChannelFound = false;
     int m_nChannel = 0;
     NodeInfoFrame m_frame;
@@ -185,6 +186,11 @@ public class Node
                 System.out.flush();
             }
         }
+        if (m_nLastActionType == action) {
+            try { Thread.sleep(1000); }
+            catch (InterruptedException e) { }
+        }
+        m_nLastActionType=action;
         String answer = null;
         DatagramSocket dsoc = null;
         try

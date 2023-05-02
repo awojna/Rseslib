@@ -9,7 +9,7 @@ The project is built with Java Development Kit version 8 and Maven. Rseslib can 
 ###  2. Command line
 Rseslib includes command-line programs computing reducts or rules or running experiments with Rseslib classifiers. See the chapter *Command line programs* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) for information how to run them. If you need to run a program from the source without Maven add weka.jar version 3.8.x to classpath to make it work on ARFF data files, for example:
 ```
-java -cp weka.jar rseslib.example.ComputeReducts [-d <discretization>] [-r <reducts type>] <data file> [<output file>]
+java -cp weka.jar rseslib.example.ComputeReducts iris.arff iris.reducts
 ```
 
 ### 3. WEKA platform

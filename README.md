@@ -4,10 +4,10 @@ Rough set and machine learning data structures, algorithms and tools in Java. Th
 The project is built with Java Development Kit version 8 and Maven. Rseslib can be used in the following ways:
 
 ###  1. Java library
-[Rseslib 3 algorithms](https://rseslib.mimuw.edu.pl/algorithms.html) provide a brief list of algorithms available in Rseslib and [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) is the main source of information how to use Rseslib components within Java code.
+[Rseslib 3 algorithms](https://rseslib.mimuw.edu.pl/algorithms.html) provide a brief list of algorithms available in the project and [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) is the main source of information how to use Rseslib components within Java code.
 
 ###  2. Command line
-Rseslib includes command-line programs computing reducts or rules or running experiments with Rseslib classifiers. See the chapter *Command line programs* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) for information how to run them. If you need to run a program from the source without Maven add weka.jar version 3.8.x to classpath to make it work on ARFF data files, for example:
+Rseslib includes command-line programs computing reducts or rules or running experiments with Rseslib classifiers. See the chapter *Command line programs* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) for information how to run them. If you run a program from the source without Maven, add weka.jar version 3.8.x to classpath to make it work on ARFF data files, for example:
 ```
 java -cp weka.jar rseslib.example.ComputeReducts iris.arff iris.reducts
 ```

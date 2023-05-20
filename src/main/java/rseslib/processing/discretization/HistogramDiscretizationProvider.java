@@ -78,8 +78,22 @@ public class HistogramDiscretizationProvider extends AbstractDiscretizationProvi
         for (DoubleData obj : filtered) data[i++] = obj.get(attribute);
         Arrays.sort(data);
     	double[] cuts = new double[m_nNumberOfIntervals-1];
+    	int c = 0;
         for (i=0; i<cuts.length; i++)
-            cuts[i] = data[(i+1)*data.length/m_nNumberOfIntervals];
-        return cuts;
+        {
+        	double val = data[(i+1)*data.length/m_nNumberOfIntervals];
+        	if(val != data[0] && (c == 0 || val != cuts[c-1]))
+        		cuts[c++] = val;
+        }
+        double[] final_cuts = null;
+        if (c == cuts.length)
+        	final_cuts = cuts;
+        else
+        {
+        	final_cuts = new double[c];
+            for (i=0; i<final_cuts.length; i++)
+            	final_cuts[i] = cuts[i];
+        }
+        return final_cuts;
     }
 }

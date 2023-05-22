@@ -22,6 +22,7 @@ package rseslib.example;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.BitSet;
 import java.util.Collection;
@@ -50,10 +51,13 @@ import rseslib.system.progress.EmptyProgress;
  * and writes them to a file.
  * 
  * Usage:
- *     java ... rseslib.example.ComputeReducts [-d <discretization>] [-r <reducts>] <data file> [<output file>]
+ *     java ... rseslib.example.ComputeReducts [-d <discretization>] [-dcfg <discr. config file>] [-r <reducts>] [-rcfg <reducts config file>] <data file> [<output file>]
  * 
  * Run the class without arguments to see possible values of the program options.
- *
+ * Each discretization method and each algorithm computing reducts has its own set of parameters. Check out:
+ * src/main/resources/rseslib/processing/discretization/ for the config files with parameters of the discretization methods,
+ * src/main/resources/rseslib/processing/reducts/ for the config files with parameters of the algorithms computing reducts.
+ * 
  * @author      Arkadiusz Wojna
  */
 public class ComputeReducts
@@ -69,6 +73,8 @@ public class ComputeReducts
     	// parse the options, print help
         DiscretizationType discretization = DiscretizationType.MaximalDiscernibilityHeuristicLocal;
     	ReductsMethod reductsType = ReductsMethod.AllGlobal;
+        String discrCfgFile = null;
+        String reductsCfgFile = null;
     	int requiredArgs = 1;
     	if (args.length > requiredArgs && args[requiredArgs - 1].equals("-d"))
     	{
@@ -86,6 +92,11 @@ public class ComputeReducts
     		}
     		requiredArgs += 2;
     	}
+		if(args.length > requiredArgs && args[requiredArgs - 1].equals("-dcfg"))
+		{
+			discrCfgFile = args[requiredArgs];
+    		requiredArgs += 2;
+		}
     	if (args.length > requiredArgs && args[requiredArgs - 1].equals("-r"))
     	{
     		try
@@ -102,19 +113,28 @@ public class ComputeReducts
     		}
     		requiredArgs += 2;
     	}
+		if(args.length > requiredArgs && args[requiredArgs - 1].equals("-rcfg"))
+		{
+			reductsCfgFile = args[requiredArgs];
+    		requiredArgs += 2;
+		}
     	if (args.length != requiredArgs && args.length != requiredArgs + 1)
     	{
     		System.out.println("Program computes reducts from a dataset and writes them to a file.");
     		System.out.println("Usage:");
-    		System.out.println("    java ... rseslib.example.ComputeReducts [-d <discretization>] [-r <reducts>] <data file> [<output file>]");
+    		System.out.println("    java ... rseslib.example.ComputeReducts [-d <discretization>] [-dcfg <discr. config file>] [-r <reducts>] [-rcfg <reducts config file>] <data file> [<output file>]");
+    		System.out.println();
     		System.out.print("Discretizations: ");
     		for(DiscretizationType discr : DiscretizationType.values())
     			System.out.print(discr + ", ");
+    		System.out.println();
+    		System.out.println("Check out src/main/resources/rseslib/processing/discretization/ in Rseslib source for the config files with parameters of the discretizations");
     		System.out.println();
     		System.out.print("Reducts: ");
     		for(ReductsMethod red : ReductsMethod.values())
     			System.out.print(red + ", ");
     		System.out.println();
+    		System.out.println("Check out src/main/resources/rseslib/processing/reducts/ in Rseslib source for the config files with parameters of the reduct types");
     		System.exit(0);
     	}
     	File dataFile = new File(args[requiredArgs - 1]);
@@ -135,28 +155,34 @@ public class ComputeReducts
         Report.displaynl(table);
 
         // discretize the table
+        Properties discrParams = null;
+        if (discrCfgFile != null)
+        {
+        	discrParams = new Properties();
+        	discrParams.load(new FileInputStream(discrCfgFile));
+        }
         TransformationProvider discrProv = null;
     	switch (discretization)
     	{
     		case None:
     			break;
     		case EqualWidth:
-    			discrProv = new RangeDiscretizationProvider(null);
+    			discrProv = new RangeDiscretizationProvider(discrParams);
     			break;
     		case EqualFrequency:
-    			discrProv = new HistogramDiscretizationProvider(null);
+    			discrProv = new HistogramDiscretizationProvider(discrParams);
     			break;
     		case OneRule:
-    			discrProv = new OneRuleDiscretizationProvider(null);
+    			discrProv = new OneRuleDiscretizationProvider(discrParams);
     			break;
     		case EntropyMinimizationStatic:
-    			discrProv = new EntropyMinStaticDiscretizationProvider(null);
+    			discrProv = new EntropyMinStaticDiscretizationProvider(discrParams);
     			break;
     		case EntropyMinimizationDynamic:
     			discrProv = new EntropyMinDynamicDiscretizationProvider();
     			break;
     		case ChiMerge:
-    			discrProv = new ChiMergeDiscretizationProvider(null);
+    			discrProv = new ChiMergeDiscretizationProvider(discrParams);
     			break;
     		case MaximalDiscernibilityHeuristicGlobal:
     			discrProv = new MDGlobalDiscretizationProvider();
@@ -178,28 +204,34 @@ public class ComputeReducts
         Report.display("Computing reducts...");
         LocalReductsProvider localProv = null;
         GlobalReductsProvider globalProv = null;
-        Properties johnsonProps;
+        Properties reductsParams = null;
+        if (reductsCfgFile != null)
+        {
+        	reductsParams = new Properties();
+        	reductsParams.load(new FileInputStream(reductsCfgFile));
+        }
     	switch (reductsType)
     	{
     	case AllLocal:
-    		localProv = new AllLocalReductsProvider(null, table);
+    		localProv = new AllLocalReductsProvider(reductsParams, table);
     		break;
     	case AllGlobal:
-    		globalProv = new AllGlobalReductsProvider(null, table);
+    		globalProv = new AllGlobalReductsProvider(reductsParams, table);
     		break;
     	case OneJohnson:
-    		globalProv = new JohnsonReductsProvider(null, table);
+    		globalProv = new JohnsonReductsProvider(reductsParams, table);
     		break;
     	case AllJohnson:
-    		johnsonProps = Configuration.loadDefaultProperties(JohnsonReductsProvider.class);
-    		johnsonProps.setProperty("Reducts", "AllJohnson");
-    		globalProv = new JohnsonReductsProvider(johnsonProps, table);
+    		if(reductsParams == null)
+    			reductsParams = Configuration.loadDefaultProperties(JohnsonReductsProvider.class);
+    		reductsParams.setProperty("Reducts", "AllJohnson");
+    		globalProv = new JohnsonReductsProvider(reductsParams, table);
     		break;
     	case PartialLocal:
-    		localProv = new PartialReductsProvider(null, table);
+    		localProv = new PartialReductsProvider(reductsParams, table);
     		break;
     	case PartialGlobal:
-    		globalProv = new PartialReductsProvider(null, table);
+    		globalProv = new PartialReductsProvider(reductsParams, table);
     		break;
     	}
     	Collection<BitSet> reducts = null;

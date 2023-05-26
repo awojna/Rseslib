@@ -1,7 +1,7 @@
 # Rseslib
 Rough set and machine learning data structures, algorithms and tools in Java. The project includes algorithms for discernibility matrix, reducts, decision rules and wide range of discretization and classification algorithms, including optimized for large data KNN classifier implementing analogy-based reasoning, and dedicated to imbalanced data RIONIDA with multidimensional optimization. The project includes also QMAK - a tool for interacting with machine learning models and visualizing classification process, and Simple Grid Manager for running experiments on many computers or cores. For more information visit https://rseslib.mimuw.edu.pl.
 
-The project is built with Java Development Kit and Maven. The following command will build *rseslib-\<version\>.jar* in Maven target directory:
+The project is built with Java Development Kit and Maven. The following command will build *rseslib-\<version\>.jar* and copy other needed libraries to Maven target directory:
 ```
 mvn package
 ```

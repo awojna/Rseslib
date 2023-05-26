@@ -31,8 +31,10 @@ import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.PropertyConfigurationException;
 
 /**
- * This class represents an algorithm that uses the chi square statistic to
- * discretize numeric attributes
+ * ChiMerge, a bottom-up discretization method using the chi square statistic to test
+ * whether neighbouring intervals have significantly different decision distributions.
+ * If the distributions are similar the algorithm merges the intervals into one interval.
+ * The method discretizes each numerical attribute independently.
  * 
  * @author Marcin Jalmuzna
  */
@@ -46,10 +48,10 @@ public class ChiMergeDiscretizationProvider extends
 
     private int minIntervals;
 	private double statisticalSignificance;
-	// Dla ka�dej warto�ci dyskretyzowanego atrybutu obliczana jest
-	// ilo�� rekord�w z t� warto�ci� oraz rozk�ad na decyzje
+	// For each value of the discretized attribute
+	// number of objects with this value and decision distribution are calculated
 	private TreeMap<Double, Record> possibleCuts;
-	// Lista warto�ci atrybutu decyzyjnego
+	// List of decision values
 	private ArrayList<Double> decisions;
 
 	public ChiMergeDiscretizationProvider(Properties prop) throws PropertyConfigurationException {
@@ -78,7 +80,7 @@ public class ChiMergeDiscretizationProvider extends
 
 		decisions = new ArrayList<Double>();
 		possibleCuts = new TreeMap<Double, Record>();
-		// ustawiamy warto�ci possibleCuts i decisions
+		// fill possibleCuts with count and decision distribution for each attribute value
 		for (DoubleData dd : table.getDataObjects()) {
 			Double tmp = Double.valueOf(dd.get(attribute));
 			Double dec = Double.valueOf(dd.get(table.attributes().decision()));
@@ -117,11 +119,11 @@ public class ChiMergeDiscretizationProvider extends
 					.lowerKey(tmp)), possibleCuts.get(tmp));
 		}
 
-		// scalamy przedzia�y a� osi�gniemy jedno z ogranicze�
+		// merge intervals until any stopping condition is met
 		while ((possibleCuts.size() > minIntervals) && (min_val < theta)) {
 			Double min = null;
 			min_val = Double.MAX_VALUE;
-			// szukamy najlepszej pary przedzia��w do scalenia
+			// search for the best pair of intervals to merge
 			for (Double tmp = possibleCuts.higherKey(possibleCuts.firstKey()); tmp != null; tmp = possibleCuts
 					.higherKey(tmp)) {
 				double val = possibleCuts.get(tmp).chi2;
@@ -146,7 +148,7 @@ public class ChiMergeDiscretizationProvider extends
 				}
 			}
 		}
-		/** Creating result table*/
+		//create result table
 		double[] ret = new double[possibleCuts.size() - 1];
 
 		Iterator<Double> iter2 = possibleCuts.keySet().iterator();

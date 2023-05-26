@@ -29,8 +29,12 @@ import rseslib.structure.data.DoubleData;
 import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.PropertyConfigurationException;
 /**
- * This class represents Holte's One Rule discretization algorithm that
- * discretize numeric attributes.
+ * Holte's 1R algorithm.
+ * It tries to cut the range of values of a numerical attribute
+ * into intervals containing training objects with the same decision
+ * but it avoids very small intervals.
+ * The minimal number of training objects that must fall
+ * into each interval is the parameter of 1R algorithm.
  * 
  * @author Marcin Jalmuzna
  */

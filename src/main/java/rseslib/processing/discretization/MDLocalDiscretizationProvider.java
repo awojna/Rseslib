@@ -37,9 +37,14 @@ import rseslib.structure.attribute.NumericAttribute;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.function.doubleval.AttributeDoubleFunction;
 import rseslib.structure.table.DoubleDataTable;
+
 /**
- * This class represents a method of discretizing continuous attributes based on
- * a local MD heuristic.
+ * Top-down local method discretizing all numerical attributes at once.
+ * It starts with the whole set of objects and splits it into two subsets
+ * with the optimal cut selected from all numerical attributes.
+ * Then the algorithm splits each subset recursively.
+ * At each step it evaluates all cuts and select the cut
+ * maximizing the number of discerned pairs of objects in the current subset.  
  * 
  * @author Marcin Jalmuzna
  */

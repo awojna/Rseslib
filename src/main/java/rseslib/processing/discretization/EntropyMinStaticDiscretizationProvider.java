@@ -31,16 +31,20 @@ import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.PropertyConfigurationException;
 
 /**
- * This class represents a method of discretizing continuous attributes based on
- * a minimal enthropy heuristic, static version (1993 Fayyad & Irani).
+ * Top-down local method discretizing independently each numerical attribute (1993 Fayyad & Irani).
+ * It starts with the whole range of values of the attribute in a data set
+ * and divides it into smaller intervals. At each step the algorithm
+ * remembers which objects from the data set fall into each interval.
+ * In a single step the algorithm searches all possible cuts in all intervals
+ * and selects the new cut maximizing information gain, i.e. minimizing entropy.
  * 
  * @author Marcin Jalmuzna
  */
 public class EntropyMinStaticDiscretizationProvider extends
 		AbstractDiscretizationProvider {
 
-	// Dla ka�dej warto�ci dyskretyzowanego atrybutu obliczana jest 
-	// ilo�� rekord�w z t� warto�ci� oraz rozk�ad na decyzje
+	// For each value of the discretized attribute
+	// number of objects with this value and decision distribution are calculated
 	private TreeMap<Double, Record> decisionDistribution;
 
 	public EntropyMinStaticDiscretizationProvider(Properties prop) throws PropertyConfigurationException {
@@ -102,8 +106,7 @@ public class EntropyMinStaticDiscretizationProvider extends
 			return null;
 		if (start >= end)
 			return null;
-		// przegladamy tabele z danymi i wyciagamy wszystkie wartosci
-		// etykiety(decyzji)
+		// collect all decision values
 		ArrayList<Double> decisions = new ArrayList<Double>();
 		double dataSize = 0;
 		for (Double tmp = start; (tmp!=null)&&(tmp <= end); tmp = decisionDistribution.higherKey(tmp)) {
@@ -120,7 +123,7 @@ public class EntropyMinStaticDiscretizationProvider extends
 		double min_e_gt = 0;
 		int[][] min_tab = new int[decisions.size()][2];
 
-		// zerujemy tablice
+		// initialize the arrays
 		int[][] tab = new int[decisions.size()][2];
 		for (int j = 0; j < decisions.size(); j++) {
 			tab[j][0] = 0;
@@ -135,8 +138,7 @@ public class EntropyMinStaticDiscretizationProvider extends
 			}
 		}
 
-		// przegladamy wszystkie rekordy i wybieramy ten z najmniejsza wartoscia
-		// entropii
+		// go over all candidate cuts and select the one with the least entropy
 		for (Double tmp = start; tmp < end; tmp = decisionDistribution.higherKey(tmp)) {
 			lw += decisionDistribution.get(tmp).getSum();
 			gt -= decisionDistribution.get(tmp).getSum();
@@ -148,7 +150,7 @@ public class EntropyMinStaticDiscretizationProvider extends
 						.getDecisions().get(d);
 			}
 
-			// liczymy entropi� dla danego ciecia
+			// calculate entropy for the candidate cut 'tmp'
 			double e_lw = 0;
 			double e_gt = 0;
 			for (int j = 0; j < decisions.size(); j++) {
@@ -169,10 +171,10 @@ public class EntropyMinStaticDiscretizationProvider extends
 
 			double val = (((double) lw / dataSize) * e_lw)
 					+ (((double) gt / dataSize) * e_gt);
-			// uaktualniamy minimum
+			// update current best cut
 			if (val < min_val) {
-				min_val = val; // minimalna entropia
-				min = tmp; // minimum val
+				min_val = val; // entropy of new best cut
+				min = tmp; // new best cut
 				min_e_lw = e_lw;
 				min_e_gt = e_gt;
 				min_tab = tab.clone();

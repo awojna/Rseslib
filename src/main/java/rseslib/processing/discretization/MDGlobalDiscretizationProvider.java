@@ -37,8 +37,10 @@ import rseslib.structure.function.doubleval.AttributeDoubleFunction;
 import rseslib.structure.table.DoubleDataTable;
 
 /**
- * This class represents a method of discretizing continuous attributes based on
- * a local MD heuristic.
+ * Top-down global method discretizing all numerical attributes at once.
+ * At each step it evaluates cuts globally with respect to the whole training set
+ * and select the cut maximizing the number of discerned pairs of objects among the pairs
+ * that are not discerned by the previously selected cuts.  
  * 
  * @author Marcin Jalmuzna
  */
@@ -52,11 +54,8 @@ public class MDGlobalDiscretizationProvider implements TransformationProvider {
      * Creates discretization cuts for one attribute.
      * Main method of this discretization provider.
      * 
-     * @param attribute				Selected attribute for discretization.
-     * @param number_of_intervals 	Not important
      * @param table 				Data used for estimating the best cuts.
-     * @return Discretization cuts 
-     */
+     */		
 	private void discretize(DoubleDataTable table) {
 		
 		int nOfAttr = table.attributes().noOfAttr();
@@ -163,7 +162,7 @@ public class MDGlobalDiscretizationProvider implements TransformationProvider {
      * Method that generate discretization based on data table.
      * 
      * @param table 		Data table to estimate the discretization.
-     * @return attribute 	Discretization estimated on data table.
+     * @return				Discretization estimated on data table.
      */
 	public Transformer generateTransformer(DoubleDataTable table) {
 		Attribute[] attributes = new Attribute[table.attributes().noOfAttr()];

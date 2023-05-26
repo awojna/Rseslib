@@ -28,7 +28,9 @@ import rseslib.structure.attribute.NumericAttribute;
 import rseslib.structure.function.doubleval.AttributeDoubleFunction;
 
 /**
- *  
+ * NumericAttributeDiscretization object converts
+ * original numerical values to discretized values.
+ * 
  * @author Rafal Latkowski
  */
 public class NumericAttributeDiscretization extends AttributeDoubleFunction
@@ -70,9 +72,9 @@ public class NumericAttributeDiscretization extends AttributeDoubleFunction
     }
     
     /**
-     * Returns the information about the discretaized attribute.
+     * Returns the information about the discretized attribute.
      * 
-     * @return	Information about the discretaized attribute.
+     * @return	Information about the discretized attribute.
      */
     public NominalAttribute getAttribute()
     {

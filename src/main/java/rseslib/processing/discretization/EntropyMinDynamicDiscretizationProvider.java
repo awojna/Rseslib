@@ -39,8 +39,13 @@ import rseslib.structure.table.ArrayListDoubleDataTable;
 import rseslib.structure.table.DoubleDataTable;
 
 /**
- * This class represents a method of discretizing continuous attributes based on
- * a minimal enthropy heuristic, dynamic version (1993 Fayyad & Irani).
+ * Top-down local method discretizing all numerical attribute at once (1993 Fayyad & Irani).
+ * It starts with the whole set of objects and splits it into two subsets
+ * with the optimal cut selected from all numerical attributes.
+ * Then the algorithm splits each subset recursively
+ * scanning all possible cuts over all numerical attributes
+ * and selecting the cut maximizing information gain, i.e. minimizing entropy
+ * at each step.
  * 
  * @author Marcin Jalmuzna
  */
@@ -109,7 +114,7 @@ public class EntropyMinDynamicDiscretizationProvider implements
 					double min_e_gt = 0;
 					int[][] min_tab = null;
 
-					// zerujemy tablice
+					// initialize the arrays
 					int[][] tab = new int[decisions.size()][2];
 					for (int j = 0; j < decisions.size(); j++) {
 						tab[j][0] = 0;
@@ -125,10 +130,7 @@ public class EntropyMinDynamicDiscretizationProvider implements
 						}
 					}
 
-					// przegladamy wszystkie rekordy i wybieramy ten z
-					// najmniejsza
-					// wartoscia
-					// entropii
+					// go over all candidate cuts and select the one with the least entropy
 					for (Double tmp : decisionDistribution.keySet()) {
 						lw += decisionDistribution.get(tmp).getSum();
 						gt -= decisionDistribution.get(tmp).getSum();
@@ -141,7 +143,7 @@ public class EntropyMinDynamicDiscretizationProvider implements
 									.get(tmp).getDecisions().get(d);
 						}
 
-						// liczymy entropi� dla danego ciecia
+						// calculate entropy for the candidate cut 'tmp'
 						double e_lw = 0;
 						double e_gt = 0;
 						for (int j = 0; j < decisions.size(); j++) {
@@ -162,10 +164,10 @@ public class EntropyMinDynamicDiscretizationProvider implements
 						double val = (((double) lw / dataSize) * e_lw)
 								+ (((double) gt / dataSize) * e_gt);
 
-						// uaktualniamy minimum
+						// update current best cut
 						if ((val < minVal) && (val < mainMinVal)) {
-							minVal = val; // minimalna entropia
-							min = tmp; // minimum val
+							minVal = val; // entropy of new best cut
+							min = tmp; // new best cut
 							min_e_lw = e_lw;
 							min_e_gt = e_gt;
 							min_tab = tab.clone();

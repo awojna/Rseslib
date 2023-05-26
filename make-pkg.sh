@@ -26,9 +26,9 @@ git archive --format zip --prefix=rseslib-$version-src/ --output target/rseslib-
 
 # prepare release package
 mkdir target/rseslib-$version
-cp $HOME/.m2/repository/nz/ac/waikato/cms/weka/weka-stable/3.8.6/weka-stable-3.8.6.jar target/rseslib-$version/weka.jar
-cp $HOME/.m2/repository/jfree/jcommon/0.9.6/jcommon-0.9.6.jar target/rseslib-$version/
-cp $HOME/.m2/repository/jfree/jfreechart/0.9.21/jfreechart-0.9.21.jar target/rseslib-$version/
+cp target/weka-stable-3.8.6.jar target/rseslib-$version/weka.jar
+cp target/jcommon-0.9.6.jar target/rseslib-$version/
+cp target/jfreechart-0.9.21.jar target/rseslib-$version/
 cp qmak.config target/rseslib-$version/
 cp scripts/* target/rseslib-$version/
 cp -R data target/rseslib-$version/

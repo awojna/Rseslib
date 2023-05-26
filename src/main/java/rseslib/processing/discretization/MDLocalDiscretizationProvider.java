@@ -183,7 +183,7 @@ public class MDLocalDiscretizationProvider implements TransformationProvider {
      * Method that generate discretization based on data table.
      * 
      * @param table 		Data table to estimate the discretization.
-     * @return attribute 	Discretization estimated on data table.
+     * @return				Discretization estimated on data table.
      */
 	public Transformer generateTransformer(DoubleDataTable table) {
 		Attribute[] attributes = new Attribute[table.attributes().noOfAttr()];

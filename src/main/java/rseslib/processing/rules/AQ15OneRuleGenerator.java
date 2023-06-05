@@ -489,8 +489,8 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 			for (int i=0; i<m_nSelectors.length; i++) {
 				if (m_nSelectors[i] != null) {
 					if (!first)
-						sb.append(" & ");
-					sb.append("( " + m_nSelectors[i] + " )");
+						sb.append("  &  ");
+					sb.append(m_nSelectors[i]);
 					first = false;
 				}
 			}

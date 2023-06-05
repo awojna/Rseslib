@@ -289,22 +289,19 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
             for (int i=0;i<m_bPresenceOfDescriptor.length;i++)
             if (m_bPresenceOfDescriptor[i])
             {
-                if (notfirst) sb.append(" & ");
+                if (notfirst) sb.append("  &  ");
                 else notfirst=true;
-                sb.append("( ");
                 sb.append(m_Header.attribute(i).name());
                
                 sb.append(" = ");
                 if (m_Header.isNominal(i)) sb.append(NominalAttribute.stringValue(m_nValueOfDescriptor[i]));
                 else sb.append(m_nValueOfDescriptor[i]);
-                sb.append(" )");
             }
         }
-        else sb.append("(Conditional part is null)");
-        sb.append(" -> ");
+        sb.append("  =>  ");
         if (m_DecAttr!=null)
         {            
-            sb.append("( DEC = { ");
+            sb.append("DEC = { ");
             boolean notfirst = false;
             for (int i=0;i<m_DecisionVector.dimension();i++)
             if (m_DecisionVector.get(i)>1e-10)
@@ -313,7 +310,7 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
                 else notfirst=true;
                 sb.append(NominalAttribute.stringValue(m_DecAttr.globalValueCode(i)));
             }
-            sb.append(" } )");
+            sb.append(" }");
         }
         else sb.append("( Decisional part is null )");
         return sb.toString();

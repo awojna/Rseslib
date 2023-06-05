@@ -67,8 +67,8 @@ public class Disjunction implements BooleanFunction
         for (int i = 0; i < m_arrComponents.length; i++)
         {
 			if (!first)
-				sb.append(" | ");
-			sb.append("( " + m_arrComponents[i] + " )");
+				sb.append("  |  ");
+			sb.append(m_arrComponents[i]);
 			first = false;
 		}
 		return sb.toString();

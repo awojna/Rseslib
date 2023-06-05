@@ -64,10 +64,10 @@ public class NumericAttributeDiscretization extends AttributeDoubleFunction
         	m_Attribute.globalValueCode("(-inf-+inf)");
         else
         {
-        	m_Attribute.globalValueCode("(-inf-"+m_aSortedCuts[0]+")");
+        	m_Attribute.globalValueCode("(-inf - "+m_aSortedCuts[0]+")");
         	for (int interval_id = 1; interval_id < m_aSortedCuts.length; interval_id++)
-        		m_Attribute.globalValueCode("["+m_aSortedCuts[interval_id-1]+"-"+m_aSortedCuts[interval_id]+")");
-        	m_Attribute.globalValueCode("["+m_aSortedCuts[m_aSortedCuts.length-1]+"-+inf)");
+        		m_Attribute.globalValueCode("["+m_aSortedCuts[interval_id-1]+" - "+m_aSortedCuts[interval_id]+")");
+        	m_Attribute.globalValueCode("["+m_aSortedCuts[m_aSortedCuts.length-1]+" - +inf)");
         }
     }
     

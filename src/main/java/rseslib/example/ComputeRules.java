@@ -22,6 +22,7 @@ package rseslib.example;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.Collection;
 import java.util.Properties;
@@ -51,10 +52,13 @@ import rseslib.system.progress.StdOutProgress;
  * The possible rule types are reduct, AQ15 or accurate rules.
  *  
  * Usage:
- *     java ... rseslib.example.ComputeRules [-d <discretization>] [-r <rules>] <data file> [<output file>]
+ *     java ... rseslib.example.ComputeRules [-d <discretization>] [-dcfg <discr. config file>] [-r <rules>] [-rcfg <rules config file>] <data file> [<output file>]
  * 
  * Run the class without arguments to see possible values of the program options.
- *
+ * Each discretization method and each algorithm computing rules has its own set of parameters. Check out:
+ * src/main/resources/rseslib/processing/discretization/ for the config files with parameters of the discretization methods,
+ * src/main/resources/rseslib/processing/rules/ for the config files with parameters of the algorithms computing rules.
+ * 
  * @author      Arkadiusz Wojna
  */
 public class ComputeRules
@@ -71,6 +75,8 @@ public class ComputeRules
         DiscretizationType discretization = DiscretizationType.MaximalDiscernibilityHeuristicLocal;
     	ReductsMethod reductsType = ReductsMethod.AllGlobal;
     	boolean aq15 = false, accurate = false;
+        String discrCfgFile = null;
+        String rulesCfgFile = null;
     	int requiredArgs = 1;
     	if (args.length > requiredArgs && args[requiredArgs - 1].equals("-d"))
     	{
@@ -88,6 +94,11 @@ public class ComputeRules
     		}
     		requiredArgs += 2;
     	}
+		if(args.length > requiredArgs && args[requiredArgs - 1].equals("-dcfg"))
+		{
+			discrCfgFile = args[requiredArgs];
+    		requiredArgs += 2;
+		}
     	if (args.length > requiredArgs && args[requiredArgs - 1].equals("-r"))
     	{
     		String ruleType = args[requiredArgs];
@@ -123,14 +134,21 @@ public class ComputeRules
     		}
     		requiredArgs += 2;
     	}
+		if(args.length > requiredArgs && args[requiredArgs - 1].equals("-rcfg"))
+		{
+			rulesCfgFile = args[requiredArgs];
+    		requiredArgs += 2;
+		}
     	if (args.length != requiredArgs && args.length != requiredArgs + 1)
     	{
     		System.out.println("Program computes rules from a dataset and writes them to a file.");
     		System.out.println("Usage:");
-    		System.out.println("    java ... rseslib.example.ComputeRules [-d <discretization>] [-r <rules>] <data file> [<output file>]");
+    		System.out.println("    java ... rseslib.example.ComputeRules [-d <discretization>] [-dcfg <discr. config file>] [-r <rules>] [-rcfg <rules config file>] <data file> [<output file>]");
     		System.out.print("Discretizations: ");
     		for(DiscretizationType discr : DiscretizationType.values())
     			System.out.print(discr + ", ");
+    		System.out.println();
+    		System.out.println("Check out src/main/resources/rseslib/processing/discretization/ in Rseslib source for the config files with parameters of the discretizations");
     		System.out.println();
     		System.out.print("Rules: ");
     		for(ReductsMethod red : ReductsMethod.values())
@@ -138,6 +156,7 @@ public class ComputeRules
 			System.out.print("AQ15, ");
 			System.out.print("Accurate, ");
     		System.out.println();
+    		System.out.println("Check out src/main/resources/rseslib/processing/rules/ in Rseslib source for the config files with parameters of the rule types");
     		System.exit(0);
     	}
     	File dataFile = new File(args[requiredArgs - 1]);
@@ -158,28 +177,34 @@ public class ComputeRules
         Report.displaynl(table);
 
         // discretize the table
+        Properties discrParams = null;
+        if (discrCfgFile != null)
+        {
+        	discrParams = new Properties();
+        	discrParams.load(new FileInputStream(discrCfgFile));
+        }
         TransformationProvider discrProv = null;
     	switch (discretization)
     	{
     		case None:
     			break;
     		case EqualWidth:
-    			discrProv = new RangeDiscretizationProvider(null);
+    			discrProv = new RangeDiscretizationProvider(discrParams);
     			break;
     		case EqualFrequency:
-    			discrProv = new HistogramDiscretizationProvider(null);
+    			discrProv = new HistogramDiscretizationProvider(discrParams);
     			break;
     		case OneRule:
-    			discrProv = new OneRuleDiscretizationProvider(null);
+    			discrProv = new OneRuleDiscretizationProvider(discrParams);
     			break;
     		case EntropyMinimizationStatic:
-    			discrProv = new EntropyMinStaticDiscretizationProvider(null);
+    			discrProv = new EntropyMinStaticDiscretizationProvider(discrParams);
     			break;
     		case EntropyMinimizationDynamic:
     			discrProv = new EntropyMinDynamicDiscretizationProvider();
     			break;
     		case ChiMerge:
-    			discrProv = new ChiMergeDiscretizationProvider(null);
+    			discrProv = new ChiMergeDiscretizationProvider(discrParams);
     			break;
     		case MaximalDiscernibilityHeuristicGlobal:
     			discrProv = new MDGlobalDiscretizationProvider();
@@ -199,15 +224,22 @@ public class ComputeRules
         
         // compute rules
         RuleGenerator ruleGen;
+        Properties rulesParams = null;
+        if (rulesCfgFile != null)
+        {
+        	rulesParams = new Properties();
+        	rulesParams.load(new FileInputStream(rulesCfgFile));
+        }
         if (aq15)
-        	ruleGen = new CoveringRuleGenerator(null);
+        	ruleGen = new CoveringRuleGenerator(rulesParams);
         else if (accurate)
-        	ruleGen = new AccurateRuleGenerator(null);
+        	ruleGen = new AccurateRuleGenerator(rulesParams);
         else
         {
-    		Properties params = Configuration.loadDefaultProperties(ReductRuleGenerator.class);
-    		params.setProperty("Reducts", reductsType.name());
-    		ruleGen = new ReductRuleGenerator(params);
+        	if (rulesParams == null)
+        		rulesParams = Configuration.loadDefaultProperties(ReductRuleGenerator.class);
+        	rulesParams.setProperty("Reducts", reductsType.name());
+    		ruleGen = new ReductRuleGenerator(rulesParams);
         }
         Collection<Rule> rules = ruleGen.generate(table, new StdOutProgress());
 

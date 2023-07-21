@@ -49,6 +49,11 @@ import rseslib.structure.data.DoubleData;
 import rseslib.structure.metric.Metric;
 import rseslib.structure.metric.Neighbour;
 
+/*
+ * Main class responsible for visualization of k-nearest neighbor classifier.
+ * 
+ * @author		Lukasz Kosson
+ */
 public class KnnPainter extends JPanel implements MouseMotionListener, MouseListener
 {
     /** Serialization version. */

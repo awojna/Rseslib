@@ -38,6 +38,11 @@ import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.PropertyConfigurationException;
 import rseslib.system.progress.Progress;
 
+/*
+ * Extension of k-nearest-neighbors classifier adding visualization.
+ * 
+ * @author		Lukasz Kosson
+ */
 public class KnnVis extends KnnClassifier implements VisualClassifier
 {
     /** Serialization version. */

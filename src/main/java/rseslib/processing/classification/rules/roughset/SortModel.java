@@ -211,7 +211,7 @@ class AccComparator implements Comparator<EqualityDescriptorsRule>{
 		if (arg0.getAccuracy()==arg1.getAccuracy()){
 			return 0;
 		}		
-		return arg0.getAccuracy()>arg1.getAccuracy()?1:-1;
+		return arg0.getAccuracy()<arg1.getAccuracy()?1:-1;
 	}
 	
 }
@@ -237,7 +237,7 @@ class SupportComparator implements Comparator<EqualityDescriptorsRule>{
 		if (arg0.getSupport()==arg1.getSupport()){
 			return 0;
 		}		
-		return arg0.getSupport()>arg1.getSupport()?1:-1;
+		return arg0.getSupport()<arg1.getSupport()?1:-1;
 	}
 	
 }

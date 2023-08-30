@@ -128,7 +128,7 @@ public class MultipleTestResult implements Serializable
      * 
      * @return  True if this result has classification measures for imbalanced data.
      */
-    private boolean hasMeasuresForImbalanced()
+    public boolean hasMeasuresForImbalanced()
     {
     	return (m_FmeasureStat != null && m_GmeanStat != null && m_SensitivityStat != null);
     }

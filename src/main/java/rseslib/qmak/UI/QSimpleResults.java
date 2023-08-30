@@ -20,30 +20,29 @@
 
 package rseslib.qmak.UI;
 
-import javax.swing.JPanel;
 
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.BorderLayout;
-import javax.swing.JDialog;
-import javax.swing.JButton;
-import javax.swing.JTable;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-
-import rseslib.qmak.dataprocess.results.QMultipleTestResult;
-
-import javax.swing.BorderFactory;
-import javax.swing.border.TitledBorder;
 import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import javax.swing.JPanel;
+import javax.swing.JDialog;
+import javax.swing.JButton;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 
+import rseslib.qmak.dataprocess.results.QMultipleTestResult;
 
 /**
  * Class implementing window showing multiple test result for a table
@@ -63,7 +62,9 @@ public class QSimpleResults extends JDialog {
 
 	private String testName;
 
-	private String[] columnNames = {"Classifier name", "Average", "Standard Deviation"};
+	private String[] columnNames = {"Classifier name", "Accuracy", "Accuracy Std Dev"};
+
+	private String[] columnNamesImbalanced = {"Classifier name", "Accuracy", "Accuracy Std Dev", "F-measure", "G-mean", "Sensitivity"};
 
 /*    String[] columnNames = {"First Name",
             "Last Name",
@@ -121,8 +122,8 @@ public class QSimpleResults extends JDialog {
 	 * @return void
 	 */
 	private void initialize(Frame owner) {
-		this.setSize(500, 200);
-		this.setPreferredSize(new Dimension(500, 200));
+		this.setSize(600, 200);
+		this.setPreferredSize(new Dimension(600, 200));
 		this.setMinimumSize(new Dimension(300, 100));
 		this.setTitle(testName);
 		this.setContentPane(getJContentPane());
@@ -148,10 +149,6 @@ public class QSimpleResults extends JDialog {
 		return jContentPane;
 	}
 
-	private void close() {
-		this.dispose();
-	}
-
 	/**
 	 * This method initializes qSimpleResultTable	
 	 * 	
@@ -159,7 +156,7 @@ public class QSimpleResults extends JDialog {
 	 */
 	private JTable getQSimpleResultTable() {
 		if (qSimpleResultTable == null) {
-			qSimpleResultTable = new JTable(data, columnNames);
+			qSimpleResultTable = new JTable(data, data[0].length > 3 ? columnNamesImbalanced : columnNames);
 			qSimpleResultTable.setPreferredScrollableViewportSize(new Dimension(500, 70));
 			qSimpleResultTable.setFillsViewportHeight(true);
 			qSimpleResultTable.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -169,10 +166,14 @@ public class QSimpleResults extends JDialog {
 			qSimpleResultTable.setShowHorizontalLines(true);
 			qSimpleResultTable.setCellSelectionEnabled(false);
 			qSimpleResultTable.add(qSimpleResultTable.getTableHeader(), BorderLayout.PAGE_START);
-
+			DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+			centerRenderer.setHorizontalAlignment( SwingConstants.CENTER );
+			for (int col = 1; col < data[0].length; ++col)
+				qSimpleResultTable.getColumnModel().getColumn(col).setCellRenderer(centerRenderer);
+			
 			// Zmiana szerokosci kolumn
 			TableColumn column = null;
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < data[0].length; i++) {
 			    column = qSimpleResultTable.getColumnModel().getColumn(i);
 			    if (i == 0) {
 			        column.setPreferredWidth(200); //first column is bigger

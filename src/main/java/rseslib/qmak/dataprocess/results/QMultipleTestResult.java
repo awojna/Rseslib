@@ -99,21 +99,20 @@ public class QMultipleTestResult implements iQProjectElement, iQXMLstoreable, Fi
 	}
 	
 	public Object[][] mapToArray(Map<String, MultipleTestResult> wyniki) {
-		Object[][] data;
-		Set<String> keys;
+
+		boolean imbalanced = wyniki.values().iterator().next().hasMeasuresForImbalanced();
+		Object[][] data = new Object[wyniki.size()][imbalanced ? 6 : 3];
 		
-		data = new Object[ wyniki.size()][3];
-		keys = wyniki.keySet();
-		
-		data[0][0] = "Klasyfikator";
-		data[0][1] = "Srednia";
-		data[0][2] = "Odchylenie standardowe";
 		int j = 0;
-		
-		for (Iterator it = keys.iterator(); it.hasNext(); ) {
-			data[j][0] = it.next();
-			data[j][1] = wyniki.get(data[j][0]).getAvgAccuracy();
-			data[j][2] = wyniki.get(data[j][0]).getAccuracyStandardDeviation();
+		for (Map.Entry<String, MultipleTestResult> wyn : wyniki.entrySet()) {
+			data[j][0] = wyn.getKey();
+			data[j][1] = Math.round(wyn.getValue().getAvgAccuracy() * 10000) / 10000.0;
+			data[j][2] = Math.round(wyn.getValue().getAccuracyStandardDeviation() * 10000) / 10000.0;
+			if (imbalanced) {
+				data[j][3] = Math.round(wyn.getValue().getAvgFmeasure() * 10000) / 10000.0;
+				data[j][4] = Math.round(wyn.getValue().getAvgGmean() * 10000) / 10000.0;
+				data[j][5] = Math.round(wyn.getValue().getAvgSensitivity() * 10000) / 10000.0;
+			}
 			
 			j++;
 		}

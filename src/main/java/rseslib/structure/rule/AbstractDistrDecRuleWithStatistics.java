@@ -37,7 +37,7 @@ public abstract class AbstractDistrDecRuleWithStatistics extends AbstractDistrDe
 	/** Rule accuracy. */
     double m_nAccuracy = Double.NaN;
 	/** Rule support. */
-    double m_nSupport = Double.NaN;
+    int m_nSupport = 0;
 
     /**
      * Sets the decision distribution of this rule.
@@ -71,9 +71,9 @@ public abstract class AbstractDistrDecRuleWithStatistics extends AbstractDistrDe
     /**
      * Sets the support of this rule.
      *
-     * @param supp	Support of this rule between 0 and 1.
+     * @param supp	Support of this rule.
      */
-    public void setSupport(double supp)
+    public void setSupport(int supp)
     {
         m_nSupport=supp;
     }
@@ -92,10 +92,10 @@ public abstract class AbstractDistrDecRuleWithStatistics extends AbstractDistrDe
     /**
      * Returns the support of this rule.
      *
-     * @return     Support of this rule between 0 and 1.
+     * @return     Support of this rule.
      * @see rseslib.structure.rule.RuleWithStatistics#getSupport()
      */
-    public double getSupport()
+    public int getSupport()
     {
         return m_nSupport;
     }

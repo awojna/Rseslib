@@ -46,8 +46,8 @@ public class SortPanel extends JPanel {
 		super();		
 		setLayout(new BorderLayout());
 		choose=new JComboBox();
-		if (nr==0){this.add(new JLabel("Sort by"),BorderLayout.WEST);}else
-			this.add(new JLabel("then sort by:"),BorderLayout.WEST);
+		if (nr==0){this.add(new JLabel("Sort by: "),BorderLayout.WEST);}else
+			this.add(new JLabel("then sort by: "),BorderLayout.WEST);
 		choose.setEditable(false);
 		
 		choose.setModel(new SortModel(smm,nr));

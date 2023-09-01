@@ -20,6 +20,7 @@
 
 package rseslib.processing.classification.rules.roughset;
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
@@ -27,8 +28,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  * Main panel of Visual Rough Set Classifier
@@ -51,8 +54,14 @@ public class VisualRoughSetPanel extends JPanel {
 		jt=new JTable(rtm);
 		//jt.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		for (int i=0;i<jt.getColumnModel().getColumnCount()-1;i++){
-			jt.getColumnModel().getColumn(i).setMaxWidth(65);
+			jt.getColumnModel().getColumn(i).setMaxWidth(70);
 		}
+		jt.getTableHeader().setFont(jt.getTableHeader().getFont().deriveFont(Font.BOLD));
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( SwingConstants.CENTER );
+		jt.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		jt.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+		jt.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 		setLayout(new BorderLayout());
 		
 		JScrollPane tableScroll=new JScrollPane(jt);
@@ -86,12 +95,9 @@ class AmountController implements TableModelListener{
 	boolean showDefault; 
 	private void setLabelText(){
 		if (showDefault){
-			jl.setText("Visible rules(selected)/All rules used in this classification/All rules in classifier: "+
-					rtm.getRowCount()+"/"+
-					rtm.getDefaultRulesCount()+
-					"/"+vrs.getRules().size());			
+			jl.setText("All rules: "+vrs.getRules().size()+"          Matching rules: "+rtm.getDefaultRulesCount()+"          Selected rules: "+rtm.getRowCount());			
 		}else
-		jl.setText("Visible rules(selected)/All rules in classifier: "+rtm.getRowCount()+"/"+vrs.getRules().size());
+		jl.setText("All rules: "+vrs.getRules().size()+"          Selected rules: "+rtm.getRowCount());
 	};
 /**
  * Main constructor

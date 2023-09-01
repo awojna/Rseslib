@@ -151,7 +151,7 @@ public class SelectMainModel extends SortMainModel implements ListDataListener{
 						 Vector<EqualityDescriptorsRule> edr=rtm.getAllRules();
 						
 						for (int i=1;i< edr.size();i++){
-							resS.add(edr.get(i).getSupport());
+							resS.add((Double)(double)edr.get(i).getSupport());
 						}
 						res=new Vector<Double>(resS);
 						Collections.sort(res);

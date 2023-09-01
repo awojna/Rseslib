@@ -37,9 +37,9 @@ public interface RuleWithStatistics extends Rule
     /**
      * Sets the support of this rule.
      *
-     * @param supp	Support of this rule between 0 and 1.
+     * @param supp	Support of this rule.
      */
-    public void setSupport(double supp);
+    public void setSupport(int supp);
 
     /**
      * Returns the accuracy of this rule.
@@ -51,7 +51,7 @@ public interface RuleWithStatistics extends Rule
     /**
      * Returns the support of this rule.
      *
-     * @return     Support of this rule between 0 and 1.
+     * @return     Support of this rule.
      */
-    public abstract double getSupport();
+    public abstract int getSupport();
 }

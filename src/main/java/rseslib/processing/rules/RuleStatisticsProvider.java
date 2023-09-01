@@ -76,7 +76,7 @@ public class RuleStatisticsProvider
             }
             if (support==0)
             	removed_rules.add(rule);
-            ((AbstractDistrDecRuleWithStatistics)rule).setSupport(support);
+            ((RuleWithStatistics)rule).setSupport(support);
             Vector dv = new Vector(decs.length);
             for (int i=0; i<decs.length; i++)
             	dv.set(i, decs[i]);

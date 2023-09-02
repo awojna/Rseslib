@@ -114,7 +114,7 @@ public class SelectMainModel extends SortMainModel implements ListDataListener{
 						
 						 Vector<EqualityDescriptorsRule> edr=rtm.getAllRules();
 						
-						for (int i=1;i< edr.size();i++){
+						for (int i=0;i< edr.size();i++){
 							resS.add((Double)(double)(edr.get(i).getRuleLength()));
 						}
 						
@@ -131,7 +131,7 @@ public class SelectMainModel extends SortMainModel implements ListDataListener{
 						
 						 Vector<EqualityDescriptorsRule> edr=rtm.getAllRules();
 						
-						for (int i=1;i< edr.size();i++){
+						for (int i=0;i< edr.size();i++){
 							resS.add(edr.get(i).getAccuracy());
 						}
 						res=new Vector<Double>(resS);
@@ -150,7 +150,7 @@ public class SelectMainModel extends SortMainModel implements ListDataListener{
 						
 						 Vector<EqualityDescriptorsRule> edr=rtm.getAllRules();
 						
-						for (int i=1;i< edr.size();i++){
+						for (int i=0;i< edr.size();i++){
 							resS.add((Double)(double)edr.get(i).getSupport());
 						}
 						res=new Vector<Double>(resS);

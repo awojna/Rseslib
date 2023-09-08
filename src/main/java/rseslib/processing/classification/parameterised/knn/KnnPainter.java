@@ -82,6 +82,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 	private double ymax = Double.POSITIVE_INFINITY;
     double mult = START_MULT;
     private String strLegend;
+    private String dataPlaceholder;
     
     double currDev = 0.00;
     double iter = 0;
@@ -107,6 +108,9 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 		htCols = colors;
 		avg = avg_dist;
 		strLegend = legend;
+		dataPlaceholder = "";
+		for (int i = 0; i < transformed.get(0).attributes().noOfAttr(); ++i)
+			dataPlaceholder += "<br>";
 		addMouseListener(this);
 		addMouseMotionListener(this);
 	}
@@ -265,7 +269,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 	    pnlBtns.setLayout(new FlowLayout());
 	    if(all_obj)
 	    {
-	    	pnlBtns.add(new JLabel("Number of points on graph: "));
+	    	pnlBtns.add(new JLabel("Objects displayed: "));
 	    	pnlBtns.add(jtMax);
 	    	pnlBtns.add(btnRestart);
 	    }
@@ -510,18 +514,22 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     			}
     		}
     		g.setColor(Color.BLACK);
-
+        	
     		info += "<b>Iteration:</b> " + (int)iter + "<br>";
-    		info += "<b>Mult:</b> " + mult + "<br><br>";
+    		info += "<b>Scaling:</b> " + Math.round(mult * 10000) / 10000.0 + "<br><br>";
 
-    		if (selected != null && showDetails)
-    		{
-    			info += "<b>Selected:</b><br>" + formatData(selected) + "<br>";	        		
-    		}
+        	info += strLegend + "<br";
 
-    		if (hovered != null && showDetails)
+    		if (showDetails)
     		{
-    			info += "<b>Hovered:</b><br>" + formatData(hovered) + "<br>"; 
+    			if (selected != null)
+    				info += "<b>Selected:</b><br>" + formatData(selected) + "<br>";
+    			if (hovered != null)
+    				info += "<b>Hovered:</b><br>" + formatData(hovered) + "<br>"; 
+    			else
+    				info += "<br><br>" + dataPlaceholder;
+    			if (selected == null)
+    				info += "<br><br>" + dataPlaceholder;
     		}
 
     		if (selected != null && hovered != null)
@@ -539,11 +547,12 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     			g.drawLine(x1, y1, x2, y2);
 
     			info += "<b>Distance:</b><br>";
-    			info += "Metric: <i>" + len_met + "</i><br>";
-    			info += "Visible: <i>" + len_vis + "</i><br>";
+    			info += "Metric: <i>" + Math.round(len_met * 100) / 100.0 + "</i><br>";
+    			info += "Visible: <i>" + Math.round(len_vis * 100) / 100.0 + "</i><br>";
     		}
+    		else
+    			info += "<br><br><br>";
     	}
-    	info += strLegend;
     	lblInfo.setText(info);
     	if (fProg > 0)
     	{

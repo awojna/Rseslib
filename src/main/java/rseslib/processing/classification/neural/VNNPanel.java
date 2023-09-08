@@ -328,15 +328,18 @@ public class VNNPanel extends JComponent implements
 			gg.setColor(Color.black);
 			corner.y = corner.y + 45;
 			if (showClassification) {
-				gg.drawString("Output: " + zoomedPerceptron.getOutput(), corner.x, corner.y);
+				double output = Math.round(zoomedPerceptron.getOutput() * 1000) / 1000.0;
+				gg.drawString("Output: " + output, corner.x, corner.y);
 				corner.y = corner.y + 2*ROW_DISTANCE;
 			}
-			gg.drawString("Bias: " + zoomedPerceptron.getWeight(zoomedPerceptron.getWeightLength() - 1), corner.x, corner.y);
+			double bias = Math.round(zoomedPerceptron.getWeight(zoomedPerceptron.getWeightLength() - 1) * 1000) / 1000.0;
+			gg.drawString("Bias: " + bias, corner.x, corner.y);
 			corner.y = corner.y + ROW_DISTANCE;
 			gg.drawString("Weights: ", corner.x, corner.y);
 			corner.y = corner.y + ROW_DISTANCE;
 			for (i = 0; i < (zoomedPerceptron.getWeightLength() - 1); i++) {
-				gg.drawString(i + " : " + zoomedPerceptron.getWeight(i), corner.x, corner.y);
+				double weight = Math.round(zoomedPerceptron.getWeight(i) * 1000) / 1000.0;
+				gg.drawString(i + " : " + weight, corner.x, corner.y);
 				corner.y = corner.y + ROW_DISTANCE;
 			}
 		}

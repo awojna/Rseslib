@@ -99,6 +99,7 @@ public class ClassifierSet implements Serializable
     	m_ClassifierTypes = (Map<String,Class>)in.readObject();
     	m_ClassifierProperties = (Map<String,Properties>)in.readObject();
     	m_Classifiers = new HashMap<String,Classifier>();
+    	m_Errors = new HashMap<String,String>();
     }
 
     /**

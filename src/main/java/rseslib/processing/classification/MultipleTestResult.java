@@ -33,7 +33,7 @@ import rseslib.system.Report;
 public class MultipleTestResult implements Serializable
 {
     /** Serialization version. */
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 	/** Name of accuracy measure. */
 	private static final String ACCURACY_NAME = "Accuracy";
 	/** Name of F-measure. */

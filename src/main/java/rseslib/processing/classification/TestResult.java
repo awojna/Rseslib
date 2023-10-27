@@ -39,7 +39,7 @@ import rseslib.system.Report;
 public class TestResult implements Serializable
 {
 	/** Serialization version. */
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 	/** Definition of statistics formatting. */
 	private static final DecimalFormat df = new DecimalFormat("0.0000");
 

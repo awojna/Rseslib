@@ -57,6 +57,8 @@ public class ClassifierSet implements Serializable
 	private Map<String,Properties> m_ClassifierProperties = new HashMap<String,Properties>();
     /** Map between classifier names and classifiers. */
     private Map<String,Classifier> m_Classifiers = new HashMap<String,Classifier>();
+    /** Map between classifier names and errors. */
+    private Map<String,String> m_Errors = new HashMap<String,String>();
 
     /**
      * Add a classifier to this set of classifiers.
@@ -131,6 +133,8 @@ public class ClassifierSet implements Serializable
      */
     public void train(DoubleDataTable trainTable, Progress prog) throws InterruptedException
 	{
+    	m_Classifiers = new HashMap<String,Classifier>();
+    	m_Errors = new HashMap<String,String>();
     	if (m_ClassifierTypes.size()==0)
     	{
     		prog.set("Training classifiers", 1);
@@ -155,8 +159,9 @@ public class ClassifierSet implements Serializable
 			catch (InvocationTargetException e)
 			{
 				if (e.getTargetException() instanceof BadHeaderException)
-					Report.displaynl(cl.getKey()+" not trained: "+e.getTargetException().getMessage());
-				else Report.exception((Exception)e.getTargetException());
+					m_Errors.put(cl.getKey(), e.getTargetException().getMessage());
+				else
+					Report.exception((Exception)e.getTargetException());
 			}
 			catch (Exception e)
 			{
@@ -220,6 +225,8 @@ public class ClassifierSet implements Serializable
             TestResult results = new TestResult(decAttr, tstTable.getDecisionDistribution(), confusionMatrix, cl.getValue().getStatistics());
             resultMap.put(cl.getKey(), results);
         }
+        for (Map.Entry<String,String> err : m_Errors.entrySet())
+        	resultMap.put(err.getKey(), new TestResult(err.getValue()));
         return resultMap;
     }
 }

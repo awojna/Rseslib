@@ -43,6 +43,8 @@ public class TestResult implements Serializable
 	/** Definition of statistics formatting. */
 	private static final DecimalFormat df = new DecimalFormat("0.0000");
 
+	/** Error message. */
+	private String m_Error = null;
 	/** Dictionary of statistics specific to a classifier. */
     private Properties m_Statistics;
     /** Decision attribute with value dictionary. */
@@ -95,6 +97,26 @@ public class TestResult implements Serializable
         }
         if (m_DecisionAttribute.isMinorityValueSet())
         	m_nLocalMinorityDec = m_DecisionAttribute.localValueCode(m_DecisionAttribute.getMinorityValueGlobalCode());
+    }
+    
+    /**
+     * Constructor for unsuccessful test.
+     * 
+     * @param errorMsg	Error message.
+     */
+    public TestResult(String errorMsg)
+    {
+    	m_Error = errorMsg;
+    }
+    
+    /**
+     * Returns true if the test completed successfully.
+     * 
+     * @return	True if the test completed successfully.
+     */
+    public boolean successfulRun()
+    {
+    	return (m_Error == null);
     }
     
     /**
@@ -229,12 +251,24 @@ public class TestResult implements Serializable
     }
     
     /**
+     * Returns the error message if error occurred during the test.
+     *
+     * @return Error message if error occurred during the test.
+     */
+    public String getError()
+    {
+        return m_Error;
+    }
+    
+    /**
      * Returns string representation of classification results.
      *
      * @return  String representation of classification results.
      */
     public String toString()
     {
+    	if (m_Error != null)
+    		return m_Error;
         StringBuffer sbuf = new StringBuffer();
         if (m_Statistics!=null)
         {
@@ -267,6 +301,8 @@ public class TestResult implements Serializable
      */
     public String toStringStats()
     {
+    	if (m_Error != null)
+    		return m_Error;
     	StringBuffer sbuf = new StringBuffer();
     	sbuf.append("true positive rate (sensitivity, recall)=" + getSensitivity() + Report.lineSeparator);
     	sbuf.append("positive predictive value (precision)=" + getPrecision() + Report.lineSeparator);
@@ -284,6 +320,8 @@ public class TestResult implements Serializable
      */
     public String toStringConfusionMatrix()
     {
+    	if (m_Error != null)
+    		return m_Error;
         StringBuffer sbuf = new StringBuffer();
         for (int dec = 0; dec < m_DecisionAttribute.noOfValues(); dec++) {
         	sbuf.append("real dec=" + dec + "\t(" + NominalAttribute.stringValue(m_DecisionAttribute.globalValueCode(dec)) + ")\t");
@@ -313,12 +351,17 @@ public class TestResult implements Serializable
     public Properties getStatisticsAndResults()
     {
     	Properties stats = (Properties)m_Statistics.clone();
-    	stats.put("all_cnt",Integer.toString(m_nAll));
-    	stats.put("cover_cnt",Integer.toString(m_nCovered));
-    	stats.put("correct_cnt",Integer.toString(m_nCorrect));
-    	stats.put("precision",Double.toString(((double)m_nCorrect)/((double)m_nCovered)));
-    	stats.put("coverage",Double.toString(((double)m_nCovered)/((double)m_nAll)));
-    	stats.put("accuracy",Double.toString(((double)m_nCorrect)/((double)m_nAll)));
+    	if (m_Error != null)
+    		stats.put("error", m_Error);
+    	else
+    	{
+    		stats.put("all_cnt",Integer.toString(m_nAll));
+    		stats.put("cover_cnt",Integer.toString(m_nCovered));
+    		stats.put("correct_cnt",Integer.toString(m_nCorrect));
+    		stats.put("precision",Double.toString(((double)m_nCorrect)/((double)m_nCovered)));
+    		stats.put("coverage",Double.toString(((double)m_nCovered)/((double)m_nAll)));
+    		stats.put("accuracy",Double.toString(((double)m_nCorrect)/((double)m_nAll)));
+    	}
     	return stats;
     }
 }

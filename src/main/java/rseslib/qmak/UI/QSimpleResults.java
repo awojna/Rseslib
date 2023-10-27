@@ -156,7 +156,10 @@ public class QSimpleResults extends JDialog {
 	 */
 	private JTable getQSimpleResultTable() {
 		if (qSimpleResultTable == null) {
-			qSimpleResultTable = new JTable(data, data[0].length > 3 ? columnNamesImbalanced : columnNames);
+			boolean imbalanced = false;
+			if (data.length != 0)
+				imbalanced = (data[0].length > 3);
+			qSimpleResultTable = new JTable(data, imbalanced ? columnNamesImbalanced : columnNames);
 			qSimpleResultTable.setPreferredScrollableViewportSize(new Dimension(500, 70));
 			qSimpleResultTable.setFillsViewportHeight(true);
 			qSimpleResultTable.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);

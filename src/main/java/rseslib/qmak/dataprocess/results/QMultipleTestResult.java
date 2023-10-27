@@ -99,19 +99,35 @@ public class QMultipleTestResult implements iQProjectElement, iQXMLstoreable, Fi
 	}
 	
 	public Object[][] mapToArray(Map<String, MultipleTestResult> wyniki) {
-
-		boolean imbalanced = wyniki.values().iterator().next().hasMeasuresForImbalanced();
+		boolean imbalanced = false;
+		for (Map.Entry<String, MultipleTestResult> wyn : wyniki.entrySet())
+			if (wyn.getValue().successfulRun()) {
+				imbalanced = wyn.getValue().hasMeasuresForImbalanced();
+				break;
+			}
 		Object[][] data = new Object[wyniki.size()][imbalanced ? 6 : 3];
 		
 		int j = 0;
 		for (Map.Entry<String, MultipleTestResult> wyn : wyniki.entrySet()) {
 			data[j][0] = wyn.getKey();
-			data[j][1] = Math.round(wyn.getValue().getAvgAccuracy() * 10000) / 10000.0;
-			data[j][2] = Math.round(wyn.getValue().getAccuracyStandardDeviation() * 10000) / 10000.0;
-			if (imbalanced) {
-				data[j][3] = Math.round(wyn.getValue().getAvgFmeasure() * 10000) / 10000.0;
-				data[j][4] = Math.round(wyn.getValue().getAvgGmean() * 10000) / 10000.0;
-				data[j][5] = Math.round(wyn.getValue().getAvgSensitivity() * 10000) / 10000.0;
+			if (wyn.getValue().successfulRun())
+			{
+				data[j][1] = Math.round(wyn.getValue().getAvgAccuracy() * 10000) / 10000.0;
+				data[j][2] = Math.round(wyn.getValue().getAccuracyStandardDeviation() * 10000) / 10000.0;
+				if (imbalanced) {
+					data[j][3] = Math.round(wyn.getValue().getAvgFmeasure() * 10000) / 10000.0;
+					data[j][4] = Math.round(wyn.getValue().getAvgGmean() * 10000) / 10000.0;
+					data[j][5] = Math.round(wyn.getValue().getAvgSensitivity() * 10000) / 10000.0;
+				}
+			} else {
+				data[j][1] = "N/A";
+				data[j][2] = "N/A";
+				if (imbalanced)
+				{
+					data[j][3] = "N/A";
+					data[j][4] = "N/A";
+					data[j][5] = "N/A";
+				}
 			}
 			
 			j++;

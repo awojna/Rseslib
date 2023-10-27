@@ -43,6 +43,8 @@ public class MultipleTestResult implements Serializable
 	/** Name of sensitivity measure. */
 	private static final String SENSITIVITY_NAME = "Sensitivity";
 	
+	/** Error message. */
+	private String m_Error = null;
 	/** Number of tests run. */
 	private int m_nNoOfTests;
 	/** Aggregated accuracy. */
@@ -73,6 +75,12 @@ public class MultipleTestResult implements Serializable
     public MultipleTestResult(TestResult[] results)
     {
     	m_nNoOfTests = results.length;
+    	for (int run = 0; run < m_nNoOfTests; run++)
+    		if (!results[run].successfulRun())
+    		{
+    			m_Error = results[run].getError();
+    			return;
+    		}
     	double[] arrAccuracy = new double[m_nNoOfTests];
     	for (int run = 0; run < m_nNoOfTests; run++)
     		arrAccuracy[run] = results[run].getAccuracy();
@@ -102,6 +110,12 @@ public class MultipleTestResult implements Serializable
     public MultipleTestResult(MultipleTestResult[] lowerLevelResults)
     {
     	m_nNoOfTests = lowerLevelResults.length;
+    	for (int run = 0; run < m_nNoOfTests; run++)
+    		if (!lowerLevelResults[run].successfulRun())
+    		{
+    			m_Error = lowerLevelResults[run].getError();
+    			return;
+    		}
     	double[] arrAccuracy = new double[m_nNoOfTests];
     	for (int run = 0; run < m_nNoOfTests; run++)
     		arrAccuracy[run] = lowerLevelResults[run].m_AccuracyStat.getAverage();
@@ -121,6 +135,16 @@ public class MultipleTestResult implements Serializable
     		m_GmeanStat = new MultipleTestSingleStat(G_MEAN_NAME, arrGmean);
     		m_SensitivityStat = new MultipleTestSingleStat(SENSITIVITY_NAME, arrSensitivity);
     	}
+    }
+    
+    /**
+     * Returns true if the test completed successfully.
+     * 
+     * @return	True if the test completed successfully.
+     */
+    public boolean successfulRun()
+    {
+    	return (m_Error == null);
     }
     
     /**
@@ -190,12 +214,24 @@ public class MultipleTestResult implements Serializable
     }
     
     /**
+     * Returns the error message if error occurred during the test.
+     *
+     * @return Error message if error occurred during the test.
+     */
+    public String getError()
+    {
+        return m_Error;
+    }
+    
+    /**
      * Returns string representation of results.
      *
      * @return  String representation of results.
      */
     public String toString()
     {
+    	if (m_Error != null)
+    		return m_Error;
         StringBuffer sbuf = new StringBuffer();
         sbuf.append(m_AccuracyStat.toString()+Report.lineSeparator);
         if (m_FmeasureStat != null)
@@ -215,6 +251,8 @@ public class MultipleTestResult implements Serializable
      */
     public String toStringDetails()
     {
+    	if (m_Error != null)
+    		return m_Error;
         StringBuffer sbuf = new StringBuffer();
         sbuf.append(m_AccuracyStat.toStringDetails()+Report.lineSeparator);
         if (m_FmeasureStat != null)

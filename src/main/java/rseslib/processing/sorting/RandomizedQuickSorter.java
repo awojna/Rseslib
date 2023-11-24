@@ -20,47 +20,49 @@
 
 package rseslib.processing.sorting;
 
-import rseslib.structure.linearorder.LinearOrder;
+import java.util.Comparator;
 
 /**
  * @author Rafal Latkowski
  */
-public class RandomizedQuickSorter implements Sorter
+public class RandomizedQuickSorter<T> implements Sorter<T>
 {
-	private LinearOrder m_order;
-	/**
-	 * 
+	private Comparator<T> m_order;
+	T[] m_array;
+	
+	/** 
+	 * Sorts data using QuickSort algorithm.
+	 * @see rseslib.processing.sorting.Sorter#sort(T[] array, Comparator<T> order)
 	 */
-	public RandomizedQuickSorter()
+	public void sort(T[] array, Comparator<T> order)
 	{
+		m_array = array;
+		m_order = order;
+		rqsort(0, m_array.length - 1);
 	}
-
+	
 	private void rqsort(int l,int r)
 	{
 		int pr = l+(int)((r-l)*Math.random());
-		m_order.swap(pr,l);
+		swap(pr,l);
 		int p = l;
 		int i = l;
 		int j = r+1;
 		while (i<j)
 		{
-			do i++; while (m_order.greater(p,i)&&(i<r));
-			do j--; while (m_order.greater(j,p)&&(j>l));
-			if (i<j) m_order.swap(i,j);
+			do i++; while (m_order.compare(m_array[p],m_array[i]) > 0 && (i<r));
+			do j--; while (m_order.compare(m_array[j],m_array[p]) > 0 && (j>l));
+			if (i<j) swap(i,j);
 		}
-		m_order.swap(p,j);
+		swap(p,j);
 		if (j-1>l) rqsort(l,j-1);
 		if (r>j+1) rqsort(j+1,r);		
 	}
-
-	/** 
-	 * Sorts data accessible by LinearOrder using QuickSort algorithm.
-	 * @see rseslib.processing.sorting.Sorter#sort(rseslib.structure.linearorder.LinearOrder)
-	 */
-	public void sort(LinearOrder order)
+	
+	private void swap(int p1, int p2)
 	{
-		m_order=order;
-		rqsort(order.getFirst(),order.getLast());
+		T tmp = m_array[p1];
+		m_array[p1] = m_array[p2];
+		m_array[p2] = tmp; 
 	}
-
 }

@@ -20,12 +20,12 @@
 
 package rseslib.processing.sorting;
 
-import rseslib.structure.linearorder.LinearOrder;
+import java.util.Comparator;
 
 /**
  * @author Rafal Latkowski
  */
-public interface Sorter
+public interface Sorter<T>
 {
-	abstract public void sort(LinearOrder order);
+	abstract public void sort(T[] array, Comparator<T> order);
 }

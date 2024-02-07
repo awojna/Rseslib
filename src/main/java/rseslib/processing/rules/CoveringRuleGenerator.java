@@ -86,8 +86,12 @@ public class CoveringRuleGenerator extends Configuration implements RuleGenerato
 			
 			//usually - while (uncovered.size() > 0) 
 			while (uncovered.size() > m_prooning * prooningObjts) {
-				rules.add(m_oneRuleGenerator.generate(tab, uncovered, m_k, dec));
-				uncovered = removeCovered(uncovered, rules);
+				Rule r = m_oneRuleGenerator.generate(tab, uncovered, m_k, dec);
+				if (r != null) {
+					rules.add(r);
+					uncovered = removeCovered(uncovered, rules);
+				} else
+					break;
 			}
 			
 			/* Debug */

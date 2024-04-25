@@ -23,15 +23,13 @@ package rseslib.processing.roughset;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import rseslib.structure.attribute.Header;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.data.DoubleDataWithDecision;
 import rseslib.structure.linearorder.AttributeSubsetComparator;
 
 /**
- * The class computing the rough set (lower and upper approximation),
- * the positive region, approximation accuracy (decision dependency)
- * and significance of a given subset of attributes.
+ * The class computing the rough set (lower and upper approximation)
+ * of a decision class, and the positive region.
  *
  * @author      Arkadiusz Wojna
  */
@@ -122,51 +120,5 @@ public class RoughSet
 					posRegion.add(objs[o]);
 		}
 		return posRegion;
-	}
-	
-	/**
-	 * Calculates the accuracy of approximation of the decision attribute
-	 * by a given set of conditional attributes in a set of objects.
-	 * This measure is known also as the dependency degree of the decision attribute
-	 * on the given attributes.
-	 * 
-	 * @param attributes	Indices of attributes.
-	 * @param objs			Set of objects.
-	 * @return				Accuracy of approximation in the range < 0.0 ; 1.0 >.
-	 */
-	public double approximationAccuracy(int[] attributes, DoubleData[] objs)
-	{
-		return ((double)positiveRegion(attributes, objs).size()) / objs.length;
-	}
-
-	/**
-	 * Calculates the significance of a given set of conditional attributes
-	 * for the decision attribute in a set of objects.
-	 * 
-	 * @param attributes	Indices of attributes.
-	 * @param objs			Set of objects.
-	 * @return				Significance of the attributes for the decision in the range < 0.0 ; 1.0 >.
-	 */
-	public double attributeSignificance(int[] attributes, DoubleData[] objs)
-	{
-		Header hdr = objs[0].attributes();
-		int[] allAttrs = new int[hdr.noOfAttr() - 1];
-		boolean[] complementMask = new boolean[hdr.noOfAttr()];
-		int att = 0;
-		for (int i = 0; i < hdr.noOfAttr(); ++i)
-			if(hdr.isConditional(i))
-			{
-				allAttrs[att++] = i;
-				complementMask[i] = true;
-			} else
-				complementMask[i] = false;
-		for (int i : attributes)
-			complementMask[i] = false;
-		int[] complement = new int[allAttrs.length - attributes.length];
-		int r = 0;
-		for (int i = 0; i < complementMask.length; ++i)
-			if(complementMask[i])
-				complement[r++] = i;
-		return 1 - approximationAccuracy(complement, objs) / approximationAccuracy(allAttrs, objs);
 	}
 }

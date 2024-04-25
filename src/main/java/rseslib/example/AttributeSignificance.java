@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import rseslib.processing.discretization.*;
 import rseslib.processing.discretization.DiscretizationFactory.DiscretizationType;
-import rseslib.processing.roughset.RoughSet;
+import rseslib.processing.evaluation.attribute.RoughSet;
 import rseslib.processing.transformation.TableTransformer;
 import rseslib.processing.transformation.TransformationProvider;
 import rseslib.processing.transformation.Transformer;

@@ -20,6 +20,7 @@
 
 package rseslib.processing.evaluation.attribute;
 
+import rseslib.processing.roughset.RoughSet;
 import rseslib.structure.attribute.Header;
 import rseslib.structure.data.DoubleData;
 
@@ -29,7 +30,7 @@ import rseslib.structure.data.DoubleData;
  *
  * @author      Arkadiusz Wojna
  */
-public class RoughSet
+public class RoughSetEvaluator
 {
 	/**
 	 * Calculates the accuracy of approximation of the decision attribute
@@ -43,7 +44,7 @@ public class RoughSet
 	 */
 	public double approximationAccuracy(int[] attributes, DoubleData[] objs)
 	{
-		return ((double)(new rseslib.processing.roughset.RoughSet()).positiveRegion(attributes, objs).size()) / objs.length;
+		return ((double)(new RoughSet()).positiveRegion(attributes, objs).size()) / objs.length;
 	}
 
 	/**

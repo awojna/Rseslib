@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import rseslib.processing.discretization.*;
 import rseslib.processing.discretization.DiscretizationFactory.DiscretizationType;
-import rseslib.processing.evaluation.attribute.RoughSet;
+import rseslib.processing.evaluation.attribute.RoughSetEvaluator;
 import rseslib.processing.transformation.TableTransformer;
 import rseslib.processing.transformation.TransformationProvider;
 import rseslib.processing.transformation.Transformer;
@@ -192,7 +192,7 @@ public class AttributeSignificance
         for (int i = 0; i < hdr.noOfAttr(); ++i)
         	if(hdr.isConditional(i))
         		allIndices[att++] = i;
-        RoughSet roughSet = new RoughSet();
+        RoughSetEvaluator roughSet = new RoughSetEvaluator();
     	BufferedWriter output = new BufferedWriter(new FileWriter(outputFile));
     	output.write("Table: " + dataFile);
     	output.newLine();

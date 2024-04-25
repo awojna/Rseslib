@@ -74,6 +74,6 @@ public class RoughSet
 		for (int i = 0; i < complementMask.length; ++i)
 			if(complementMask[i])
 				complement[r++] = i;
-		return 1 - approximationAccuracy(complement, objs) / (new rseslib.processing.roughset.RoughSet()).approximationAccuracy(allAttrs, objs);
+		return 1 - approximationAccuracy(complement, objs) / approximationAccuracy(allAttrs, objs);
 	}
 }

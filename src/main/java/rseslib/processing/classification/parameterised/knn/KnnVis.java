@@ -156,6 +156,16 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
 	        if (m_Transformer!=null)
 	        	obj = m_Transformer.transformToNew(obj);
 			Neighbour[] n = m_VicinityProvider.getVicinity(obj, getIntProperty(K_PROPERTY_NAME));
+			if (n.length > 1 && n[1].dist() == 0.0) {
+				int noOfZeroDist = 2;
+				for(; noOfZeroDist < n.length && n[noOfZeroDist].dist() == 0.0; ++noOfZeroDist);
+				if (noOfZeroDist < n.length)
+					--noOfZeroDist;
+				Neighbour[] withoutZero = new Neighbour[n.length-noOfZeroDist];
+				for (int i = 1; i < withoutZero.length; ++i)
+					withoutZero[i] = n[i + noOfZeroDist];
+				n = withoutZero;
+			}
 		    if (!canvas.equals(pnl_clas)) {
 		    	if(painter_clas != null)
 		    		painter_clas.stopThread();

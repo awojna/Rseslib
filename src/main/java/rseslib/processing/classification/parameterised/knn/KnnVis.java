@@ -139,13 +139,13 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
 
 	public void draw(JPanel canvas)
 	{
-	    if (canvas.equals(pnl))
-	    	return;
-	    pnl = canvas;
-	    if(painter != null)
-	    	painter.stopThread();
-	    painter = new KnnPainter(m_OriginalData, m_TransformedTrainTable.getDataObjects(), m_Metric, rnd, htCols, avg, strLegend);
-	    painter.draw(canvas);
+		if (canvas.equals(pnl))
+			return;
+		pnl = canvas;
+		if(painter != null)
+			painter.stopThread();
+		painter = new KnnPainter(m_OriginalData, m_TransformedTrainTable.getDataObjects(), m_Metric, rnd, htCols, avg, strLegend);
+		painter.draw(canvas);
 	}
 
 	public void drawClassify(JPanel canvas, DoubleData obj)
@@ -174,7 +174,14 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
 		    }
 			if(painter_clas == null)
 				painter_clas = new KnnPainter(m_OriginalData, m_TransformedTrainTable.getDataObjects(), m_Metric, rnd_clas, htCols, avg, strLegend);
-			painter_clas.drawClassify(canvas, obj, orig, n);
+			double[] decDistr = classifyWithDistributedDecision(orig);
+			double sum = 0;
+			for(double v : decDistr)
+				sum += v;
+			if (sum > 0)
+				for (int d = 0; d < decDistr.length; ++d)
+					decDistr[d] /= sum;
+			painter_clas.drawClassify(canvas, obj, orig, n, decDistr, getProperty(VOTING_PROPERTY_NAME));
 		}
 		catch (Exception exc)
 		{

@@ -82,6 +82,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 	private double ymax = Double.POSITIVE_INFINITY;
     double mult = START_MULT;
     private String strLegend;
+    private String strVoting;
     private String dataPlaceholder;
     
     double currDev = 0.00;
@@ -98,6 +99,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 	private DoubleData selected;
 	private DoubleData classified;
     private DoubleData origClassified;
+    private double[] decDistribution;
 	
 	public KnnPainter(ArrayList<DoubleData> orig, ArrayList<DoubleData> transformed, Metric m, Random r, Hashtable<Double, Integer> colors, double avg_dist, String legend)
 	{
@@ -337,10 +339,11 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 		calcThread.start();
 	}
 
-	public void drawClassify(JPanel canvas, DoubleData obj, DoubleData origObj, Neighbour[] n)
+	public void drawClassify(JPanel canvas, DoubleData obj, DoubleData origObj, Neighbour[] n, double[] decDistr, String voting)
 	{
 		try
 		{
+			strVoting = voting;
 			if (classified == null)
 				drawInternal(canvas, false);			
 			if(calcThread != null)
@@ -359,6 +362,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 			classified = obj;
 			origClassified = origObj;
 			selected = obj;
+			decDistribution = decDistr;
 			repaint();
 
 			startThread();
@@ -470,7 +474,12 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 		repaint();
 		// System.out.println(System.currentTimeMillis() - starttime);
     }
-	
+
+	private String toHex(int val)
+	{
+		return ("" + "0123456789ABCDEF".charAt(val>>4)) + ("" + "0123456789ABCDEF".charAt(val%16));
+	}
+
     public void paint(Graphics g)
     {
     	String info = "<html>";
@@ -517,8 +526,26 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
         	
     		info += "<b>Iteration:</b> " + (int)iter + "<br>";
     		info += "<b>Scaling:</b> " + Math.round(mult * 10000) / 10000.0 + "<br><br>";
-
-        	info += strLegend + "<br";
+    		
+    		if (classified == null)
+    			info += strLegend + "<br>";
+    		else
+    		{
+    	        String voteInfo = "<br><b>Voting:<br>" + strVoting + "</b><br><br>";
+    	        NominalAttribute decAttr = transformedData.get(0).attributes().nominalDecisionAttribute();
+    	        for (int d = 0; d < decDistribution.length; ++d)
+    	        {
+    	        	double decGlobal = decAttr.globalValueCode(d);
+    				String name = NominalAttribute.stringValue(decGlobal);
+    				int color = htCols.get(decGlobal);
+    				int cr = color % 256;
+    				int cg = (color >> 8) % 256;
+    				int cb = (color >> 16) % 256; 
+    				String hexColor = toHex(cr) + toHex(cg) + toHex(cb);
+    				voteInfo += "<font color=#" + hexColor + ">" + name + ": " + Math.round(decDistribution[d] * 100) + " %</font><br>";
+    	        }
+    			info += voteInfo + "<br>";
+    		}
 
     		if (showDetails)
     		{

@@ -156,8 +156,9 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
 	        if (m_Transformer!=null)
 	        	obj = m_Transformer.transformToNew(obj);
 			Neighbour[] n = m_VicinityProvider.getVicinity(obj, getIntProperty(K_PROPERTY_NAME));
+			int noOfZeroDist = 0;
 			if (n.length > 1 && n[1].dist() == 0.0) {
-				int noOfZeroDist = 2;
+				noOfZeroDist = 2;
 				for(; noOfZeroDist < n.length && n[noOfZeroDist].dist() == 0.0; ++noOfZeroDist);
 				if (noOfZeroDist < n.length)
 					--noOfZeroDist;
@@ -172,16 +173,30 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
 		    	painter_clas = null;
 		    	pnl_clas = canvas;
 		    }
-			if(painter_clas == null)
+			if (painter_clas == null)
 				painter_clas = new KnnPainter(m_OriginalData, m_TransformedTrainTable.getDataObjects(), m_Metric, rnd_clas, htCols, avg, strLegend);
-			double[] decDistr = classifyWithDistributedDecision(orig);
+			double[] nWeights = null;
+			double[] decDistr;
+			if	(noOfZeroDist > 0)
+				decDistr = classifyWithDistributedDecision(orig);
+			else
+			{
+				nWeights = new double[n.length];
+				decDistr = getDistributedDecisionAndVotingWeights(obj, n, nWeights);
+				double sum = 0;
+				for (double v : nWeights)
+					sum += v;
+				if (sum > 0.0)
+					for (int i = 0; i < nWeights.length; ++i)
+						nWeights[i] /= sum;
+			}
 			double sum = 0;
-			for(double v : decDistr)
+			for (double v : decDistr)
 				sum += v;
 			if (sum > 0)
 				for (int d = 0; d < decDistr.length; ++d)
 					decDistr[d] /= sum;
-			painter_clas.drawClassify(canvas, obj, orig, n, decDistr, getProperty(VOTING_PROPERTY_NAME));
+			painter_clas.drawClassify(canvas, obj, orig, n, decDistr, nWeights, getProperty(VOTING_PROPERTY_NAME));
 		}
 		catch (Exception exc)
 		{

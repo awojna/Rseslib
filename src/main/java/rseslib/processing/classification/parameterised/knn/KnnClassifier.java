@@ -425,6 +425,67 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
     }
 
     /**
+     * Calculates the decision distribution and the voting weights
+     * for a given set of neighbors with calculated distances to a test object.
+     * The index of each position with a decision weight in the output vector
+     * corresponds to the local code of a decision value.
+     *
+     * @param dObj  			Object already transformed whose neighbors are given to this method.
+     * @param neighbours  		Set of neighbors with the position 0 omitted ordered by the distance to dObj.
+     * @param neighbourWeights  Array to be filled with the voting weights of the given neighbors, its length must be equal to neighbours.length.
+     * @return      			Decision distribution.
+     */
+    public double[] getDistributedDecisionAndVotingWeights(DoubleData dObj, Neighbour[] neighbours, double[] neighbourWeights) throws PropertyConfigurationException
+    {
+    	boolean checkConsistency = getBoolProperty(FILTER_NEIGHBOURS_PROPERTY_NAME);
+        if (checkConsistency && m_NeighboursFilter!=null)
+        	m_NeighboursFilter.markConsistency(dObj, neighbours);
+        double[] decDistr = new double[m_DecisionAttribute.noOfValues()];
+        Voting votingType;
+        try
+        {
+        	votingType = Voting.valueOf(getProperty(VOTING_PROPERTY_NAME));
+        }
+        catch (IllegalArgumentException e)
+        {
+        	throw new PropertyConfigurationException("Unknown voting method: "+getProperty(VOTING_PROPERTY_NAME));
+        }
+        for (int n = 0; n < neighbourWeights.length; ++n)
+        	neighbourWeights[n] = 0.0;
+        if (neighbours[1].dist() == 0.0 && (votingType == Voting.InverseDistance || votingType == Voting.InverseSquareDistance))
+        {
+        	for (int n = 1; n < neighbours.length && neighbours[n].dist() == 0; n++)
+        		if (!checkConsistency || neighbours[n].m_bConsistent)
+        		{
+        			decDistr[m_DecisionAttribute.localValueCode(neighbours[n].neighbour().getDecision())] = 1.0;
+        			neighbourWeights[n] = Double.POSITIVE_INFINITY;
+        		}
+        }
+        else
+        	for (int n = 1; n < neighbours.length; n++)
+        	{
+        		int curDec = m_DecisionAttribute.localValueCode(neighbours[n].neighbour().getDecision());
+        		if (!checkConsistency || neighbours[n].m_bConsistent)
+        		{
+        			switch (votingType)
+        			{
+        			case Equal:
+        				neighbourWeights[n] = 1.0;
+        				break;
+        			case InverseDistance:
+        				neighbourWeights[n] = 1.0 / neighbours[n].dist();
+        				break;
+        			case InverseSquareDistance:
+        				neighbourWeights[n] = 1.0 / (neighbours[n].dist()*neighbours[n].dist());
+        				break;
+        			}
+    				decDistr[curDec] += neighbourWeights[n];
+        		}
+        	}
+        return decDistr;
+    }
+
+    /**
      * Assigns a decision to a single test object.
      * The method searches for the nearest neighbors, optionally filters them by rules
      * and applies the selected method of voting by the neighbors.

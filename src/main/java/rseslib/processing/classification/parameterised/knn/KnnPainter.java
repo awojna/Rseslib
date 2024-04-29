@@ -100,6 +100,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 	private DoubleData classified;
     private DoubleData origClassified;
     private double[] decDistribution;
+    private Hashtable<DoubleData, Double> weights = new Hashtable<DoubleData, Double>();
 	
 	public KnnPainter(ArrayList<DoubleData> orig, ArrayList<DoubleData> transformed, Metric m, Random r, Hashtable<Double, Integer> colors, double avg_dist, String legend)
 	{
@@ -339,7 +340,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 		calcThread.start();
 	}
 
-	public void drawClassify(JPanel canvas, DoubleData obj, DoubleData origObj, Neighbour[] n, double[] decDistr, String voting)
+	public void drawClassify(JPanel canvas, DoubleData obj, DoubleData origObj, Neighbour[] n, double[] decDistr, double[] nWeights, String voting)
 	{
 		try
 		{
@@ -351,12 +352,15 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
 			mult = START_MULT;
 			iter = 0;
 			placement.clear();
+			weights.clear();
 			for (int i=0;i<n.length;i++)
 			{
         	   DPoint guess = new DPoint(avg);
         	   //obj.add(next);
         	   if (n[i] == null) continue;
-        	   placement.put(n[i].neighbour(), guess);				
+        	   placement.put(n[i].neighbour(), guess);	
+        	   if (nWeights != null)
+        		   weights.put(n[i].neighbour(), nWeights[i]);
 			}
 	    	placement.put(obj, new DPoint(avg));				
 			classified = obj;
@@ -550,9 +554,21 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     		if (showDetails)
     		{
     			if (selected != null)
-    				info += "<b>Selected:</b><br>" + formatData(selected) + "<br>";
+    			{
+    				Double weight = weights.get(selected);
+    				if (weight != null)
+    					info += "<b>Selected: " + Math.round(weight * 100) + " %</b><br>" + formatData(selected) + "<br>";
+    				else
+    					info += "<b>Selected:</b><br>" + formatData(selected) + "<br>";
+    			}
     			if (hovered != null)
-    				info += "<b>Hovered:</b><br>" + formatData(hovered) + "<br>"; 
+    			{
+    				Double weight = weights.get(hovered);
+    				if (weight != null)
+    					info += "<b>Hovered: " + Math.round(weight * 100) + " %</b><br>" + formatData(hovered) + "<br>";
+    				else
+    					info += "<b>Hovered:</b><br>" + formatData(hovered) + "<br>";
+    			}
     			else
     				info += "<br><br>" + dataPlaceholder;
     			if (selected == null)

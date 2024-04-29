@@ -1266,36 +1266,48 @@ public void actionPerformed_QmouseClickedMulticlassifier(java.awt.event.MouseEve
 		Collection<DoubleData>[] tabele;
 		QDataTable Oryg = (QDataTable) SelectedTable.getElem();
 		try {
-			tabele = Oryg.randomPartition(2);
-			QDataTable tab;
-			Iterator it;
-			iQDataTable cp;
-			for (int i = 0; i<2; i++) {
-				/*
-				PASKUDNE!!! Ale to jest jedyna metoda, by uniknac jakies problemy, przy
-				ewentualnych dalszych zmianach tabelki - skopiowac cala tabelke (razem 
-				z danymi, polami dodatkowymi), usunac wszystkie dane i dodac te dane,
-				ktore sa potrzebne
-				*/
-				
-				//Nie zamieniac tego ((QDataTable) SelectedTable.getElem()).clone() na Oryg
-				tab = (QDataTable) ((QDataTable) SelectedTable.getElem()).clone();
-				it =  ((QDataTable) SelectedTable.getElem()).iterator();
-				while (it.hasNext()) tab.remove((DoubleData) it.next());
-	
-				it = tabele[i].iterator();
-				while (it.hasNext()) tab.add((DoubleData) it.next());
-					
-				cp = tab;
-				QmakMain.getMainFrame().getProject().GetProjectElements().add(cp);
-				cp.setName(QmakMain.getMainFrame().getProject().CreateUniqeName(
-						String.format("%s_part%d", Oryg.getName(), i+1),false));
-				insertIcon(cp, null);
-				makeArrowFromTo(Oryg, cp);
+			String trainPercentText = JOptionPane.showInputDialog(this,
+					"Rows percentage for the first part of the split",
+					"50");
+			if(trainPercentText != null) {
+				int trainPercent = Integer.parseInt(trainPercentText);
+				if(trainPercent < 1 || trainPercent > 99)
+					JOptionPane.showMessageDialog(this, "Value must be in the range between 1 and 99", "", JOptionPane.ERROR_MESSAGE);
+				else {
+					tabele = Oryg.randomSplit(trainPercent, 100 - trainPercent);
+					QDataTable tab;
+					Iterator it;
+					iQDataTable cp;
+					for (int i = 0; i<2; i++) {
+						/*
+						PASKUDNE!!! Ale to jest jedyna metoda, by uniknac jakies problemy, przy
+						ewentualnych dalszych zmianach tabelki - skopiowac cala tabelke (razem 
+						z danymi, polami dodatkowymi), usunac wszystkie dane i dodac te dane,
+						ktore sa potrzebne
+						 */
+
+						//Nie zamieniac tego ((QDataTable) SelectedTable.getElem()).clone() na Oryg
+						tab = (QDataTable) ((QDataTable) SelectedTable.getElem()).clone();
+						it =  ((QDataTable) SelectedTable.getElem()).iterator();
+						while (it.hasNext()) tab.remove((DoubleData) it.next());
+
+						it = tabele[i].iterator();
+						while (it.hasNext()) tab.add((DoubleData) it.next());
+
+						cp = tab;
+						QmakMain.getMainFrame().getProject().GetProjectElements().add(cp);
+						cp.setName(QmakMain.getMainFrame().getProject().CreateUniqeName(
+								String.format("%s_part%d", Oryg.getName(), i+1),false));
+						insertIcon(cp, null);
+						makeArrowFromTo(Oryg, cp);
+					}
+					mainFrame.invalidateProject();
+				}
 			}
-			mainFrame.invalidateProject();
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(this, "Provide a number in the range between 1 and 99", "", JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this, mainFrame.messages.getString("ErrInSplit"));
+			JOptionPane.showMessageDialog(this, mainFrame.messages.getString("ErrInSplit"), "", JOptionPane.ERROR_MESSAGE);
 		}
 		
 	}

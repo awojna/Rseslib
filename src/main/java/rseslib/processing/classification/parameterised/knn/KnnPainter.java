@@ -528,14 +528,14 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     		}
     		g.setColor(Color.BLACK);
         	
-    		info += "<b>Iteration:</b> " + (int)iter + "<br>";
-    		info += "<b>Scaling:</b> " + Math.round(mult * 10000) / 10000.0 + "<br><br>";
+//    		info += "<b>Iteration:</b> " + (int)iter + "<br>";
+//    		info += "<b>Scaling:</b> " + Math.round(mult * 10000) / 10000.0 + "<br><br>";
     		
     		if (classified == null)
     			info += strLegend + "<br>";
     		else
     		{
-    	        String voteInfo = "<br><b>Voting:<br>" + strVoting + "</b><br><br>";
+    	        String voteInfo = "<br><b>VOTING:<br>" + strVoting + "</b><br><br>";
     	        NominalAttribute decAttr = transformedData.get(0).attributes().nominalDecisionAttribute();
     	        for (int d = 0; d < decDistribution.length; ++d)
     	        {

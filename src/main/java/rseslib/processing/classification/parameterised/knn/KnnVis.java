@@ -94,7 +94,7 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
         }
         avg /= cnt;
 
-        strLegend = "<br><b>Decisions</b>:<br>";
+        strLegend = "<br><b>DECISION CLASSES:</b><br>";
         for (Double key : htCols.keySet())
         {
 			String name = NominalAttribute.stringValue(key);

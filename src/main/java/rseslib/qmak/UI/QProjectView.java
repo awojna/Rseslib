@@ -903,8 +903,8 @@ public void actionPerformed_QmouseClickedMulticlassifier(java.awt.event.MouseEve
 	
 	private void renameMultiClassifier() {
 		String newName = JOptionPane.showInputDialog(this,
-				mainFrame.messages.getString("InfoInsertName") + " " + SelectedMulticlassifier.getElem().getName() + " to",
-				"", JOptionPane.PLAIN_MESSAGE);
+				mainFrame.messages.getString("InfoInsertName"),
+				SelectedMulticlassifier.getElem().getName());
 		if(newName != null) {
 			mainFrame.setTitleUnsaved();
 			SelectedMulticlassifier.getElem().setName(QmakMain.getMainFrame()
@@ -948,8 +948,8 @@ public void actionPerformed_QmouseClickedMulticlassifier(java.awt.event.MouseEve
 
 	private void renameClassifier() {
 		String newName = JOptionPane.showInputDialog(this,
-				mainFrame.messages.getString("InfoInsertName") + " " + SelectedClassifier.getElem().getName() + " to",
-				"", JOptionPane.PLAIN_MESSAGE);
+				mainFrame.messages.getString("InfoInsertName"),
+				SelectedClassifier.getElem().getName());
 		if(newName != null) {
 			mainFrame.setTitleUnsaved();
 			SelectedClassifier.getElem().setName(QmakMain.getMainFrame()
@@ -1314,8 +1314,8 @@ public void actionPerformed_QmouseClickedMulticlassifier(java.awt.event.MouseEve
 
 	private void renameTableIcon() {
 		String newName = JOptionPane.showInputDialog(this,
-				mainFrame.messages.getString("InfoInsertName") + " " + SelectedTable.getElem().getName() + " to",
-				"", JOptionPane.PLAIN_MESSAGE);
+				mainFrame.messages.getString("InfoInsertName"),
+				SelectedTable.getElem().getName());
 		if(newName != null) {
 			mainFrame.setTitleUnsaved();
 			SelectedTable.getElem().setName(QmakMain.getMainFrame()
@@ -1474,8 +1474,8 @@ public void actionPerformed_QmouseClickedMulticlassifier(java.awt.event.MouseEve
 
 	private void renameMultipleTestResult() {
 		String newName = JOptionPane.showInputDialog(this,
-				mainFrame.messages.getString("InfoInsertName") + " " + SelectedMultipleTestResult.getElem().getName() + " to",
-				"", JOptionPane.PLAIN_MESSAGE);
+				mainFrame.messages.getString("InfoInsertName"),
+				SelectedMultipleTestResult.getElem().getName());
 		if(newName != null) {
 			mainFrame.setTitleUnsaved();
 			SelectedMultipleTestResult.getElem().setName(QmakMain.getMainFrame()
@@ -1518,8 +1518,8 @@ public void actionPerformed_QmouseClickedMulticlassifier(java.awt.event.MouseEve
 
 	private void renameTestResult() {
 		String newName = JOptionPane.showInputDialog(this,
-				mainFrame.messages.getString("InfoInsertName") + " " + SelectedTestResult.getElem().getName() + " to",
-				"", JOptionPane.PLAIN_MESSAGE);
+				mainFrame.messages.getString("InfoInsertName"),
+				SelectedTestResult.getElem().getName());
 		if(newName != null) {
 			mainFrame.setTitleUnsaved();
 			SelectedTestResult.getElem().setName(QmakMain.getMainFrame()

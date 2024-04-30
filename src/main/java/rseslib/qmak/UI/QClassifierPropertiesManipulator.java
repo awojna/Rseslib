@@ -27,6 +27,8 @@ import java.awt.Insets;
 import java.util.*;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -35,7 +37,9 @@ import javax.swing.border.Border;
 
 import rseslib.qmak.QmakMain;
 import rseslib.qmak.dataprocess.classifier.iQClassifier;
+import rseslib.system.Configuration;
 import rseslib.system.ConfigurationWithStatistics;
+import rseslib.system.PropertyConfigurationException;
 
 /**
  * 
@@ -45,74 +49,99 @@ import rseslib.system.ConfigurationWithStatistics;
 public class QClassifierPropertiesManipulator {
     private Properties prop;
 
-    private Vector<JLabel> labels=new Vector<JLabel>();
-    private Vector<JTextField> textFields=new Vector<JTextField>();
+    private JLabel[] labels;
+    private JTextField[] textFields;
+    private JComboBox[] comboBoxes;
 
     public QClassifierPropertiesManipulator(Properties pr, iQClassifier cl) {
+    	HashMap<String, String[]> possibleVals;
+    	try {
+    		possibleVals = Configuration.possibleValues(cl.getClassifierClass());
+    	} catch (PropertyConfigurationException e) {
+			e.printStackTrace();
+			possibleVals = new HashMap<String, String[]>();
+		}
       if (pr == null)
-        prop = new Properties();
+    	  prop = new Properties();
       else
-      prop=(Properties)pr.clone();
+    	  prop=(Properties)pr.clone();
 
+      labels = new JLabel[prop.size()];
+      textFields = new JTextField[prop.size()];
+      comboBoxes = new JComboBox[prop.size()];
+      
         Enumeration enum_names = prop.propertyNames();
-        JLabel label;
-        JTextField textField;
 
+        int el = 0;
         while(enum_names.hasMoreElements())
         {
         	String s=(String)enum_names.nextElement();
-        	label=new JLabel(s,SwingConstants.RIGHT);
-        	textField=new JTextField(prop.getProperty(s));
-
-        	if ((cl.isTrained()) && 
-        	(!((ConfigurationWithStatistics) cl.getClassifier()).isModifiableProperty(s))){
-//        		textField.setBackground(Color.pink);
-    			textField.setEnabled(false);
+        	JLabel label = new JLabel(s,SwingConstants.RIGHT);
+        	labels[el] = label;
+        	JComponent comp;
+        	if(possibleVals.containsKey(s)) {
+        		comboBoxes[el] = new JComboBox(possibleVals.get(s));
+        		comboBoxes[el].setSelectedItem(prop.getProperty(s));
+        		comp = comboBoxes[el];
         	} else {
-        		textField.setEnabled(true);
+            	textFields[el] = new JTextField(prop.getProperty(s));
+            	comp = textFields[el];
         	}
 
-
-        	labels.add(label);
-        	textFields.add(textField);
+        	if ((cl.isTrained()) && 
+        			(!((ConfigurationWithStatistics) cl.getClassifier()).isModifiableProperty(s))) {
+//        		textField.setBackground(Color.pink);
+    			comp.setEnabled(false);
+        	} else {
+        		comp.setEnabled(true);
+        	}
+        	
+        	++el;
         }
 
         if(prop.isEmpty())
         {
-        	label=new JLabel(QmakMain.getMainFrame().messages.getString("NotConfigurable"));
-        	labels.add(label);
+        	labels = new JLabel[1];
+        	labels[0] = new JLabel(QmakMain.getMainFrame().messages.getString("NotConfigurable"));
         }
     }
     
     public void draw(JPanel panel)
     {
     	if(prop.isEmpty())
-    		panel.add(labels.elementAt(0), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
+    		panel.add(labels[0], new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
                     , GridBagConstraints.CENTER,
                     GridBagConstraints.NONE,
                     new Insets(0, 0, 0, 0), 0, 0));
     	else {
-    		GridLayout layGrid =new GridLayout(labels.size(),2);
+    		GridLayout layGrid =new GridLayout(labels.length,2);
     		layGrid.setHgap(7);
     		layGrid.setVgap(3);
     		panel.setLayout(layGrid);
     		Border bo = BorderFactory.createEmptyBorder(10, 10, 10, 10);//BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
     		panel.setBorder(bo);
-    		for(int i=0;i<labels.size();i++)
+    		for(int i=0;i<labels.length;i++)
     		{
-    		panel.add(labels.elementAt(i));
-      		panel.add(textFields.elementAt(i));
+    			panel.add(labels[i]);
+    			if(textFields[i] != null)
+    				panel.add(textFields[i]);
+    			else
+    				panel.add(comboBoxes[i]);
     		}
     	}
     }
 
     public Properties getProperties()
     {
-    	for(int i=0;i<textFields.size();i++)
-    	{
-    		String s=(textFields.elementAt(i)).getText();
-//    		if(s.equals(""))throw new BadAttributeValue();
-    		prop.setProperty((labels.elementAt(i)).getText(),s);
+    	for(int i=0;i<labels.length;i++) {
+    		String s;
+    		if(textFields[i] != null) {
+    			s=textFields[i].getText();
+    		} else {
+    			s=(String)comboBoxes[i].getSelectedItem();
+    		}
+//   		if(s.equals(""))throw new BadAttributeValue();
+			prop.setProperty(labels[i].getText(),s);
     	}
     	return prop;
     }

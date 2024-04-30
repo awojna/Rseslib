@@ -40,6 +40,12 @@ import rseslib.system.progress.Progress;
 public interface iQClassifier extends iQProjectElement , FileStoreable  {
 
 	/**
+	 * 
+	 * @return klasa klasyfikatora
+	 */
+	public Class getClassifierClass();
+	
+	/**
 	 * Czy klasyfikator jest wytrenowany
 	 */
 	public boolean isTrained();

@@ -63,10 +63,106 @@ public abstract class Configuration
     }
 
     /**
+     * Returns the dictionary of possible values for all string properties for a given class.
+     *
+     * @param configurableClass		Class.
+     * @return						Dictionary of possible values for all string properties for a given class.
+     * @throws PropertyConfigurationException If the class is not a subclass of Configuration or a property file has an invalid format.
+     */
+    public static HashMap<String, String[]> possibleValues(Class configurableClass) throws PropertyConfigurationException
+    {
+        Class superclass = configurableClass;
+        while (superclass!=null && superclass!=Configuration.class)
+        	superclass = superclass.getSuperclass();
+        if (superclass==null)
+        	throw new PropertyConfigurationException(configurableClass.getName()+" not a subclass of rseslib.system.Configuration");
+        HashMap<String, String[]> possibleVals = new HashMap<String, String[]>();
+        Class cls = configurableClass;
+        while (cls!=null)
+        {
+        	String path = '/'+cls.getName().replace('.', '/')+PROPERTIES_EXTENSION;
+        	InputStream in = cls.getResourceAsStream(path);
+        	if (in == null)
+        	{
+                cls = cls.getSuperclass();
+        		continue;
+        	}
+        	BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        	String line = null;
+        	try
+        	{
+        		if (reader.ready())
+        			line = reader.readLine();
+        		while (line != null)
+        		{
+        			int idx = 8;
+        			if (line.startsWith("##VALUES") && idx < line.length() && Character.isWhitespace(line.charAt(idx++)))
+        			{
+        				ArrayList<String> values = new ArrayList<String>();
+        				for (; idx < line.length() && Character.isWhitespace(line.charAt(idx)); ++idx);
+        				while (idx < line.length())
+        				{
+        					int begin = idx;
+        					if (line.charAt(idx) == ',')
+        						throw new PropertyConfigurationException("Invalid format of possible values in the properties file of " + cls.getCanonicalName());
+        					for (; idx < line.length() && !Character.isWhitespace(line.charAt(idx)) && line.charAt(idx) != ','; ++idx);
+        					values.add(line.substring(begin, idx));
+        					for (; idx < line.length() && Character.isWhitespace(line.charAt(idx)); ++idx);
+        					if (idx < line.length() && line.charAt(idx++) != ',')
+        						throw new PropertyConfigurationException("Invalid format of possible values in the properties file of " + cls.getCanonicalName());
+        					for (; idx < line.length() && Character.isWhitespace(line.charAt(idx)); ++idx);
+        				}
+        				if (values.isEmpty())
+        					throw new PropertyConfigurationException("No possible value found after ##VALUES keyword in the properties file of " + cls.getCanonicalName());
+        				while (reader.ready())
+        				{
+        					line = reader.readLine();
+        					idx = 0;
+        					for (; idx < line.length() && Character.isWhitespace(line.charAt(idx)); ++idx);
+        					if (idx < line.length() && line.charAt(idx) != '#' && line.charAt(idx) != '!')
+        					{
+        						int eq = line.indexOf('=');
+        						int colon = line.indexOf(':');
+        						int end = -1;
+        						if (eq < 0)
+        							end = colon;
+        						else if (colon < 0)
+        							end = eq;
+        						else
+        							end = Math.min(eq,  colon);
+        						while (end > idx && Character.isWhitespace(line.charAt(end - 1)))
+        							--end;
+        						if (end == idx)
+        							throw new PropertyConfigurationException("Invalid format of a property in the properties file of " + cls.getCanonicalName());
+        						possibleVals.put(line.substring(idx, end), values.toArray(new String[0]));
+        						break;
+        					}
+        				}
+        			}
+        			line = (reader.ready() ? reader.readLine() : null);
+        		}
+        	} catch (IOException e) {
+                throw new PropertyConfigurationException(e.getMessage());
+        	}
+        	String[] boolVals = { "TRUE", "FALSE" };
+        	Properties props = loadDefaultProperties(configurableClass);
+        	for (String prop : props.stringPropertyNames())
+        	{
+        		String val = props.getProperty(prop).toLowerCase();
+        		if((val.equals("true") || val.equals("false")) && !possibleVals.containsKey(prop))
+        			possibleVals.put(prop, boolVals);
+        	}
+            cls = cls.getSuperclass();
+        }
+        
+        return possibleVals;
+    }
+
+    /**
      * Returns the default properties for a given class.
      *
-     * @param configurableClass       Class.
-     * @return Properties             Default properties for a given class name.
+     * @param configurableClass		Class.
+     * @return						Default properties for a given class.
      * @throws PropertyConfigurationException If the class is not a subclass of Configuration.
      */
     public static Properties loadDefaultProperties(Class configurableClass) throws PropertyConfigurationException

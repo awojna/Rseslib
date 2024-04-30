@@ -107,6 +107,10 @@ public class QClassifier implements iQClassifier, iQXMLstoreable {
 
     }
 	
+	public Class getClassifierClass() {
+		return typ.classifierClass;
+	}
+	
 	public int trainOnTable(DoubleDataTable dataTable) {
 		return trainOnTableWithProgress(dataTable, new EmptyProgress());
 	}
@@ -226,7 +230,7 @@ public class QClassifier implements iQClassifier, iQXMLstoreable {
 	/**
 	 * Zwraca nazwe klasy, ktora reprezentuje klasyfikator
 	 */
-	public String getClassifierClass() {
+	public String getClassifierClassName() {
 		return wlasciwosci_pr.getProperty("class");
 	}
 	

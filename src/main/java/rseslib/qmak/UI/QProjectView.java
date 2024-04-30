@@ -105,7 +105,10 @@ class QKlasyfikator extends JMenuItem {
  * 
  */
 public class QProjectView extends JPanel {
-	Set<QIcon> elements = new HashSet<QIcon>();
+	
+    final static int timerInterval = (Integer) Toolkit.getDefaultToolkit().getDesktopProperty("awt.multiClickInterval");
+
+    Set<QIcon> elements = new HashSet<QIcon>();
 
 	QMainFrame mainFrame = null;
 
@@ -203,6 +206,9 @@ public class QProjectView extends JPanel {
 	JMenuItem TestResultIconRename = new JMenuItem();
 	JMenuItem TestResultHelpJMenuItem = new JMenuItem();
 	JMenuItem TestResultSave = new JMenuItem();
+	
+	boolean wasDoubleClick = false;
+	javax.swing.Timer timer;
 
 
 	// INICJALIZACJA I BUDOWANIE INTERFEJSU
@@ -1565,40 +1571,52 @@ public void actionPerformed_QmouseClickedMulticlassifier(java.awt.event.MouseEve
 	/*
 	 * ikona ma zawierac w sobie obiekt klasy iQProjectElement
 	 */
-	private void zaznaczObiektiIkone(QIcon ikona) {
+	private boolean zaznaczObiektiIkone(QIcon ikona) {
+		boolean res = false;
 		iQProjectElement el = ikona.getElem();
 		if (el == null)
-			return;
+			return false;
 		if (el.isClassifier()) {
+			if(SelectedClassifier == ikona)
+				res = true;
 			if (SelectedClassifier != null)
 				SelectedClassifier.setInactive();
 			SelectedClassifier = ikona;
 			SelectedClassifier.setActive();
 		}
 		if (el.isMulticlassifier()) {
+			if(SelectedMulticlassifier == ikona)
+				res = true;
 			if (SelectedMulticlassifier != null)
 				SelectedMulticlassifier.setInactive();
 			SelectedMulticlassifier = ikona;
 			SelectedMulticlassifier.setActive();
 		}
 		if (el.isTable()) {
+			if(SelectedTable == ikona)
+				res = true;
 			if (SelectedTable != null)
 				SelectedTable.setInactive();
 			SelectedTable = ikona;
 			SelectedTable.setActive();
 		}
 		if (el.isMultipleTestResult()) {
+			if(SelectedMultipleTestResult == ikona)
+				res = true;
 			if (SelectedMultipleTestResult != null)
 				SelectedMultipleTestResult.setInactive();
 			SelectedMultipleTestResult = ikona;
 			SelectedMultipleTestResult.setActive();
 		}
 		if (el.isTestResult()) {
+			if(SelectedTestResult == ikona)
+				res = true;
 			if (SelectedTestResult != null)
 				SelectedTestResult.setInactive();
 			SelectedTestResult = ikona;
 			SelectedTestResult.setActive();
 		}
+		return res;
 	}
 
 	private void insertIcon(iQProjectElement el, Point p) {
@@ -1625,12 +1643,25 @@ public void actionPerformed_QmouseClickedMulticlassifier(java.awt.event.MouseEve
 		if (el.isTable()) {
 			nowa.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					zaznaczObiektiIkone((QIcon) e.getSource());
+					boolean same = zaznaczObiektiIkone((QIcon) e.getSource());
 					if (e.getButton() == MouseEvent.BUTTON3)
 						actionPerformed_QmouseClickedTable(e);
-					if (e.getButton() == MouseEvent.BUTTON1
-							&& e.getClickCount() == 2) {
-						showSelectedTable();
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						if (e.getClickCount() == 2) {
+							wasDoubleClick = true;
+							showSelectedTable();
+						} else {
+			                timer = new javax.swing.Timer(timerInterval, new ActionListener() {
+			                    public void actionPerformed(ActionEvent evt) {
+			                        if (wasDoubleClick)
+			                            wasDoubleClick = false; // reset flag
+			                        else if(same)
+			                        	renameTableIcon();
+			                    }
+			                });
+			                timer.setRepeats(false);
+			                timer.start();
+						}
 					}
 					QMainFrame.getMainFrame().jMainWindow.repaint();
 				}
@@ -1639,64 +1670,90 @@ public void actionPerformed_QmouseClickedMulticlassifier(java.awt.event.MouseEve
 
 		// CLASSIFIER
 		if (el.isClassifier()) {
-			QClassifier elll = (QClassifier) el;
-			if (elll.getClassifier() instanceof rseslib.processing.classification.VisualClassifier){
-				nowa.addMouseListener(new java.awt.event.MouseAdapter() {
-					public void mouseClicked(java.awt.event.MouseEvent e) {
-						zaznaczObiektiIkone((QIcon) e.getSource());
-						if (e.getButton() == MouseEvent.BUTTON3)
-							actionPerformed_QmouseClickedClassifier(e);
-						if (e.getButton() == MouseEvent.BUTTON1
-							&& e.getClickCount() == 2) {
-							pokazWizualizacje();
-						}
-						QMainFrame.getMainFrame().jMainWindow.repaint();
-					}
-				});
-			
-			}else{//dla nie wizualnego
-				nowa.addMouseListener(new java.awt.event.MouseAdapter() {
-					public void mouseClicked(java.awt.event.MouseEvent e) {
-						zaznaczObiektiIkone((QIcon) e.getSource());
-						if (e.getButton() == MouseEvent.BUTTON3)
-							actionPerformed_QmouseClickedClassifier(e);
-						if (e.getButton() == MouseEvent.BUTTON1
-								&& e.getClickCount() == 2) {
+			nowa.addMouseListener(new java.awt.event.MouseAdapter() {
+				public void mouseClicked(java.awt.event.MouseEvent e) {
+					boolean same = zaznaczObiektiIkone((QIcon) e.getSource());
+					if (e.getButton() == MouseEvent.BUTTON3)
+						actionPerformed_QmouseClickedClassifier(e);
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						if (e.getClickCount() == 2) {
+							wasDoubleClick = true;
+							if (((QClassifier)el).getClassifier() instanceof rseslib.processing.classification.VisualClassifier)
+								pokazWizualizacje();
+							else
 								showClassifierProperties();
+						} else {
+							timer = new javax.swing.Timer(timerInterval, new ActionListener() {
+								public void actionPerformed(ActionEvent evt) {
+									if (wasDoubleClick)
+										wasDoubleClick = false; // reset flag
+									else if(same)
+										renameClassifier();
+								}
+							});
+							timer.setRepeats(false);
+							timer.start();
 						}
-						QMainFrame.getMainFrame().jMainWindow.repaint();
 					}
-				});	
-			}
+					QMainFrame.getMainFrame().jMainWindow.repaint();
+				}
+			});
 		}
 
 		// MULTICLASSIFIER
 		if (el.isMulticlassifier()) {
 			nowa.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					zaznaczObiektiIkone((QIcon) e.getSource());
+					boolean same = zaznaczObiektiIkone((QIcon) e.getSource());
 					if (e.getButton() == MouseEvent.BUTTON3)
 						actionPerformed_QmouseClickedMulticlassifier(e);
-					if (e.getButton() == MouseEvent.BUTTON1
-							&& e.getClickCount() == 2) {
-						showSelectedMulticlassifier();
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						if (e.getClickCount() == 2) {
+							wasDoubleClick = true;
+							showSelectedMulticlassifier();
+						} else {
+			                timer = new javax.swing.Timer(timerInterval, new ActionListener() {
+			                    public void actionPerformed(ActionEvent evt) {
+			                        if (wasDoubleClick) {
+			                            wasDoubleClick = false; // reset flag
+			                        } else if(same)
+			                        	renameMultiClassifier();
+			                    }
+			                });
+			                timer.setRepeats(false);
+			                timer.start();
+						}
 					}
 					QMainFrame.getMainFrame().jMainWindow.repaint();
 				}
 			});
 		}
+		
 		// MULTIPLE TEST RESULT
 		if (el.isMultipleTestResult()) {
 			nowa.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					zaznaczObiektiIkone((QIcon) e.getSource());
+					boolean same = zaznaczObiektiIkone((QIcon) e.getSource());
 					QMultipleTestResult el = (QMultipleTestResult) ((QIcon) e
 							.getSource()).getElem();
 					if (e.getButton() == MouseEvent.BUTTON3)
 						actionPerformed_QRightClickedMultipleTestResult(e);
-					if (e.getButton() == MouseEvent.BUTTON1
-							&& e.getClickCount() == 2) {
-						showSelectedMultipleTestResult();
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						if (e.getClickCount() == 2) {
+							wasDoubleClick = true;
+							showSelectedMultipleTestResult();
+						} else {
+			                timer = new javax.swing.Timer(timerInterval, new ActionListener() {
+			                    public void actionPerformed(ActionEvent evt) {
+			                        if (wasDoubleClick) {
+			                            wasDoubleClick = false; // reset flag
+			                        } else if(same)
+			                        	renameMultipleTestResult();
+			                    }
+			                });
+			                timer.setRepeats(false);
+			                timer.start();
+						}
 					}
 					QMainFrame.getMainFrame().jMainWindow.repaint();
 				}
@@ -1706,14 +1763,27 @@ public void actionPerformed_QmouseClickedMulticlassifier(java.awt.event.MouseEve
 		if (el.isTestResult()) {
 			nowa.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(java.awt.event.MouseEvent e) {
-					zaznaczObiektiIkone((QIcon) e.getSource());
+					boolean same = zaznaczObiektiIkone((QIcon) e.getSource());
 					QTestResult el = (QTestResult) ((QIcon) e.getSource())
 							.getElem();
 					if (e.getButton() == MouseEvent.BUTTON3)
 						actionPerformed_QRightClickedTestResult(e);
-					if (e.getButton() == MouseEvent.BUTTON1
-							&& e.getClickCount() == 2) {
-						showClassifierTestResult(el);
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						if (e.getClickCount() == 2) {
+							wasDoubleClick = true;
+							showClassifierTestResult(el);
+						} else {
+			                timer = new javax.swing.Timer(timerInterval, new ActionListener() {
+			                    public void actionPerformed(ActionEvent evt) {
+			                        if (wasDoubleClick) {
+			                            wasDoubleClick = false; // reset flag
+			                        } else if(same)
+			                        	renameTestResult();
+			                    }
+			                });
+			                timer.setRepeats(false);
+			                timer.start();
+						}
 					}
 					QMainFrame.getMainFrame().jMainWindow.repaint();
 				}

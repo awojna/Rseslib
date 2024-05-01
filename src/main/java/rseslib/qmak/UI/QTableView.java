@@ -22,6 +22,7 @@ package rseslib.qmak.UI;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,7 +37,6 @@ import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -47,6 +47,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.table.AbstractTableModel;
@@ -54,11 +55,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-import rseslib.qmak.UI.QIcon;
-import rseslib.qmak.UI.QMainFrame;
 import rseslib.qmak.UI.QTryb;
-import rseslib.qmak.UI.QVisClassifierView;
-import rseslib.qmak.UI.iQTables;
 import rseslib.qmak.QmakMain;
 import rseslib.qmak.dataprocess.classifier.iQClassifier;
 import rseslib.qmak.dataprocess.project.iQProjectElement;
@@ -364,6 +361,7 @@ public class QTableView
         int column) {
       Component def = super.getTableCellRendererComponent(table, obj,
           isSelected, hasFocus, row, column);
+      setHorizontalAlignment(SwingConstants.RIGHT);
       Color color;
       if ( ( (iQDataTable) table.getModel()).isBadlyClassified(row)) {
         color = badlyClassifiedColor;
@@ -433,8 +431,11 @@ public class QTableView
           setForeground(header.getForeground());
           setBackground(header.getBackground());
           setFont(header.getFont());
+          setHorizontalAlignment(getHorizontalAlignment());
         }
       }
+      setFont(getFont().deriveFont(Font.BOLD));
+      setHorizontalAlignment(SwingConstants.CENTER);
       if (table.getModel().getColumnName(column) == null) {
     	  setText("");
       } else {
@@ -445,6 +446,7 @@ public class QTableView
         this.setBackground(decisionAttributeColor);
         return this;
       }
+      
       setBorder(UIManager.getBorder("TableHeader.cellBorder"));
       if ( ( (DoubleDataTable) table.getModel()).attributes().attribute(
           column).isDecision()) {
@@ -487,9 +489,9 @@ public class QTableView
       exc = true;
     }
     if (combo == null || exc) {
-      combo = new JComboBox();
-      combo.setEditor(new TDataTableComboBoxEditor(jTable1, attrNo));
-      combo.setEditable(true);
+        combo = new JComboBox();
+        combo.setEditor(new TDataTableComboBoxEditor(jTable1, attrNo));
+        combo.setEditable(true);
     }
     // combo.setModel(new DefaultComboBoxModel());
 	for (DoubleData data : dataTable.getDataObjects()) {

@@ -489,24 +489,23 @@ public class QDataTable extends AbstractTableModel implements iQDataTable, FileS
 	 * @see javax.swing.table.TableModel#setValueAt(java.lang.Object, int, int)
 	 */
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		boolean pusty = false;
-		try {
-			getRow(rowIndex).set(columnIndex,
-					(new Double((String) aValue).doubleValue()));
-		} catch (Exception a) {
-			if (a.getMessage() != null) {
-				if (a.getMessage().compareTo("empty String") == 0) {
-					getRow(rowIndex).set(columnIndex, Double.NaN);
-					pusty = true;
+		if(aValue instanceof Double)
+			getRow(rowIndex).set(columnIndex, ((Double)aValue).doubleValue());
+		else {
+			String strVal = (String)aValue; 
+			if(header.isMissing(strVal))
+				getRow(rowIndex).set(columnIndex, Double.NaN);
+			else {
+				Attribute att = header.attribute(columnIndex);
+				if(att.isNumeric()) {
+					try {
+						double numVal = new Double(strVal).doubleValue();
+						getRow(rowIndex).set(columnIndex, numVal);
+					} catch (Exception e) { }
+				} else {
+					getRow(rowIndex).set(columnIndex, ((NominalAttribute)att).globalValueCode((String)aValue));
 				}
 			}
-		}
-		;
-		Attribute att = header.attribute(columnIndex);
-		if (att.isNominal() && !pusty) {
-			getRow(rowIndex).set(columnIndex, ((Double) aValue).doubleValue());
-			// ((NominalAttribute) att).globalValueCode(aValue
-			// .toString()));
 		}
 		properties.set_unsaved();
 	}

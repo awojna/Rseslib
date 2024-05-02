@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import rseslib.processing.classification.parameterised.knn.KNearestNeighbors;
+import rseslib.processing.classification.parameterised.knn.LocalKNearestNeighbors;
 import rseslib.processing.metrics.MetricFactory;
 import weka.classifiers.AbstractRseslibClassifierWrapper;
 import weka.core.Option;
@@ -33,12 +33,12 @@ import weka.core.Tag;
 import weka.core.Utils;
 
 /**
- * Weka wrapper for rseslib K-NN classifier.
- * @see rseslib.processing.classification.parameterised.knn.KNearestNeighbors
+ * Weka wrapper for K-NN classifier with local metric induction.
+ * @see rseslib.processing.classification.parameterised.knn.LocalKNearestNeighbors
  *
  * @author      Arkadiusz Wojna
  */
-public class RseslibKnn extends AbstractRseslibClassifierWrapper
+public class LocalKNN extends AbstractRseslibClassifierWrapper
 {
 	/** for serialization */
 	static final long serialVersionUID = 1L;
@@ -59,16 +59,16 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 		    new Tag(MetricFactory.Weighting.AccuracyBased.ordinal(), MetricFactory.Weighting.AccuracyBased.name()),
 	  };
 	
-	  /** Tags for 'voting' option */
+	  /** Tags for 'weightingMethod' option */
 	  private static final Tag[] TAGS_VOTING = {
-		    new Tag(KNearestNeighbors.Voting.Equal.ordinal(), KNearestNeighbors.Voting.Equal.name()),
-		    new Tag(KNearestNeighbors.Voting.InverseDistance.ordinal(), KNearestNeighbors.Voting.InverseDistance.name()),
-		    new Tag(KNearestNeighbors.Voting.InverseSquareDistance.ordinal(), KNearestNeighbors.Voting.InverseSquareDistance.name()),
+		    new Tag(LocalKNearestNeighbors.Voting.Equal.ordinal(), LocalKNearestNeighbors.Voting.Equal.name()),
+		    new Tag(LocalKNearestNeighbors.Voting.InverseDistance.ordinal(), LocalKNearestNeighbors.Voting.InverseDistance.name()),
+		    new Tag(LocalKNearestNeighbors.Voting.InverseSquareDistance.ordinal(), LocalKNearestNeighbors.Voting.InverseSquareDistance.name()),
 	  };
 
-	public RseslibKnn() throws Exception
+	public LocalKNN() throws Exception
 	{
-		super(KNearestNeighbors.class);
+		super(LocalKNearestNeighbors.class);
 	}
 	
 	/**
@@ -78,9 +78,9 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 	 */
 	public String globalInfo() {
 
-		return  "K nearest neighours classifier "
-				+ "with various distance measures applicable also to data with both numeric and nominal attributes. "
-				+ "It implements fast neighour search in large data sets and has the mode to work as RIONA algorithm. "
+		return  "K nearest neighours classifier with local metric induction. "
+				+ "Intendend to improve accuracy in relation to the standard k-nn, particularly in case of data with nominal attributes. "
+				+ "Works reasonably with 2000+ training instances. "
 				+ "For more information see\n\n"
 				+ getTechnicalInformation().toString();
 	}
@@ -144,14 +144,14 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 
 	int getWeigthingOrdinal()
 	{
-		return MetricFactory.Weighting.valueOf(getProperties().getProperty(KNearestNeighbors.WEIGHTING_METHOD_PROPERTY_NAME)).ordinal();
+		return MetricFactory.Weighting.valueOf(getProperties().getProperty(LocalKNearestNeighbors.WEIGHTING_METHOD_PROPERTY_NAME)).ordinal();
 	}
 
 	public void setWeightingMethod(SelectedTag newType)
 	{
 	    if (newType.getTags() == TAGS_WEIGHTING) {
 	    	MetricFactory.Weighting value = MetricFactory.Weighting.values()[newType.getSelectedTag().getID()];
-	    	getProperties().setProperty(KNearestNeighbors.WEIGHTING_METHOD_PROPERTY_NAME, value.name());
+	    	getProperties().setProperty(LocalKNearestNeighbors.WEIGHTING_METHOD_PROPERTY_NAME, value.name());
 	    }
 	}
 
@@ -165,31 +165,15 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 	    return "Attribute weighting method";
 	}
 
-	// methods required for option 'indexing'
-	public void setIndexing(boolean value)
-	{
-		getProperties().setProperty(KNearestNeighbors.INDEXING_PROPERTY_NAME, String.valueOf(value));
-	}
-	
-	public boolean getIndexing()
-	{
-		return Boolean.parseBoolean(getProperties().getProperty(KNearestNeighbors.INDEXING_PROPERTY_NAME));
-	}
-	
-	public String indexingTipText()
-	{
-		return "Whether the classifier uses indexing to accelerate search of nearest neighbours";
-	}
-
 	// methods required for option 'learnOptimalK'
 	public void setLearnOptimalK(boolean value)
 	{
-		getProperties().setProperty(KNearestNeighbors.LEARN_OPTIMAL_K_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(LocalKNearestNeighbors.LEARN_OPTIMAL_K_PROPERTY_NAME, String.valueOf(value));
 	}
 	
 	public boolean getLearnOptimalK()
 	{
-		return Boolean.parseBoolean(getProperties().getProperty(KNearestNeighbors.LEARN_OPTIMAL_K_PROPERTY_NAME));
+		return Boolean.parseBoolean(getProperties().getProperty(LocalKNearestNeighbors.LEARN_OPTIMAL_K_PROPERTY_NAME));
 	}
 	
 	public String learnOptimalKTipText()
@@ -197,31 +181,31 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 		return "Whether the classifier learns the optimal number of nearest neighbors";
 	}
 
-	// methods required for option 'maxK'
-	public void setMaxK(int value)
+	// methods required for option 'localSetSize'
+	public void setLocalSetSize(int value)
 	{
-		getProperties().setProperty(KNearestNeighbors.MAXIMAL_K_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(LocalKNearestNeighbors.LOCAL_SET_SIZE_PROPERTY_NAME, String.valueOf(value));
 	}
 	
-	public int getMaxK()
+	public int getLocalSetSize()
 	{
-		return Integer.parseInt(getProperties().getProperty(KNearestNeighbors.MAXIMAL_K_PROPERTY_NAME));
+		return Integer.parseInt(getProperties().getProperty(LocalKNearestNeighbors.LOCAL_SET_SIZE_PROPERTY_NAME));
 	}
 	
-	public String maxKTipText()
+	public String localSetSizeTipText()
 	{
-		return "Maximal possible k while learning the optimum (used only if learnOptimalK = TRUE)";
+		return "Size of the local set used to induce local metric";
 	}
 
 	// methods required for option 'k'
 	public void setK(int value)
 	{
-		getProperties().setProperty(KNearestNeighbors.K_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(LocalKNearestNeighbors.K_PROPERTY_NAME, String.valueOf(value));
 	}
 	
 	public int getK()
 	{
-		return Integer.parseInt(getProperties().getProperty(KNearestNeighbors.K_PROPERTY_NAME));
+		return Integer.parseInt(getProperties().getProperty(LocalKNearestNeighbors.K_PROPERTY_NAME));
 	}
 	
 	public String kTipText()
@@ -229,41 +213,25 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 		return "Number of nearest neighbours used to vote for decision (set automatically if learnOptimalK = TRUE)";
 	}
 
-	// methods required for option 'filterNeighboursUsingRules'
-	public void setFilterNeighboursUsingRules(boolean value)
-	{
-		getProperties().setProperty(KNearestNeighbors.FILTER_NEIGHBOURS_PROPERTY_NAME, String.valueOf(value));
-	}
-	
-	public boolean getFilterNeighboursUsingRules()
-	{
-		return Boolean.parseBoolean(getProperties().getProperty(KNearestNeighbors.FILTER_NEIGHBOURS_PROPERTY_NAME));
-	}
-	
-	public String filterNeighboursUsingRulesTipText()
-	{
-		return "Whether nearest neighbours are filtered by rules (RIONA)";
-	}
-
 	// methods required for option 'voting'
 	String enumarateVotingToString()
 	{
 		StringBuilder sb = new StringBuilder();
-		for (KNearestNeighbors.Voting voting : KNearestNeighbors.Voting.values())
+		for (LocalKNearestNeighbors.Voting voting : LocalKNearestNeighbors.Voting.values())
 			sb.append("\t\t"+voting.ordinal()+"="+voting.name()+"\n");
 		return sb.toString();
 	}
 
 	int getVotingOrdinal()
 	{
-		return KNearestNeighbors.Voting.valueOf(getProperties().getProperty(KNearestNeighbors.VOTING_PROPERTY_NAME)).ordinal();
+		return LocalKNearestNeighbors.Voting.valueOf(getProperties().getProperty(LocalKNearestNeighbors.VOTING_PROPERTY_NAME)).ordinal();
 	}
 
 	public void setVoting(SelectedTag newType)
 	{
 	    if (newType.getTags() == TAGS_VOTING) {
-	    	KNearestNeighbors.Voting value = KNearestNeighbors.Voting.values()[newType.getSelectedTag().getID()];
-	    	getProperties().setProperty(KNearestNeighbors.VOTING_PROPERTY_NAME, value.name());
+	    	LocalKNearestNeighbors.Voting value = LocalKNearestNeighbors.Voting.values()[newType.getSelectedTag().getID()];
+	    	getProperties().setProperty(LocalKNearestNeighbors.VOTING_PROPERTY_NAME, value.name());
 	    }
 	}
 
@@ -307,29 +275,23 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 						+ "\t(default: "+MetricFactory.Weighting.DistanceBased.ordinal()+"="+MetricFactory.Weighting.DistanceBased.name()+")",
 						"W", 1, "-W"));
 
-	    result.addElement(new Option("\tDo not use indexing tree (linear search for nearest neighbours is used).",
-			      "L", 0, "-L"));
-
 	    result.addElement(new Option("\tDo not optimize the number of the nearest neighbours automatically.",
 			      "U", 0, "-U"));
 
 		result.addElement(new Option(
-				"\tMaximum number of neighbours while optimizing automatically.\n"
+				"\tSize of the local set used to induce local metric.\n"
 						+ "\t(default: 100)",
-						"N", 1, "-N <maximum number>"));
+						"L", 1, "-L <local set size>"));
 
 		result.addElement(new Option(
 				"\tNumber of nearest neighbours if not set automatically.\n"
 						+ "\t(default: 1)",
 						"K", 1, "-K <number of neighbours>"));
 
-	    result.addElement(new Option("\tUse rules to filter nearest neighbours (RIONA).",
-			      "R", 0, "-R"));
-
 		result.addElement(new Option(
 				"\tVoting method:\n"
 						+ enumarateVotingToString()
-						+ "\t(default: "+KNearestNeighbors.Voting.InverseSquareDistance.ordinal()+"="+KNearestNeighbors.Voting.InverseSquareDistance.name()+")",
+						+ "\t(default: "+LocalKNearestNeighbors.Voting.InverseSquareDistance.ordinal()+"="+LocalKNearestNeighbors.Voting.InverseSquareDistance.name()+")",
 						"V", 1, "-V"));
 
 		return result.elements();
@@ -363,15 +325,14 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 		if (tmpStr.length() != 0)
 			setWeightingMethod(new SelectedTag(Integer.parseInt(tmpStr), TAGS_WEIGHTING));
 		
-	    setIndexing(!Utils.getFlag('L', options));
-
 	    boolean learn = !Utils.getFlag('U', options);
 	    setLearnOptimalK(learn);
-	    
+
+		tmpStr = Utils.getOption('L', options);
+		if (tmpStr.length() != 0)
+			setLocalSetSize(Integer.parseInt(tmpStr));
+
 	    if (learn) {
-			tmpStr = Utils.getOption('N', options);
-			if (tmpStr.length() != 0)
-				setMaxK(Integer.parseInt(tmpStr));
 			tmpStr = Utils.getOption('K', options);
 			if (tmpStr.length() != 0)
 				throw new Exception("Setting K makes sense only if automatic optimization is not used");
@@ -379,12 +340,7 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 			tmpStr = Utils.getOption('K', options);
 			if (tmpStr.length() != 0)
 				setK(Integer.parseInt(tmpStr));
-			tmpStr = Utils.getOption('N', options);
-			if (tmpStr.length() != 0)
-				throw new Exception("Setting maximum number of neighbours makes sense only if automatic optimization is used");
 	    }
-
-	    setFilterNeighboursUsingRules(Utils.getFlag('R', options));
 
 		tmpStr = Utils.getOption('V', options);
 		if (tmpStr.length() != 0)
@@ -413,20 +369,14 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 		result.add("-W");
 		result.add("" + getWeigthingOrdinal());
 
-		if(!getIndexing())
-			result.add("-L");
+		result.add("-L");
+		result.add("" + getLocalSetSize());
 
-		if(getLearnOptimalK()) {
-			result.add("-N");
-			result.add("" + getMaxK());
-		} else {
+		if(!getLearnOptimalK()) {
 			result.add("-U");
 			result.add("-K");
 			result.add("" + getK());
 		}
-
-		if(getFilterNeighboursUsingRules())
-			result.add("-R");
 
 		result.add("-V");
 		result.add("" + getVotingOrdinal());
@@ -442,6 +392,6 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 	*/
 	public static void main(String[] args) throws Exception
 	{
-		runClassifier(new RseslibKnn(), args);
+		runClassifier(new LocalKNN(), args);
 	}
 }

@@ -23,8 +23,6 @@ package rseslib.qmak.dataprocess.classifier;
 import java.io.*;
 import java.util.*;
 
-import rseslib.qmak.dataprocess.classifier.QClassifierType;
-
 /**
  * Klasa reprezentuje dostepne w programie typy klasyfikatorow.
  * 
@@ -35,7 +33,7 @@ public class QClassifierTypes {
 	
     public static String pathToConfig = "qmak.config";
 
-    private Set<QClassifierType> classifierTypes = new HashSet<QClassifierType>();
+    private ArrayList<QClassifierType> classifierTypes = new ArrayList<QClassifierType>();
 
     /**
      * wczytuje z pliku konfiguracyjnego dost�pne klasyfikatory
@@ -47,18 +45,20 @@ public class QClassifierTypes {
     // TODO nie dodawa� b��dnych typ�w - usuwa� je w bloku catch
     public QClassifierTypes() {
 		try {
-        	Properties defaultProps = new Properties();
-        	FileInputStream in = new FileInputStream(pathToConfig);
-        	defaultProps.load(in);
-        	in.close();
+        	BufferedReader in = new BufferedReader(new FileReader(pathToConfig));
         	
         	//dodawanie do zbioru nowych typ�w klasyfikator�w wczytanych z pliku
+        	String line = null;
+        	if (in.ready())
+        		line = in.readLine();
         	int i = 0;
-        	for (Object klucz : defaultProps.keySet()) {
+        	while (line != null) {
         		i++;
-        		classifierTypes.add(new QClassifierType("klasyfi"+i,defaultProps.getProperty((String) klucz).replace(File.separatorChar,'.')));	
-        		//usun�� koncowe spacje - je�li w pliku s� dodatkowe spacje na ko�cu za nazw� klasyfikatora to przy Class.forName wyskajuje b��d �e nie da si� znale�� klasy
+        		line = line.trim();
+        		classifierTypes.add(new QClassifierType("klasyfi"+i, line));	
+        		line = (in.ready() ? in.readLine() : null); 
         	}
+        	in.close();
         	
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -97,25 +97,20 @@ public class QClassifierTypes {
     	            it.remove();
     }
     
-    public  Set<QClassifierType> getTypes() {
+    public  ArrayList<QClassifierType> getTypes() {
         return classifierTypes;
     }
     
     //zapisuje typy klasyfikator�w do pliku 
     public void saveClassifierTypesConfiguration(){
     	
-  		FileOutputStream out;
-  		Properties outProps = new Properties();
-  		
 		try {
-			out = new FileOutputStream(pathToConfig);
-			int i = 0;
-			for (QClassifierType typ : classifierTypes) {
-  	  			i++;
-  	  			outProps.setProperty("classifier"+i,typ.getPathToClass());
-			}		
-			outProps.store(out,null);
-			out.close();
+	    	BufferedWriter output = new BufferedWriter(new FileWriter(pathToConfig));
+			for (QClassifierType typ : classifierTypes) {	
+	    		output.write(typ.getPathToClass());
+	    		output.newLine();
+			}
+	    	output.close();
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

@@ -679,12 +679,9 @@ public class QMainFrame extends JFrame implements ActionListener {
 		Vector<String> vec = new Vector<String>();
 		Object[] possibilities;
 		
-		for (Iterator it = QMainFrame.getClassifierTypes().getTypes().iterator(); it.hasNext();) {
-			QClassifierType el = (QClassifierType) it.next();
+		for (QClassifierType el : QMainFrame.getClassifierTypes().getTypes())
 			vec.add(el.getPathToClass());
-		}
 		possibilities = vec.toArray();
-		QMainFrame.getClassifierTypes().getTypes();
 		
 		String s = (String)JOptionPane.showInputDialog(
 		                    QMainFrame.getMainFrame(),

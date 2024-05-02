@@ -54,7 +54,7 @@ import rseslib.structure.metric.Neighbour;
  * 
  * @author		Lukasz Kosson
  */
-public class KnnPainter extends JPanel implements MouseMotionListener, MouseListener
+public class KNNPainter extends JPanel implements MouseMotionListener, MouseListener
 {
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
@@ -102,7 +102,7 @@ public class KnnPainter extends JPanel implements MouseMotionListener, MouseList
     private double[] decDistribution;
     private Hashtable<DoubleData, Double> weights = new Hashtable<DoubleData, Double>();
 	
-	public KnnPainter(ArrayList<DoubleData> orig, ArrayList<DoubleData> transformed, Metric m, Random r, Hashtable<Double, Integer> colors, double avg_dist, String legend)
+	public KNNPainter(ArrayList<DoubleData> orig, ArrayList<DoubleData> transformed, Metric m, Random r, Hashtable<Double, Integer> colors, double avg_dist, String legend)
 	{
 		origData = orig;
 		transformedData = transformed;

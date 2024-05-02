@@ -47,7 +47,7 @@ public class VisualRoughSetPanel extends JPanel {
      * @param vrs classifier which will be visualized
      * @param defSelector default selector, normally null, used to create visualization of classiffication of single table element
      */
-	VisualRoughSetPanel(VisualRoughSetClassifier vrs,RulesSelector defSelector){
+	VisualRoughSetPanel(RoughSetRulesVisual vrs,RulesSelector defSelector){
 		JLabel amountLabel=new JLabel();
 		RulesTableModel rtm=new RulesTableModel(vrs,defSelector);
 		new AmountController(amountLabel,rtm,vrs,(defSelector!=null));				
@@ -91,7 +91,7 @@ class AmountController implements TableModelListener{
 
 	JLabel jl;
 	RulesTableModel rtm;
-	VisualRoughSetClassifier vrs;
+	RoughSetRulesVisual vrs;
 	boolean showDefault; 
 	private void setLabelText(){
 		if (showDefault){
@@ -107,7 +107,7 @@ class AmountController implements TableModelListener{
  * @param showDefault controls if label will be showing also additional number - how many rules are selected by the default selector
  */
 
-	public AmountController(JLabel jl, RulesTableModel rtm,VisualRoughSetClassifier vrs,boolean showDefault) {
+	public AmountController(JLabel jl, RulesTableModel rtm,RoughSetRulesVisual vrs,boolean showDefault) {
 	
 		this.jl = jl;
 		this.rtm = rtm;

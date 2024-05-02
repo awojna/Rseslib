@@ -39,7 +39,7 @@ import rseslib.system.progress.Progress;
  * @author Lukasz Ligowski
  */
 
-public class NaiveBayesClassifier extends ConfigurationWithStatistics implements Classifier
+public class NaiveBayes extends ConfigurationWithStatistics implements Classifier
 {
 	/** Attributes. */
 	private Header m_Attributes;
@@ -55,7 +55,7 @@ public class NaiveBayesClassifier extends ConfigurationWithStatistics implements
 	 * @param table Data table for classification.
      * @param prog Progress indicator.
 	 */
-	public NaiveBayesClassifier(Properties prop, DoubleDataTable table, Progress prog)  throws PropertyConfigurationException, InterruptedException
+	public NaiveBayes(Properties prop, DoubleDataTable table, Progress prog)  throws PropertyConfigurationException, InterruptedException
 	{
 		super(prop);
 		m_Attributes = table.attributes();

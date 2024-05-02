@@ -35,13 +35,13 @@ import java.io.*;
 import java.awt.*;
 
 /**
- * <p>Description: Base class for visulalising C45 decision tree </p>
+ * <p>Description: Base class for visualising C45DecisionTree </p>
  * 
  * @author	Maciej Prochniak
  */
 
-public class C45Vis
-    extends C45
+public class C45DecisionTreeVisual
+    extends C45DecisionTree
     implements VisualClassifier {
 
   /** Serialization version. */
@@ -61,8 +61,8 @@ public class C45Vis
   private JPanel canvas;
   private JPanel clas_canvas;
 
-  // constructors coming from C45
-  public C45Vis(Properties prop, DoubleDataTable tab, Progress prog) throws
+  // constructors coming from C45DecisionTree
+  public C45DecisionTreeVisual(Properties prop, DoubleDataTable tab, Progress prog) throws
       InterruptedException, PropertyConfigurationException {
     super(prop, tab, prog);
   }

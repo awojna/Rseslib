@@ -41,7 +41,7 @@ public class RulesTableModel extends AbstractTableModel {
 
 
 	//private 
-	VisualRoughSetClassifier vrs;
+	RoughSetRulesVisual vrs;
 	private Vector<EqualityDescriptorsRule> rules;
 	private Vector<EqualityDescriptorsRule> defaultRules;	
 	private Comparator<EqualityDescriptorsRule>lastComparator;
@@ -55,7 +55,7 @@ public class RulesTableModel extends AbstractTableModel {
      * @param defSelector default selector, normally null, used to create visualization of classification of single table element
      */
 
-	RulesTableModel(VisualRoughSetClassifier vrs2,RulesSelector defSelector){
+	RulesTableModel(RoughSetRulesVisual vrs2,RulesSelector defSelector){
 		vrs=vrs2;		
 		rules=new Vector<EqualityDescriptorsRule>();
 		Iterator<Rule> i=vrs.getRules().iterator();

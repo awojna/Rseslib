@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import rseslib.processing.classification.parameterised.knn.KnnClassifier;
+import rseslib.processing.classification.parameterised.knn.KNearestNeighbors;
 import rseslib.processing.metrics.MetricFactory;
 import weka.classifiers.AbstractRseslibClassifierWrapper;
 import weka.core.Option;
@@ -34,7 +34,7 @@ import weka.core.Utils;
 
 /**
  * Weka wrapper for rseslib K-NN classifier.
- * @see rseslib.processing.classification.parameterised.knn.KnnClassifier
+ * @see rseslib.processing.classification.parameterised.knn.KNearestNeighbors
  *
  * @author      Arkadiusz Wojna
  */
@@ -61,14 +61,14 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 	
 	  /** Tags for 'voting' option */
 	  private static final Tag[] TAGS_VOTING = {
-		    new Tag(KnnClassifier.Voting.Equal.ordinal(), KnnClassifier.Voting.Equal.name()),
-		    new Tag(KnnClassifier.Voting.InverseDistance.ordinal(), KnnClassifier.Voting.InverseDistance.name()),
-		    new Tag(KnnClassifier.Voting.InverseSquareDistance.ordinal(), KnnClassifier.Voting.InverseSquareDistance.name()),
+		    new Tag(KNearestNeighbors.Voting.Equal.ordinal(), KNearestNeighbors.Voting.Equal.name()),
+		    new Tag(KNearestNeighbors.Voting.InverseDistance.ordinal(), KNearestNeighbors.Voting.InverseDistance.name()),
+		    new Tag(KNearestNeighbors.Voting.InverseSquareDistance.ordinal(), KNearestNeighbors.Voting.InverseSquareDistance.name()),
 	  };
 
 	public RseslibKnn() throws Exception
 	{
-		super(KnnClassifier.class);
+		super(KNearestNeighbors.class);
 	}
 	
 	/**
@@ -144,14 +144,14 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 
 	int getWeigthingOrdinal()
 	{
-		return MetricFactory.Weighting.valueOf(getProperties().getProperty(KnnClassifier.WEIGHTING_METHOD_PROPERTY_NAME)).ordinal();
+		return MetricFactory.Weighting.valueOf(getProperties().getProperty(KNearestNeighbors.WEIGHTING_METHOD_PROPERTY_NAME)).ordinal();
 	}
 
 	public void setWeightingMethod(SelectedTag newType)
 	{
 	    if (newType.getTags() == TAGS_WEIGHTING) {
 	    	MetricFactory.Weighting value = MetricFactory.Weighting.values()[newType.getSelectedTag().getID()];
-	    	getProperties().setProperty(KnnClassifier.WEIGHTING_METHOD_PROPERTY_NAME, value.name());
+	    	getProperties().setProperty(KNearestNeighbors.WEIGHTING_METHOD_PROPERTY_NAME, value.name());
 	    }
 	}
 
@@ -168,12 +168,12 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 	// methods required for option 'indexing'
 	public void setIndexing(boolean value)
 	{
-		getProperties().setProperty(KnnClassifier.INDEXING_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(KNearestNeighbors.INDEXING_PROPERTY_NAME, String.valueOf(value));
 	}
 	
 	public boolean getIndexing()
 	{
-		return Boolean.parseBoolean(getProperties().getProperty(KnnClassifier.INDEXING_PROPERTY_NAME));
+		return Boolean.parseBoolean(getProperties().getProperty(KNearestNeighbors.INDEXING_PROPERTY_NAME));
 	}
 	
 	public String indexingTipText()
@@ -184,12 +184,12 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 	// methods required for option 'learnOptimalK'
 	public void setLearnOptimalK(boolean value)
 	{
-		getProperties().setProperty(KnnClassifier.LEARN_OPTIMAL_K_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(KNearestNeighbors.LEARN_OPTIMAL_K_PROPERTY_NAME, String.valueOf(value));
 	}
 	
 	public boolean getLearnOptimalK()
 	{
-		return Boolean.parseBoolean(getProperties().getProperty(KnnClassifier.LEARN_OPTIMAL_K_PROPERTY_NAME));
+		return Boolean.parseBoolean(getProperties().getProperty(KNearestNeighbors.LEARN_OPTIMAL_K_PROPERTY_NAME));
 	}
 	
 	public String learnOptimalKTipText()
@@ -200,12 +200,12 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 	// methods required for option 'maxK'
 	public void setMaxK(int value)
 	{
-		getProperties().setProperty(KnnClassifier.MAXIMAL_K_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(KNearestNeighbors.MAXIMAL_K_PROPERTY_NAME, String.valueOf(value));
 	}
 	
 	public int getMaxK()
 	{
-		return Integer.parseInt(getProperties().getProperty(KnnClassifier.MAXIMAL_K_PROPERTY_NAME));
+		return Integer.parseInt(getProperties().getProperty(KNearestNeighbors.MAXIMAL_K_PROPERTY_NAME));
 	}
 	
 	public String maxKTipText()
@@ -216,12 +216,12 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 	// methods required for option 'k'
 	public void setK(int value)
 	{
-		getProperties().setProperty(KnnClassifier.K_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(KNearestNeighbors.K_PROPERTY_NAME, String.valueOf(value));
 	}
 	
 	public int getK()
 	{
-		return Integer.parseInt(getProperties().getProperty(KnnClassifier.K_PROPERTY_NAME));
+		return Integer.parseInt(getProperties().getProperty(KNearestNeighbors.K_PROPERTY_NAME));
 	}
 	
 	public String kTipText()
@@ -232,12 +232,12 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 	// methods required for option 'filterNeighboursUsingRules'
 	public void setFilterNeighboursUsingRules(boolean value)
 	{
-		getProperties().setProperty(KnnClassifier.FILTER_NEIGHBOURS_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(KNearestNeighbors.FILTER_NEIGHBOURS_PROPERTY_NAME, String.valueOf(value));
 	}
 	
 	public boolean getFilterNeighboursUsingRules()
 	{
-		return Boolean.parseBoolean(getProperties().getProperty(KnnClassifier.FILTER_NEIGHBOURS_PROPERTY_NAME));
+		return Boolean.parseBoolean(getProperties().getProperty(KNearestNeighbors.FILTER_NEIGHBOURS_PROPERTY_NAME));
 	}
 	
 	public String filterNeighboursUsingRulesTipText()
@@ -249,21 +249,21 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 	String enumarateVotingToString()
 	{
 		StringBuilder sb = new StringBuilder();
-		for (KnnClassifier.Voting voting : KnnClassifier.Voting.values())
+		for (KNearestNeighbors.Voting voting : KNearestNeighbors.Voting.values())
 			sb.append("\t\t"+voting.ordinal()+"="+voting.name()+"\n");
 		return sb.toString();
 	}
 
 	int getVotingOrdinal()
 	{
-		return KnnClassifier.Voting.valueOf(getProperties().getProperty(KnnClassifier.VOTING_PROPERTY_NAME)).ordinal();
+		return KNearestNeighbors.Voting.valueOf(getProperties().getProperty(KNearestNeighbors.VOTING_PROPERTY_NAME)).ordinal();
 	}
 
 	public void setVoting(SelectedTag newType)
 	{
 	    if (newType.getTags() == TAGS_VOTING) {
-	    	KnnClassifier.Voting value = KnnClassifier.Voting.values()[newType.getSelectedTag().getID()];
-	    	getProperties().setProperty(KnnClassifier.VOTING_PROPERTY_NAME, value.name());
+	    	KNearestNeighbors.Voting value = KNearestNeighbors.Voting.values()[newType.getSelectedTag().getID()];
+	    	getProperties().setProperty(KNearestNeighbors.VOTING_PROPERTY_NAME, value.name());
 	    }
 	}
 
@@ -329,7 +329,7 @@ public class RseslibKnn extends AbstractRseslibClassifierWrapper
 		result.addElement(new Option(
 				"\tVoting method:\n"
 						+ enumarateVotingToString()
-						+ "\t(default: "+KnnClassifier.Voting.InverseSquareDistance.ordinal()+"="+KnnClassifier.Voting.InverseSquareDistance.name()+")",
+						+ "\t(default: "+KNearestNeighbors.Voting.InverseSquareDistance.ordinal()+"="+KNearestNeighbors.Voting.InverseSquareDistance.name()+")",
 						"V", 1, "-V"));
 
 		return result.elements();

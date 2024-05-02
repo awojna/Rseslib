@@ -43,7 +43,7 @@ import rseslib.system.progress.Progress;
  * 
  * @author		Lukasz Kosson
  */
-public class KnnVis extends KnnClassifier implements VisualClassifier
+public class KNearestNeighborsVisual extends KNearestNeighbors implements VisualClassifier
 {
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
@@ -54,13 +54,13 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
     private Random rnd_clas = new Random(System.currentTimeMillis());
     private JPanel pnl;
     private JPanel pnl_clas;
-    private KnnPainter painter;
-    private KnnPainter painter_clas;
+    private KNNPainter painter;
+    private KNNPainter painter_clas;
     private double avg;
     private String strLegend = "";
 	private Hashtable<Double, Integer> htCols = new Hashtable<Double, Integer>();
 	
-	public KnnVis(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
+	public KNearestNeighborsVisual(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
 	{
 		super(prop, trainTable, prog);
 		initVisualization();
@@ -144,7 +144,7 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
 		pnl = canvas;
 		if(painter != null)
 			painter.stopThread();
-		painter = new KnnPainter(m_OriginalData, m_TransformedTrainTable.getDataObjects(), m_Metric, rnd, htCols, avg, strLegend);
+		painter = new KNNPainter(m_OriginalData, m_TransformedTrainTable.getDataObjects(), m_Metric, rnd, htCols, avg, strLegend);
 		painter.draw(canvas);
 	}
 
@@ -174,7 +174,7 @@ public class KnnVis extends KnnClassifier implements VisualClassifier
 		    	pnl_clas = canvas;
 		    }
 			if (painter_clas == null)
-				painter_clas = new KnnPainter(m_OriginalData, m_TransformedTrainTable.getDataObjects(), m_Metric, rnd_clas, htCols, avg, strLegend);
+				painter_clas = new KNNPainter(m_OriginalData, m_TransformedTrainTable.getDataObjects(), m_Metric, rnd_clas, htCols, avg, strLegend);
 			double[] nWeights = null;
 			double[] decDistr;
 			if	(noOfZeroDist > 0)

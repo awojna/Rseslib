@@ -43,8 +43,8 @@ import rseslib.system.PropertyConfigurationException;
 import rseslib.system.progress.Progress;
 
 
-public class PcaClassifierVis 
-	extends PcaClassifier
+public class PrincipalComponentNetworkVisual 
+	extends PrincipalComponentNetwork
 	implements VisualClassifier
 {
 	
@@ -58,9 +58,9 @@ public class PcaClassifierVis
 	
 	DoubleDataTable train_table;
 
-	// constructors coming from PcaClassifier
+	// constructors coming from PrincipalComponentNetwork
 
-	public PcaClassifierVis(Properties prop, DoubleDataTable tab, Progress prog) throws
+	public PrincipalComponentNetworkVisual(Properties prop, DoubleDataTable tab, Progress prog) throws
 		InterruptedException, BadHeaderException, PropertyConfigurationException {
 		super(prop, tab, prog);
 		train_table = tab;

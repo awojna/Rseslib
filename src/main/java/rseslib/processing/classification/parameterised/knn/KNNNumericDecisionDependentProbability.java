@@ -38,17 +38,17 @@ import rseslib.system.progress.EmptyProgress;
 /**
  * @author Lukasz Ligowski
  */
-public class KnnNumericDecisionDependentProbability extends Configuration implements DecisionDependentProbability
+public class KNNNumericDecisionDependentProbability extends Configuration implements DecisionDependentProbability
 {
 	private ArrayHeader newHeader;
-	private KnnClassifier m_Classifier;
+	private KNearestNeighbors m_Classifier;
 
 	/**
 	 * @param prop
 	 * @param table
 	 * @param index
 	 */
-	public KnnNumericDecisionDependentProbability(Properties prop,DoubleDataTable table,int index) throws PropertyConfigurationException, InterruptedException
+	public KNNNumericDecisionDependentProbability(Properties prop,DoubleDataTable table,int index) throws PropertyConfigurationException, InterruptedException
 	{
 		super(prop);
 		Attribute[] newAttrList = new Attribute[2];
@@ -64,16 +64,16 @@ public class KnnNumericDecisionDependentProbability extends Configuration implem
 			container.setDecision(((DoubleDataWithDecision)temp).getDecision());
 			transformedTable.add(container);
 		}
-        Properties knnProp = Configuration.loadDefaultProperties(KnnClassifier.class);
+        Properties knnProp = Configuration.loadDefaultProperties(KNearestNeighbors.class);
         knnProp.setProperty(MetricFactory.METRIC_PROPERTY_NAME, getProperty(MetricFactory.METRIC_PROPERTY_NAME));
         knnProp.setProperty(MetricFactory.VICINITY_SIZE_FOR_DBVDM_PROPERTY_NAME, getProperty(MetricFactory.VICINITY_SIZE_FOR_DBVDM_PROPERTY_NAME));
-        knnProp.setProperty(KnnClassifier.WEIGHTING_METHOD_PROPERTY_NAME, getProperty(KnnClassifier.WEIGHTING_METHOD_PROPERTY_NAME));
-        knnProp.setProperty(KnnClassifier.LEARN_OPTIMAL_K_PROPERTY_NAME, getProperty(KnnClassifier.LEARN_OPTIMAL_K_PROPERTY_NAME));
-        knnProp.setProperty(KnnClassifier.MAXIMAL_K_PROPERTY_NAME, getProperty(KnnClassifier.MAXIMAL_K_PROPERTY_NAME));
-        knnProp.setProperty(KnnClassifier.K_PROPERTY_NAME, getProperty(KnnClassifier.K_PROPERTY_NAME));
-        knnProp.setProperty(KnnClassifier.FILTER_NEIGHBOURS_PROPERTY_NAME, getProperty(KnnClassifier.FILTER_NEIGHBOURS_PROPERTY_NAME));
-        knnProp.setProperty(KnnClassifier.VOTING_PROPERTY_NAME, getProperty(KnnClassifier.VOTING_PROPERTY_NAME));
-		m_Classifier = new KnnClassifier(knnProp,transformedTable,new EmptyProgress());
+        knnProp.setProperty(KNearestNeighbors.WEIGHTING_METHOD_PROPERTY_NAME, getProperty(KNearestNeighbors.WEIGHTING_METHOD_PROPERTY_NAME));
+        knnProp.setProperty(KNearestNeighbors.LEARN_OPTIMAL_K_PROPERTY_NAME, getProperty(KNearestNeighbors.LEARN_OPTIMAL_K_PROPERTY_NAME));
+        knnProp.setProperty(KNearestNeighbors.MAXIMAL_K_PROPERTY_NAME, getProperty(KNearestNeighbors.MAXIMAL_K_PROPERTY_NAME));
+        knnProp.setProperty(KNearestNeighbors.K_PROPERTY_NAME, getProperty(KNearestNeighbors.K_PROPERTY_NAME));
+        knnProp.setProperty(KNearestNeighbors.FILTER_NEIGHBOURS_PROPERTY_NAME, getProperty(KNearestNeighbors.FILTER_NEIGHBOURS_PROPERTY_NAME));
+        knnProp.setProperty(KNearestNeighbors.VOTING_PROPERTY_NAME, getProperty(KNearestNeighbors.VOTING_PROPERTY_NAME));
+		m_Classifier = new KNearestNeighbors(knnProp,transformedTable,new EmptyProgress());
 	}
 
 	public double getProbability(double value, int decision)

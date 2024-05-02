@@ -38,7 +38,7 @@ import rseslib.system.progress.Progress;
  *
  * @author      Arkadiusz Wojna
  */
-public class C45 extends ConfigurationWithStatistics implements Classifier, Serializable
+public class C45DecisionTree extends ConfigurationWithStatistics implements Classifier, Serializable
 {
    /** Serialization version. */
 	private static final long serialVersionUID = 1L;
@@ -64,7 +64,7 @@ public class C45 extends ConfigurationWithStatistics implements Classifier, Seri
      * @param prog            Progress object to report training progress.
      * @throws InterruptedException when the user interrupts the execution.
      */
-    public C45(Properties prop, DoubleDataTable tab, Progress prog) throws PropertyConfigurationException, InterruptedException
+    public C45DecisionTree(Properties prop, DoubleDataTable tab, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
         super(prop);
         m_Header = tab.attributes();

@@ -65,7 +65,7 @@ import rseslib.system.progress.Progress;
  *
  * @author      Arkadiusz Wojna, Grzegorz Gora, Lukasz Ligowski
  */
-public class KnnClassifier extends AbstractParameterisedClassifier implements ClassifierWithDistributedDecision, Serializable
+public class KNearestNeighbors extends AbstractParameterisedClassifier implements ClassifierWithDistributedDecision, Serializable
 {
 	/** Attribute weighting methods. */
 	public enum Voting { Equal, InverseDistance, InverseSquareDistance; }
@@ -123,7 +123,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
      * @throws PropertyConfigurationException	when the parameters are incorrect or incomplete.
      * @throws InterruptedException				when a user interrupts execution.
      */
-    public KnnClassifier(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
+    public KNearestNeighbors(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
     	// partition progress into three or two stages: metric induction, metric tree construction and optionally k optimization
         super(prop, K_PROPERTY_NAME);
@@ -194,7 +194,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
      * @throws PropertyConfigurationException	when the parameters are incorrect or incomplete.
      * @throws InterruptedException				when a user interrupts execution.
      */
-    public KnnClassifier(Properties prop, Metric metric, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
+    public KNearestNeighbors(Properties prop, Metric metric, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
         super(prop, K_PROPERTY_NAME);
         IndexingTreeNode indexingTree = new TreeIndexer(null).indexing(trainTable.getDataObjects(), metric, prog);
@@ -220,7 +220,7 @@ public class KnnClassifier extends AbstractParameterisedClassifier implements Cl
      * @param neighbourFilter	Rule filter for nearest neighbors.
      * @param decDistribution 	Decision distribution in the training set.
      */
-    public KnnClassifier(Properties prop, NominalAttribute decAttr, VicinityProvider vicinProv, CubeBasedNeighboursFilter neighbourFilter, int[] decDistribution) throws PropertyConfigurationException
+    public KNearestNeighbors(Properties prop, NominalAttribute decAttr, VicinityProvider vicinProv, CubeBasedNeighboursFilter neighbourFilter, int[] decDistribution) throws PropertyConfigurationException
     {
         super(prop, K_PROPERTY_NAME);
         m_VicinityProvider = vicinProv;

@@ -46,7 +46,7 @@ import rseslib.system.progress.Progress;
  * @author Damian Wojcik
  * 
  */
-public class VisualNeuronNetwork extends NeuronNetwork implements VisualClassifier,
+public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifier,
 		ActionListener {
 	public VNNPanel nnView, nnViewOne;
 	
@@ -66,7 +66,7 @@ public class VisualNeuronNetwork extends NeuronNetwork implements VisualClassifi
 	 * @param prog postep
 	 * @throws PropertyConfigurationException
 	 */
-	public VisualNeuronNetwork(Properties prop, DoubleDataTable trainTable, Progress prog)
+	public NeuralNetworkVisual(Properties prop, DoubleDataTable trainTable, Progress prog)
 		throws PropertyConfigurationException, InterruptedException
 	{
 		super(prop, trainTable, prog);

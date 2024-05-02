@@ -60,12 +60,12 @@ public class AddNodesDialog extends JDialog implements ActionListener {
 
 	private JTextField jTextField1 = null;
 	
-	private VisualNeuronNetwork owner;
+	private NeuralNetworkVisual owner;
 
 	/**
 	 * @param owner
 	 */
-	public AddNodesDialog(VisualNeuronNetwork owner) {
+	public AddNodesDialog(NeuralNetworkVisual owner) {
 		super();
 		initialize();
 		this.owner = owner;

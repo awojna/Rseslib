@@ -26,7 +26,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 
-import rseslib.processing.classification.rules.roughset.RoughSetRuleClassifier;
+import rseslib.processing.classification.rules.roughset.RoughSetRules;
 import rseslib.processing.discernibility.DiscernibilityMatrixProvider;
 import rseslib.processing.discretization.DiscretizationFactory;
 import rseslib.processing.reducts.PartialReductsProvider;
@@ -40,7 +40,7 @@ import weka.core.Utils;
 
 /**
  * Weka wrapper for rough set classifier.
- * @see rseslib.processing.classification.rules.roughset.RoughSetRuleClassifier
+ * @see rseslib.processing.classification.rules.roughset.RoughSetRules
  *
  * @author      Arkadiusz Wojna
  */
@@ -89,7 +89,7 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
 
 	public RoughSet() throws Exception
 	{
-		super(RoughSetRuleClassifier.class);
+		super(RoughSetRules.class);
 	}
 	
 	/**
@@ -558,7 +558,7 @@ public class RoughSet extends AbstractRseslibClassifierWrapper
      */
     public Collection<Rule> getRules()
     {
-        return ((RoughSetRuleClassifier)getRseslibClassifier()).getRules();
+        return ((RoughSetRules)getRseslibClassifier()).getRules();
     }
 
 	/**

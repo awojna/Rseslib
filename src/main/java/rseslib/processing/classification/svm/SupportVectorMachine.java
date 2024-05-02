@@ -37,7 +37,7 @@ import rseslib.system.progress.Progress;
 /**
  * Main class for support vector machine clasifier
  */
-public class SVM extends ConfigurationWithStatistics implements Classifier {
+public class SupportVectorMachine extends ConfigurationWithStatistics implements Classifier {
 
     /**
      * The database of the training examples.
@@ -135,14 +135,14 @@ public class SVM extends ConfigurationWithStatistics implements Classifier {
      * @param prog progress object to report training progress.
      * @throws InterruptedException when the user interrupts the execution.
      */
-    public SVM(Properties prop, DoubleDataTable t, Progress prog) throws PropertyConfigurationException, BadHeaderException, InterruptedException {
+    public SupportVectorMachine(Properties prop, DoubleDataTable t, Progress prog) throws PropertyConfigurationException, BadHeaderException, InterruptedException {
         super(prop);
         boolean allNumeric = true;
         for (int at = 0; allNumeric && at < t.attributes().noOfAttr(); at++)
             if (t.attributes().isConditional(at) && !t.attributes().isNumeric(at))
                 allNumeric = false;
-        if (!allNumeric) throw new BadHeaderException("SVM classifier requires all attributes to be numerical");
-        prog.set("Learning SVM classifier", 1);
+        if (!allNumeric) throw new BadHeaderException("SupportVectorMachine requires all attributes to be numerical");
+        prog.set("Learning SupportVectorMachine", 1);
         tab = t;
         m_Database = new ArrayList<DoubleData>(tab.getDataObjects());
         // setting classifier's parameters
@@ -223,7 +223,7 @@ public class SVM extends ConfigurationWithStatistics implements Classifier {
         // count number of possible decisions
         countClasses();
         if (noOfDec<2)
-            throw new RuntimeException("There must be at least two decisions in SVM's");
+            throw new RuntimeException("There must be at least two decisions in SupportVectorMachine");
         // table for Lagrange multipliers for each object in each of classifications processes
         alphas = new double[tab.noOfObjects()][noOfDec * (noOfDec - 1) / 2];
         // numerical errors for each object

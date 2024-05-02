@@ -43,7 +43,7 @@ import rseslib.system.progress.Progress;
  *
  * @author      Rafal Falkowski
  */
-public class PcaClassifier extends AbstractParameterisedClassifier
+public class PrincipalComponentNetwork extends AbstractParameterisedClassifier
 {
     /** Parameter name. */
     public static final String PRINCIPAL_SUBSPACE_DIM = "principalSubspaceDim";
@@ -75,14 +75,14 @@ public class PcaClassifier extends AbstractParameterisedClassifier
      * @param prog                Progress object for training process.
      * @throws InterruptedException when the user interrupts the execution.
      */
-	public PcaClassifier(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, BadHeaderException, InterruptedException
+	public PrincipalComponentNetwork(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, BadHeaderException, InterruptedException
     {
         super(prop, OPTIMAL_DIM);
         boolean numericNotFound = true;
         for (int at = 0; numericNotFound && at < trainTable.attributes().noOfAttr(); at++)
             if (trainTable.attributes().isConditional(at) && trainTable.attributes().isNumeric(at))
                 numericNotFound = false;
-        if (numericNotFound) throw new BadHeaderException("Pca classifier requires numerical attributes");
+        if (numericNotFound) throw new BadHeaderException("PrincipalComponentNetwork classifier requires numerical attributes");
 		prog.set("Learning PCA classifier from training table", 1);
         NominalAttribute decAttr = trainTable.attributes().nominalDecisionAttribute();
 		int[] decDistr = trainTable.getDecisionDistribution();

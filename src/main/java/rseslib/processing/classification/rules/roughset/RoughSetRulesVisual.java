@@ -40,7 +40,7 @@ import rseslib.system.progress.Progress;
  * @author Krzysztof Niemkiewicz
  */
 
-public class VisualRoughSetClassifier extends RoughSetRuleClassifier implements VisualClassifier
+public class RoughSetRulesVisual extends RoughSetRules implements VisualClassifier
 {
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
@@ -57,7 +57,7 @@ public class VisualRoughSetClassifier extends RoughSetRuleClassifier implements 
      * @throws PropertyConfigurationExcpetion 	when the properties are incorrect.
      */
 
-    public VisualRoughSetClassifier(Properties prop, DoubleDataTable trainTable, Progress prog)
+    public RoughSetRulesVisual(Properties prop, DoubleDataTable trainTable, Progress prog)
 	throws PropertyConfigurationException, InterruptedException {	
     	super(prop, trainTable, prog);
     	trainHeader=trainTable.attributes();	
@@ -66,7 +66,7 @@ public class VisualRoughSetClassifier extends RoughSetRuleClassifier implements 
     /**
      * Additional constructor
      */
-    public VisualRoughSetClassifier(Collection<Rule> rules, NominalAttribute decAttr) {
+    public RoughSetRulesVisual(Collection<Rule> rules, NominalAttribute decAttr) {
     	super(rules, decAttr);
     }
     

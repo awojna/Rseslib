@@ -44,7 +44,7 @@ import rseslib.system.progress.Progress;
  *
  * @author      Rafal Falkowski
  */
-public class LocalPcaClassifier extends AbstractParameterisedClassifier
+public class LocalPrincipalComponentNetwork extends AbstractParameterisedClassifier
 {
     /** Parameter name. */
     public static final String PRINCIPAL_SUBSPACE_DIM = "principalSubspaceDim";
@@ -84,7 +84,7 @@ public class LocalPcaClassifier extends AbstractParameterisedClassifier
      * @param prog                Progress object for training process.
      * @throws InterruptedException when the user interrupts the execution.
      */
-        public LocalPcaClassifier(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, BadHeaderException, InterruptedException
+        public LocalPrincipalComponentNetwork(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, BadHeaderException, InterruptedException
         {
                 super(prop, OPTIMAL_DIM);
                 boolean numericNotFound = true;

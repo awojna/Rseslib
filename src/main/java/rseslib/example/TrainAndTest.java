@@ -92,23 +92,23 @@ public class TrainAndTest
         // define classifiers to be tested
         // delete the lines with the classifiers not to be tested
         ClassifierSet classifiers = new ClassifierSet();
-        classifiers.addClassifier("Rough Set", rseslib.processing.classification.rules.roughset.RoughSetRuleClassifier.class);
-        classifiers.addClassifier("KNN", rseslib.processing.classification.parameterised.knn.KnnClassifier.class);
-        classifiers.addClassifier("Local KNN", rseslib.processing.classification.parameterised.knn.LocalKnnClassifier.class);
+        classifiers.addClassifier("Rough Set", rseslib.processing.classification.rules.roughset.RoughSetRules.class);
+        classifiers.addClassifier("KNN", rseslib.processing.classification.parameterised.knn.KNearestNeighbors.class);
+        classifiers.addClassifier("Local KNN", rseslib.processing.classification.parameterised.knn.LocalKNearestNeighbors.class);
         if (trainTable.attributes().nominalDecisionAttribute().noOfValues()==2)
         	classifiers.addClassifier("RIONIDA", rseslib.processing.classification.parameterised.knn.rionida.RIONIDA.class);
-        classifiers.addClassifier("C4.5", rseslib.processing.classification.tree.c45.C45.class);
-        classifiers.addClassifier("AQ15", rseslib.processing.classification.rules.AQ15Classifier.class);
-        classifiers.addClassifier("Neural Network", rseslib.processing.classification.neural.NeuronNetwork.class);
-        classifiers.addClassifier("Naive Bayes", rseslib.processing.classification.bayes.NaiveBayesClassifier.class);
-        classifiers.addClassifier("SVM", rseslib.processing.classification.svm.SVM.class);
-        classifiers.addClassifier("PCA", rseslib.processing.classification.parameterised.pca.PcaClassifier.class);
-        classifiers.addClassifier("Local PCA", rseslib.processing.classification.parameterised.pca.LocalPcaClassifier.class);
+        classifiers.addClassifier("C4.5", rseslib.processing.classification.tree.c45.C45DecisionTree.class);
+        classifiers.addClassifier("AQ15", rseslib.processing.classification.rules.AQ15.class);
+        classifiers.addClassifier("Neural Network", rseslib.processing.classification.neural.NeuralNetwork.class);
+        classifiers.addClassifier("Naive Bayes", rseslib.processing.classification.bayes.NaiveBayes.class);
+        classifiers.addClassifier("SVM", rseslib.processing.classification.svm.SupportVectorMachine.class);
+        classifiers.addClassifier("PCN", rseslib.processing.classification.parameterised.pca.PrincipalComponentNetwork.class);
+        classifiers.addClassifier("Local PCN", rseslib.processing.classification.parameterised.pca.LocalPrincipalComponentNetwork.class);
 
         // define an exemplary classifier with non-default parameter values
-        Properties nonDefaultParams = Configuration.loadDefaultProperties(rseslib.processing.classification.tree.c45.C45.class);
+        Properties nonDefaultParams = Configuration.loadDefaultProperties(rseslib.processing.classification.tree.c45.C45DecisionTree.class);
         nonDefaultParams.setProperty("pruning", "TRUE");
-        classifiers.addClassifier("C4.5 Pruned", rseslib.processing.classification.tree.c45.C45.class, nonDefaultParams);
+        classifiers.addClassifier("C4.5 Pruned", rseslib.processing.classification.tree.c45.C45DecisionTree.class, nonDefaultParams);
         
         // print the training table info
         if (args.length==1)

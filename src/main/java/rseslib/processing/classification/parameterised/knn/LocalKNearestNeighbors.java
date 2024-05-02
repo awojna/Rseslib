@@ -60,7 +60,7 @@ import rseslib.system.progress.Progress;
  *
  * @author      Arkadiusz Wojna
  */
-public class LocalKnnClassifier extends AbstractParameterisedClassifier implements ClassifierWithDistributedDecision, Serializable
+public class LocalKNearestNeighbors extends AbstractParameterisedClassifier implements ClassifierWithDistributedDecision, Serializable
 {
 	/** Attribute weighting methods. */
 	public enum Voting { Equal, InverseDistance, InverseSquareDistance; }
@@ -119,7 +119,7 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
      * @param prog                   Progress object to report training progress.
      * @throws InterruptedException when the user interrupts the execution.
      */
-    public LocalKnnClassifier(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
+    public LocalKNearestNeighbors(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
         super(prop, K_PROPERTY_NAME);
         // prepare progress information
@@ -183,7 +183,7 @@ public class LocalKnnClassifier extends AbstractParameterisedClassifier implemen
      * @param vicinProv       Provider of vicninities for test data objects.
      * @param decDistribution Distribution of decision in a training data set.
      */
-    public LocalKnnClassifier(Properties prop, NominalAttribute decAttr, VicinityProvider vicinProv, int[] decDistribution) throws PropertyConfigurationException
+    public LocalKNearestNeighbors(Properties prop, NominalAttribute decAttr, VicinityProvider vicinProv, int[] decDistribution) throws PropertyConfigurationException
     {
         super(prop, K_PROPERTY_NAME);
         m_VicinityProvider = vicinProv;

@@ -38,7 +38,7 @@ import rseslib.system.progress.Progress;
  * 
  * @author Jakub Sakowicz
  */
-public class NeuronNetwork extends ConfigurationWithStatistics implements Classifier
+public class NeuralNetwork extends ConfigurationWithStatistics implements Classifier
 {
 	protected long timeLimit;
 	protected int[] networkStructure;
@@ -65,7 +65,7 @@ public class NeuronNetwork extends ConfigurationWithStatistics implements Classi
 	 * @param trainTable	- tabelka treningowa
 	 * @param prog			- obiekt do raportowania postepu
 	 */
-	public NeuronNetwork(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
+	public NeuralNetwork(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
 	{
 		super(prop);
 		timeLimit = ((long)this.getIntProperty(Global.TIME_LIMIT_NAME)) * 1000;

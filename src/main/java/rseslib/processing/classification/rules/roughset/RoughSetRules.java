@@ -52,7 +52,7 @@ import rseslib.processing.transformation.Transformer;
  * 
  * @author Rafal Latkowski
  */
-public class RoughSetRuleClassifier extends ConfigurationWithStatistics implements Classifier, ClassifierWithDistributedDecision, Serializable
+public class RoughSetRules extends ConfigurationWithStatistics implements Classifier, ClassifierWithDistributedDecision, Serializable
 {
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
@@ -77,7 +77,7 @@ public class RoughSetRuleClassifier extends ConfigurationWithStatistics implemen
      * @throws PropertyConfigurationException	when the parameters are incorrect or incomplete.
      * @throws InterruptedException				when a user interrupts execution.
      */
-    public RoughSetRuleClassifier(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
+    public RoughSetRules(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
         super(prop);
         TransformationProvider discrProv = DiscretizationFactory.getDiscretizationProvider(getProperties());
@@ -96,7 +96,7 @@ public class RoughSetRuleClassifier extends ConfigurationWithStatistics implemen
      * @param	Prepared set of rules.
      * @param	Decision attribute.
      */
-    public RoughSetRuleClassifier(Collection<Rule> rules, NominalAttribute decAttr)
+    public RoughSetRules(Collection<Rule> rules, NominalAttribute decAttr)
     {
         m_cDecisionRules=rules;
         m_DecAttr = decAttr;

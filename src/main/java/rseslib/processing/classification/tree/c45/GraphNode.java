@@ -32,11 +32,11 @@ public class GraphNode {
 
   static Dimension dim = new Dimension(15, 15);
   static ImageIcon leaf =
-      new ImageIcon(rseslib.processing.classification.tree.c45.C45Vis.class.getResource("leaf.gif"));
+      new ImageIcon(rseslib.processing.classification.tree.c45.C45DecisionTreeVisual.class.getResource("leaf.gif"));
   static ImageIcon branch =
-      new ImageIcon(rseslib.processing.classification.tree.c45.C45Vis.class.getResource("branch.gif"));
+      new ImageIcon(rseslib.processing.classification.tree.c45.C45DecisionTreeVisual.class.getResource("branch.gif"));
 
-  /** holds handle to DecisionTreeNode in C45 classifier */
+  /** holds handle to DecisionTreeNode in C45DecisionTree classifier */
   DecisionTreeNode m_RealNode;
   /** children of this node if it's Leaf, then null */
   GraphNode[] m_Children = null;
@@ -53,13 +53,13 @@ public class GraphNode {
   GraphNode parent = null;
 
   //NodeButton button;
-  C45Vis m_clasif;
+  C45DecisionTreeVisual m_clasif;
 
   boolean m_expanded;
   int m_path = 0;
 
   public GraphNode(DecisionTreeNode orgNode, int level,
-                   C45Vis clas) {
+                   C45DecisionTreeVisual clas) {
 
     m_clasif = clas;
     m_RealNode = orgNode;

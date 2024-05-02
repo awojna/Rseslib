@@ -52,7 +52,7 @@ import rseslib.system.progress.Progress;
  *  
  * @author	Cezary Tkaczyk
  */
-public class AQ15Classifier extends ConfigurationWithStatistics implements Classifier {
+public class AQ15 extends ConfigurationWithStatistics implements Classifier {
 
 	/** Decision attribute. */
     NominalAttribute m_DecisionAttribute;
@@ -80,7 +80,7 @@ public class AQ15Classifier extends ConfigurationWithStatistics implements Class
     private int[]      m_narrayOfDescriptors;
     private Header     m_header;
     
-	public AQ15Classifier(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
+	public AQ15(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
 	{
 		super(prop);
 

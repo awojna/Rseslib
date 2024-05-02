@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import rseslib.processing.classification.parameterised.knn.LocalKnnClassifier;
+import rseslib.processing.classification.parameterised.knn.LocalKNearestNeighbors;
 import rseslib.processing.metrics.MetricFactory;
 import weka.classifiers.AbstractRseslibClassifierWrapper;
 import weka.core.Option;
@@ -34,7 +34,7 @@ import weka.core.Utils;
 
 /**
  * Weka wrapper for K-NN classifier with local metric induction.
- * @see rseslib.processing.classification.parameterised.knn.LocalKnnClassifier
+ * @see rseslib.processing.classification.parameterised.knn.LocalKNearestNeighbors
  *
  * @author      Arkadiusz Wojna
  */
@@ -61,14 +61,14 @@ public class LocalKnn extends AbstractRseslibClassifierWrapper
 	
 	  /** Tags for 'weightingMethod' option */
 	  private static final Tag[] TAGS_VOTING = {
-		    new Tag(LocalKnnClassifier.Voting.Equal.ordinal(), LocalKnnClassifier.Voting.Equal.name()),
-		    new Tag(LocalKnnClassifier.Voting.InverseDistance.ordinal(), LocalKnnClassifier.Voting.InverseDistance.name()),
-		    new Tag(LocalKnnClassifier.Voting.InverseSquareDistance.ordinal(), LocalKnnClassifier.Voting.InverseSquareDistance.name()),
+		    new Tag(LocalKNearestNeighbors.Voting.Equal.ordinal(), LocalKNearestNeighbors.Voting.Equal.name()),
+		    new Tag(LocalKNearestNeighbors.Voting.InverseDistance.ordinal(), LocalKNearestNeighbors.Voting.InverseDistance.name()),
+		    new Tag(LocalKNearestNeighbors.Voting.InverseSquareDistance.ordinal(), LocalKNearestNeighbors.Voting.InverseSquareDistance.name()),
 	  };
 
 	public LocalKnn() throws Exception
 	{
-		super(LocalKnnClassifier.class);
+		super(LocalKNearestNeighbors.class);
 	}
 	
 	/**
@@ -144,14 +144,14 @@ public class LocalKnn extends AbstractRseslibClassifierWrapper
 
 	int getWeigthingOrdinal()
 	{
-		return MetricFactory.Weighting.valueOf(getProperties().getProperty(LocalKnnClassifier.WEIGHTING_METHOD_PROPERTY_NAME)).ordinal();
+		return MetricFactory.Weighting.valueOf(getProperties().getProperty(LocalKNearestNeighbors.WEIGHTING_METHOD_PROPERTY_NAME)).ordinal();
 	}
 
 	public void setWeightingMethod(SelectedTag newType)
 	{
 	    if (newType.getTags() == TAGS_WEIGHTING) {
 	    	MetricFactory.Weighting value = MetricFactory.Weighting.values()[newType.getSelectedTag().getID()];
-	    	getProperties().setProperty(LocalKnnClassifier.WEIGHTING_METHOD_PROPERTY_NAME, value.name());
+	    	getProperties().setProperty(LocalKNearestNeighbors.WEIGHTING_METHOD_PROPERTY_NAME, value.name());
 	    }
 	}
 
@@ -168,12 +168,12 @@ public class LocalKnn extends AbstractRseslibClassifierWrapper
 	// methods required for option 'learnOptimalK'
 	public void setLearnOptimalK(boolean value)
 	{
-		getProperties().setProperty(LocalKnnClassifier.LEARN_OPTIMAL_K_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(LocalKNearestNeighbors.LEARN_OPTIMAL_K_PROPERTY_NAME, String.valueOf(value));
 	}
 	
 	public boolean getLearnOptimalK()
 	{
-		return Boolean.parseBoolean(getProperties().getProperty(LocalKnnClassifier.LEARN_OPTIMAL_K_PROPERTY_NAME));
+		return Boolean.parseBoolean(getProperties().getProperty(LocalKNearestNeighbors.LEARN_OPTIMAL_K_PROPERTY_NAME));
 	}
 	
 	public String learnOptimalKTipText()
@@ -184,12 +184,12 @@ public class LocalKnn extends AbstractRseslibClassifierWrapper
 	// methods required for option 'localSetSize'
 	public void setLocalSetSize(int value)
 	{
-		getProperties().setProperty(LocalKnnClassifier.LOCAL_SET_SIZE_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(LocalKNearestNeighbors.LOCAL_SET_SIZE_PROPERTY_NAME, String.valueOf(value));
 	}
 	
 	public int getLocalSetSize()
 	{
-		return Integer.parseInt(getProperties().getProperty(LocalKnnClassifier.LOCAL_SET_SIZE_PROPERTY_NAME));
+		return Integer.parseInt(getProperties().getProperty(LocalKNearestNeighbors.LOCAL_SET_SIZE_PROPERTY_NAME));
 	}
 	
 	public String localSetSizeTipText()
@@ -200,12 +200,12 @@ public class LocalKnn extends AbstractRseslibClassifierWrapper
 	// methods required for option 'k'
 	public void setK(int value)
 	{
-		getProperties().setProperty(LocalKnnClassifier.K_PROPERTY_NAME, String.valueOf(value));
+		getProperties().setProperty(LocalKNearestNeighbors.K_PROPERTY_NAME, String.valueOf(value));
 	}
 	
 	public int getK()
 	{
-		return Integer.parseInt(getProperties().getProperty(LocalKnnClassifier.K_PROPERTY_NAME));
+		return Integer.parseInt(getProperties().getProperty(LocalKNearestNeighbors.K_PROPERTY_NAME));
 	}
 	
 	public String kTipText()
@@ -217,21 +217,21 @@ public class LocalKnn extends AbstractRseslibClassifierWrapper
 	String enumarateVotingToString()
 	{
 		StringBuilder sb = new StringBuilder();
-		for (LocalKnnClassifier.Voting voting : LocalKnnClassifier.Voting.values())
+		for (LocalKNearestNeighbors.Voting voting : LocalKNearestNeighbors.Voting.values())
 			sb.append("\t\t"+voting.ordinal()+"="+voting.name()+"\n");
 		return sb.toString();
 	}
 
 	int getVotingOrdinal()
 	{
-		return LocalKnnClassifier.Voting.valueOf(getProperties().getProperty(LocalKnnClassifier.VOTING_PROPERTY_NAME)).ordinal();
+		return LocalKNearestNeighbors.Voting.valueOf(getProperties().getProperty(LocalKNearestNeighbors.VOTING_PROPERTY_NAME)).ordinal();
 	}
 
 	public void setVoting(SelectedTag newType)
 	{
 	    if (newType.getTags() == TAGS_VOTING) {
-	    	LocalKnnClassifier.Voting value = LocalKnnClassifier.Voting.values()[newType.getSelectedTag().getID()];
-	    	getProperties().setProperty(LocalKnnClassifier.VOTING_PROPERTY_NAME, value.name());
+	    	LocalKNearestNeighbors.Voting value = LocalKNearestNeighbors.Voting.values()[newType.getSelectedTag().getID()];
+	    	getProperties().setProperty(LocalKNearestNeighbors.VOTING_PROPERTY_NAME, value.name());
 	    }
 	}
 
@@ -291,7 +291,7 @@ public class LocalKnn extends AbstractRseslibClassifierWrapper
 		result.addElement(new Option(
 				"\tVoting method:\n"
 						+ enumarateVotingToString()
-						+ "\t(default: "+LocalKnnClassifier.Voting.InverseSquareDistance.ordinal()+"="+LocalKnnClassifier.Voting.InverseSquareDistance.name()+")",
+						+ "\t(default: "+LocalKNearestNeighbors.Voting.InverseSquareDistance.ordinal()+"="+LocalKNearestNeighbors.Voting.InverseSquareDistance.name()+")",
 						"V", 1, "-V"));
 
 		return result.elements();

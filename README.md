@@ -12,7 +12,7 @@ Rseslib can be used in the following ways:
 [Rseslib 3 algorithms](https://rseslib.mimuw.edu.pl/algorithms.html) provide a brief list of algorithms available in the project and [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) is the main source of information how to use Rseslib components within Java code.
 
 ###  2. Command line
-Rseslib includes command-line programs computing reducts or rules or running experiments with Rseslib classifiers. See the chapter *Command line programs* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) for information how to run them. While starting a program, add weka jar version 3.8.x to classpath to make it work on ARFF data files, for example:
+Rseslib includes command-line programs evaluating attributes, computing reducts or rules or running experiments with Rseslib classifiers. See the chapter *Command line programs* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) for information how to run them. While starting a program, add weka jar version 3.8.x to classpath to make it work on ARFF data files, for example:
 ```
 java -cp rseslib.jar:weka.jar rseslib.example.ComputeReducts data/iris.arff iris.reducts
 ```

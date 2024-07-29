@@ -122,23 +122,25 @@ public class MDLocalDiscretizationProvider implements TransformationProvider {
 
 		SortedMap<Double, HashMap<Double, Integer>> tmpDist = new TreeMap<Double, HashMap<Double, Integer>>();
 
-		for (DoubleData dd : table.getDataObjects()) {
+		for (DoubleData dd : table.getDataObjects())
+			if (!Double.isNaN(dd.get(attribute)))
+			{
 
-			Double tmp = Double.valueOf(dd.get(attribute));
-			Double dec = Double.valueOf(dd.get(table.attributes().decision()));
+				Double tmp = Double.valueOf(dd.get(attribute));
+				Double dec = Double.valueOf(dd.get(table.attributes().decision()));
 
-			if (tmpDist.containsKey(tmp)) {
-				HashMap<Double, Integer> map = tmpDist.get(tmp);
-				map.put(dec, map.get(dec) + 1);
-			} else {
-				HashMap<Double, Integer> map = new HashMap<Double, Integer>();
-				for (Double v : decisionVal)
-					map.put(v, 0);
+				if (tmpDist.containsKey(tmp)) {
+					HashMap<Double, Integer> map = tmpDist.get(tmp);
+					map.put(dec, map.get(dec) + 1);
+				} else {
+					HashMap<Double, Integer> map = new HashMap<Double, Integer>();
+					for (Double v : decisionVal)
+						map.put(v, 0);
 
-				map.put(dec, 1);
-				tmpDist.put(tmp, map);
+					map.put(dec, 1);
+					tmpDist.put(tmp, map);
+				}
 			}
-		}
 
 		return tmpDist;
 	}
@@ -157,25 +159,31 @@ public class MDLocalDiscretizationProvider implements TransformationProvider {
 			Integer attr) {
 
 		Double lastKey = Double.MIN_VALUE;
+		boolean first = true;
 
 		for (Double key : distribution.keySet()) {
-			int val = 0;
-			for (Double i : after.keySet()) {
-				for (Double j : before.keySet()) {
-					if (i != j)
-						val += after.get(i) * before.get(j);
+			if (first) {
+				lastKey = key;
+				first = false;
+			} else {
+				int val = 0;
+				for (Double i : after.keySet()) {
+					for (Double j : before.keySet()) {
+						if (i != j)
+							val += after.get(i) * before.get(j);
+					}
 				}
+				if (val > maxVal) {
+					maxVal = val;
+					maxCut = (key + lastKey) / 2.0;
+					maxAttr = attr;
+				}
+				lastKey = key;
 			}
 			for (Double i : after.keySet()) {
 				after.put(i, after.get(i) - distribution.get(key).get(i));
 				before.put(i, before.get(i) + distribution.get(key).get(i));
 			}
-			if (val > maxVal) {
-				maxVal = val;
-				maxCut = (key + lastKey) / 2.0;
-				maxAttr = attr;
-			}
-			lastKey = key;
 		}
 	}
 	

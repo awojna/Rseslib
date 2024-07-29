@@ -79,6 +79,6 @@ public class BooleanFunctionRule implements Rule
      */
     public String toString()
     {
-    	return m_Predecessor + "  =>  DEC = " + NominalAttribute.stringValue(m_nDecision);
+    	return m_Predecessor + "  =>  " + m_DecisionAttr.name() + " = " + NominalAttribute.stringValue(m_nDecision);
     }
 }

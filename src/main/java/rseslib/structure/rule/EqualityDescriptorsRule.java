@@ -300,8 +300,9 @@ public class EqualityDescriptorsRule extends AbstractDistrDecRuleWithStatistics 
         }
         sb.append("  =>  ");
         if (m_DecAttr!=null)
-        {            
-            sb.append("DEC = { ");
+        {
+        	sb.append(m_DecAttr.name());
+            sb.append(" = { ");
             boolean notfirst = false;
             for (int i=0;i<m_DecisionVector.dimension();i++)
             if (m_DecisionVector.get(i)>1e-10)

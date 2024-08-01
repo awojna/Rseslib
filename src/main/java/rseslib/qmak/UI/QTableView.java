@@ -109,17 +109,25 @@ public class QTableView
   {
     public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand() == "ClasifyRow") {
-    	  if (QMainFrame.getMainFrame().jMainWindow.SelectedClassifier != null) {
+    		if (QMainFrame.getMainFrame().jMainWindow.SelectedClassifier == null) {
+    			JOptionPane.showMessageDialog(QMainFrame.qmainframe, QMainFrame.qmainframe.messages.getString("QTVChoseClassifier"));
+    			return;
+    		}
     	  classifyRow(jTable1.getSelectedRow(),QMainFrame.getMainFrame().jMainWindow.SelectedClassifier.getElem(), true);
-    	  }
       }
       if (e.getActionCommand() == "SortByCol") {
-    	  if (jTable1.getSelectedColumn() == -1)
-    		  JOptionPane.showConfirmDialog(QMainFrame.qmainframe, QMainFrame.qmainframe.messages.getString("QTVChooseColumn"));
+    	  if (jTable1.getSelectedColumn() == -1) {
+    		  JOptionPane.showMessageDialog(QMainFrame.qmainframe, QMainFrame.qmainframe.messages.getString("QTVChooseColumn"));
+    		  return;
+    	  }
     	  owner.sort(jTable1.getSelectedColumn());
       }
       if (e.getActionCommand() == "Remove") {
         int[] selRows = jTable1.getSelectedRows();
+        if (selRows.length == 0) {
+    		JOptionPane.showMessageDialog(QMainFrame.qmainframe, QMainFrame.qmainframe.messages.getString("QTVChoseRows"));
+    		return;
+        }
         for (int i = selRows.length - 1; i > -1; i--) {
           ( (iQDataTable) jTable1.getModel())
               .remove( ( (iQDataTable) jTable1.getModel())
@@ -243,7 +251,12 @@ public class QTableView
 		        public void actionPerformed(ActionEvent e) {
 		        	iQProjectElement el;
 		        	el = QmakMain.getMainFrame().getProject().getElement(((JMenuItem)e.getSource()).getText());
-		        	classifyRow(jTable1.getSelectedRow(),el, true);
+		        	if (el != null)
+		        		classifyRow(jTable1.getSelectedRow(),el, true);
+		        	else {
+		        		JOptionPane.showMessageDialog(QmakMain.getMainFrame(), QMainFrame.qmainframe.messages.getString("QTVReopenTableView"));
+		        		return;
+		        	}
 		        };
 		    });
 			tablePopupMenuClassifyWith.add(ElListy);
@@ -274,12 +287,9 @@ public class QTableView
   
   public void classifyRow(int i,iQProjectElement klas, boolean withVisual) {
     if (i < 0 || i >= jTable1.getRowCount()) {
-      return;
-    }
-	if (QMainFrame.getMainFrame().jMainWindow.SelectedClassifier == null) {
-		JOptionPane.showMessageDialog(this, QMainFrame.qmainframe.messages.getString("QTVChoseClassifier"));
+		JOptionPane.showMessageDialog(this, QMainFrame.qmainframe.messages.getString("QTVChoseRow"));
 		return;
-	}
+    }
     try {
     	if (withVisual && (((iQClassifier)klas).getClassifier() instanceof rseslib.processing.classification.VisualClassifier)) {
     		QIcon klasIcon = null;

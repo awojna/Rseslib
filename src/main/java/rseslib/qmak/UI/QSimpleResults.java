@@ -62,9 +62,9 @@ public class QSimpleResults extends JDialog {
 
 	private String testName;
 
-	private String[] columnNames = {"Classifier name", "Accuracy", "Accuracy Std Dev"};
+	private String[] columnNames = {"Classifier name", "Accuracy", "Acc Std Dev"};
 
-	private String[] columnNamesImbalanced = {"Classifier name", "Accuracy", "Accuracy Std Dev", "F-measure", "G-mean", "Sensitivity"};
+	private String[] columnNamesImbalanced = {"Classifier name", "Accuracy", "Acc Std Dev", "F-measure", "G-mean", "Sensitivity"};
 
 /*    String[] columnNames = {"First Name",
             "Last Name",

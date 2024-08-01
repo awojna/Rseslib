@@ -81,11 +81,18 @@ public class QHelp extends JDialog {
 	}
 	
 	private void wypelnijHasla() {
-		Enumeration<String> klucze = helpTemat.getKeys();
-		Hasla.removeAll();
-		while (klucze.hasMoreElements()) {
-			Hasla.add(helpTemat.getString(klucze.nextElement()));
-		}	
+		Hasla.add(helpTemat.getString("QProjectView_popup_menu"));
+		Hasla.add(helpTemat.getString("QProjectView_TableIcon"));
+		Hasla.add(helpTemat.getString("QProjectView_ClassifierIcon"));
+		Hasla.add(helpTemat.getString("QProjectView_visualize_classification"));
+		Hasla.add(helpTemat.getString("QProjectView_MultiClassifierIcon"));
+		Hasla.add(helpTemat.getString("QProjectView_TestResultIcon"));
+		Hasla.add(helpTemat.getString("QProjectView_MultipleTestResultIcon"));
+//		Enumeration<String> klucze = helpTemat.getKeys();
+//		Hasla.removeAll();
+//		while (klucze.hasMoreElements()) {
+//			Hasla.add(helpTemat.getString(klucze.nextElement()));
+//		}	
 	}	
 
 	private void zaznaczHaslo(String nap) {

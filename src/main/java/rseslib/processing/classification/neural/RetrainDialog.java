@@ -32,6 +32,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.SwingConstants;
 
+import rseslib.system.PropertyConfigurationException;
+
 /**
  * @author damian
  *
@@ -61,8 +63,8 @@ public class RetrainDialog extends JDialog implements ActionListener {
 	 */
 	public RetrainDialog(NeuralNetworkVisual owner) {
 		super();
-		initialize();
 		this.owner = owner;
+		initialize();
 	}
 
 	/**
@@ -167,7 +169,11 @@ public class RetrainDialog extends JDialog implements ActionListener {
 			jTextField = new JTextField();
 			jTextField.setFont(new Font("Dialog", Font.PLAIN, 14));
 			jTextField.setName("jTextField");
-			jTextField.setText("1");
+			String timeLimitString = "120";
+			try {
+				timeLimitString = owner.getProperty(Global.TIME_LIMIT_NAME);
+			} catch (PropertyConfigurationException e) { }
+			jTextField.setText(timeLimitString);
 		}
 		return jTextField;
 	}

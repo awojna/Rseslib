@@ -320,10 +320,10 @@ public class QTableView
 	    		visDialog.setVisible(true);	
 			}
     	} else {
-        	JOptionPane.showMessageDialog(this, String.format(QMainFrame.getMainFrame().messages.getString("QTVcomment") + ": %s",
-        	    	((iQDataTable)jTable1.getModel()).NameOfResult( 
-        	    	((iQClassifier) klas).classify(( (iQDataTable) jTable1.getModel()).getRow(i))
-        	          )));   		
+        	JOptionPane.showMessageDialog(this,
+        			String.format("                         %s                         ",
+        					((iQDataTable)jTable1.getModel()).NameOfResult(((iQClassifier) klas).classify(( (iQDataTable) jTable1.getModel()).getRow(i)))),
+        			QMainFrame.getMainFrame().messages.getString("QTVcomment"), JOptionPane.PLAIN_MESSAGE);
     	}
     }
     catch (java.lang.ArrayIndexOutOfBoundsException e) {

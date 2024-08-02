@@ -39,6 +39,7 @@ import rseslib.qmak.dataprocess.classifier.QClassifierTypes;
 import rseslib.qmak.dataprocess.project.QProject;
 import rseslib.qmak.dataprocess.project.iQProject;
 import rseslib.qmak.dataprocess.project.iQProjectElement;
+import rseslib.processing.classification.Classifier;
 import rseslib.qmak.QmakMain;
 import rseslib.qmak.UI.QDataTableNewDialog;
 import rseslib.qmak.UI.QMainFrame;
@@ -63,8 +64,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-
-import javax.swing.JMenuItem;
 
 /**
  * Klasa reprezentujaca glowne okno programu.
@@ -607,71 +606,51 @@ public class QMainFrame extends JFrame implements ActionListener {
 	// na podstawie TOptionsAddClassifierDialog z trikstera
 	public void jMenuOptionsAddClType_actionPerformed(ActionEvent e) {
 		
-		class myFilter extends FileFilter {
-		    public boolean accept(File f) {
-		    	String extension = Utils.getExtension(f);
-		        if (f.isDirectory()) {
-		            return true;
-		        }
-		    	if (extension.equals("java"))
-		    		return true;
-		    	else 
-		    		return false;
-		    }
-		    public String getDescription() {
-		        return "Java files (*.java)";
-		    }
-		}
-		
-		
-	    JFileChooser dlg = new JFileChooser(".");
-	    dlg.setFileFilter(new myFilter());
-	    int rval = dlg.showOpenDialog(this);
-	    String name = "";
-	    if (rval == JFileChooser.APPROVE_OPTION) {
-	    	name = dlg.getSelectedFile().getAbsolutePath();
-	    }
+		JTextField packageField = new JTextField(40);
+	    JTextField nameField = new JTextField(40);
+	    JPanel myPanel = new JPanel();
+	    myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.Y_AXIS));
+	    myPanel.add(new JLabel("Package:"));
+	    myPanel.add(Box.createVerticalStrut(5)); // a spacer
+	    myPanel.add(packageField);
+	    myPanel.add(Box.createVerticalStrut(10)); // a spacer
+	    myPanel.add(new JLabel("Class name:"));
+	    myPanel.add(Box.createVerticalStrut(5)); // a spacer
+	    myPanel.add(nameField);
+	    int result = JOptionPane.OK_OPTION;
+	    while (result == JOptionPane.OK_OPTION) {
+	    	result = JOptionPane.showConfirmDialog(null, myPanel, 
+	    			"Specify the class of a new classifier type", JOptionPane.OK_CANCEL_OPTION);
+	    	if (result == JOptionPane.OK_OPTION) {
 
-
-	 if ((name != null) && (name.length() > 0)) {   
-	    try {
-	      name = name.substring(name.indexOf("rseslib")); // remove everything before rseslib
-	      name = name.substring(0, name.lastIndexOf(".")); // remove ".java"
-	      name = name.replace('/', '.'); // change /'s into .'s
-	      name = name.replace('\\', '.'); // change /'s into .'s
-	    }
-	    catch (StringIndexOutOfBoundsException ex) {
-	      name = "";
-	    }
-	    catch (NullPointerException ex) {
-	      name = "";
-	    }
-	    
-	    if (name.equals("")){
-			JOptionPane.showMessageDialog(qmainframe, "Wrong file","Warning", JOptionPane.WARNING_MESSAGE);
-	    } else {
-	    	try {
-				Class classifierClass = Class.forName(name);
-				//sprawdzenie czy wsrod implementowanych interfejsow jest interfejs Classifier
-			    Class[] theInterfaces = classifierClass.getInterfaces();
-			    Set<String> s = new HashSet<String>();
-			    for (int i = 0; i < theInterfaces.length; i++) {
-			    	String interfaceName = theInterfaces[i].getName();
-			    	s.add(interfaceName);
-			    }
-			    if (!s.contains("rseslib.processing.classification.Classifier")){
-					JOptionPane.showMessageDialog(qmainframe, "Class must implement Classifier interface","Warning", JOptionPane.WARNING_MESSAGE);
-					return;
-			    }
-			} catch (ClassNotFoundException e1) {
-				JOptionPane.showMessageDialog(qmainframe, "Class not found","Warning", JOptionPane.WARNING_MESSAGE);
-				return;
-			}	
-	    		QClassifierType nowyTyp = new QClassifierType("new",name);
-	    		QMainFrame.getClassifierTypes().add(nowyTyp);
-	    		QMainFrame.getClassifierTypes().saveClassifierTypesConfiguration();	
+	    		if (nameField.getText() == null || nameField.getText().length() == 0)
+	    			JOptionPane.showMessageDialog(qmainframe, "Class name must be specified", "Error", JOptionPane.ERROR_MESSAGE);
+	    		else {
+	    			String name = null;
+	    			if (packageField.getText() == null || packageField.getText().length() == 0)
+	    				name = nameField.getText();
+	    			else
+	    				name = packageField.getText() + "." + nameField.getText();
+	    			try {
+	    				Class classifierClass = Class.forName(name);
+	    				//sprawdzenie czy wsrod implementowanych interfejsow jest interfejs Classifier
+	    				if (Classifier.class.isAssignableFrom(classifierClass)) {
+	    					QClassifierType nowyTyp = new QClassifierType("new", name);
+	    					if(QMainFrame.getClassifierTypes().contains(nowyTyp))
+	    						JOptionPane.showMessageDialog(qmainframe, "Classifier type was already in the configuraiton", "Error", JOptionPane.ERROR_MESSAGE);
+	    					else {
+	    						QMainFrame.getClassifierTypes().add(nowyTyp);
+	    						QMainFrame.getClassifierTypes().saveClassifierTypesConfiguration();
+	    					}
+	    					return;
+	    				} else
+	    					JOptionPane.showMessageDialog(qmainframe, "Class does not implement rseslib.processing.classification.Classifier interface", "Error", JOptionPane.ERROR_MESSAGE);
+	    			} catch (ClassNotFoundException e1) {
+	    				JOptionPane.showMessageDialog(qmainframe, "Class not found. The compiled new classifier must be in the class path of the command starting QMAK.","Error", JOptionPane.ERROR_MESSAGE);
+	    			}
+	    		}
 	    	}
-	 	}
+	    }
 	}
 	
 	public void jMenuOptionsRemoveClType_actionPerformed(ActionEvent e) {

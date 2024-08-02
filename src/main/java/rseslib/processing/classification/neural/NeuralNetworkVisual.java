@@ -52,6 +52,8 @@ public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifi
 	
 	public AddNodesDialog addNodesView;
 
+	public RetrainDialog retrainView;
+
     private Task task;
     
     private JPanel canvas = null;
@@ -88,7 +90,11 @@ public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifi
 			if (event.getSource() == nnView.TrainButton) {
 				/*rozpoczecie trenowania sieci*/
 				nnView.showClassification = false;
-				startTrain();
+				if (retrainView == null) {
+					retrainView = new RetrainDialog(this);
+					retrainView.setLocationRelativeTo(nnView);
+				}
+				retrainView.setVisible(true);			
 				return;
 			}
 			if (event.getSource() == nnView.AddNodes) {		
@@ -163,6 +169,10 @@ public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifi
 			if (nnView != null) nnView.updateModel(networkStructure, bestEngine.layers);
 			if (nnViewOne != null) nnViewOne.updateModel(networkStructure, bestEngine.layers);			
 		}
+	}
+	
+	public void setTimeLimit(int limitSeconds) {
+		timeLimit = ((long)limitSeconds) * 1000;
 	}
 	
 	/**

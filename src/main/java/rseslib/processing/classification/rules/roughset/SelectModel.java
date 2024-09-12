@@ -74,7 +74,8 @@ public class SelectModel extends AbstractListModel implements ComboBoxModel,List
 	
 		String s;
 		if (actualAttr.isNominal()){s=NominalAttribute.stringValue(d);}else
-				s=String.valueOf(d);
+		if(actualAttr==SortMainModel.ATRIB_LENGTH || actualAttr==SortMainModel.ATRIB_SUPPORT){s=String.valueOf((int)d);}else
+			s=String.valueOf(d);
 		coding.put(s, d);
 		return s;
 	}

@@ -111,7 +111,9 @@ public class SortModel extends AbstractListModel implements ComboBoxModel,ListDa
      public Comparator<EqualityDescriptorsRule> getComparator(){
     	 int i=main.indexOfAtrr(selected);
 
-    	 if (i>=0){return new OneValueComparator(i,main.attribs.get(i).isNominal());};
+    	 if (i>=0)
+    	 	if (main.attribs.get(i).isDecision()){return new DecisionComparator(main);}
+    	 	else{return new OneValueComparator(i,main.attribs.get(i).isNominal());};
     	 
     	 if (selected==SortMainModel.ATRIB_LENGTH){
     		 return new LengthComparator(main);
@@ -165,6 +167,28 @@ class OneValueComparator implements Comparator<EqualityDescriptorsRule>{
 				return 0;
 			}
 		
+	}
+	
+}
+/**
+ *  Comparator which compares two EqualityDescriptorsRules basing on their decision
+ */
+
+class DecisionComparator implements Comparator<EqualityDescriptorsRule>{
+	
+	SortMainModel smm;
+	
+	
+	public DecisionComparator(SortMainModel smm) {
+
+		this.smm = smm;
+	}
+
+
+	public int compare(EqualityDescriptorsRule arg0,
+			EqualityDescriptorsRule arg1) {
+
+		return NominalAttribute.stringValue(arg0.getDecision()).compareTo(NominalAttribute.stringValue(arg1.getDecision()));
 	}
 	
 }

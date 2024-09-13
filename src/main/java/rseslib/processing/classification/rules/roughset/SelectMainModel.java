@@ -74,9 +74,12 @@ public class SelectMainModel extends SortMainModel implements ListDataListener{
 		super(msp, rtm2);		
 		selMod=new Vector<SelectModel>();
 		Vector<TreeSet<Double>> treeValues=new Vector<TreeSet<Double>>();
+		int decAttr = -1;
 		for (int i=0;i<rtm.getAttributes().size();i++){
 			treeValues.add(new TreeSet<Double>());
 			values.add(new Vector<Double>());
+			if (rtm.getAttributes().get(i).isDecision())
+				decAttr = i;
 		};
 		Iterator<EqualityDescriptorsRule> i=rtm.getRules().iterator();
 		EqualityDescriptorsRule edr;
@@ -88,6 +91,7 @@ public class SelectMainModel extends SortMainModel implements ListDataListener{
 					treeValues.get(j).add(edr.getDescriptor(j));
 				};
 			};
+			treeValues.get(decAttr).add(edr.getDecision());
 		};
 		for (int j=0;j<rtm.getAttributes().size();j++){
 			values.get(j).addAll(treeValues.get(j));

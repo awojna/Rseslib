@@ -131,7 +131,7 @@ public class SelectModel extends AbstractListModel implements ComboBoxModel,List
      */
 	
 	public Object getElementAt(int index) {
-		if (!SelectMainModel.specialValueCreators.containsKey(actualAttr)){
+		if (!SelectMainModel.specialValueCreators.containsKey(actualAttr) && !actualAttr.isDecision()){
 		if (index==0)return NAME_NONE;
 		if (index==1)return NAME_NOT_NULL;		
 		return getValueName(main.valuesOf(actualAttr).get(index-2));}else
@@ -148,7 +148,7 @@ public class SelectModel extends AbstractListModel implements ComboBoxModel,List
      
      */
 	public int getSize() {
-		if (!SelectMainModel.specialValueCreators.containsKey(actualAttr)){
+		if (!SelectMainModel.specialValueCreators.containsKey(actualAttr) && !actualAttr.isDecision()){
 		return main.valuesOf(actualAttr).size()+2;}else{
 			return main.valuesOf(actualAttr).size()+1;
 		}
@@ -179,7 +179,9 @@ public class SelectModel extends AbstractListModel implements ComboBoxModel,List
 		if (SelectMainModel.normalValueSelected(sel)){
 			i=main.indexOfAtrr(actualAttr);}else{i=-1;};
 			
-		if (i>=0){return new OneValueTester(i,sel);};
+		if (i>=0)
+			if(actualAttr.isDecision()){return new RuleDecisionTester(sel);}
+			else{return new OneValueTester(i,sel);};
 		
 		if (sel==SelectMainModel.VAL_NONE)
 			return null;	

@@ -84,9 +84,7 @@ public class SortMainModel extends AbstractListModel {
 		Iterator<Attribute> i=attribs.iterator();
 		while (i.hasNext()){
 			Attribute a=i.next();
-			if (!(a.isDecision())){
-				free.add(a);
-			}
+			free.add(a);
 		};
 //		attribs=(Vector<Attribute>)free.clone();
 		sortModels=new Vector<SortModel>();

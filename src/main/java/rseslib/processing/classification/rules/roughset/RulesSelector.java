@@ -81,6 +81,24 @@ class OneValueTester implements RulesSelector{
 	}
 }
 /**
+ * Selector which selects rules of given decision
+ *
+ */
+class RuleDecisionTester implements RulesSelector{
+
+	Double dec;
+	public RuleDecisionTester(Double dec) {
+	
+		this.dec = dec;
+	}
+	public boolean isChoosen(EqualityDescriptorsRule r) {
+		return r.getDecision()==dec;
+	}
+	public String toString(){
+		return "RuleDecisionTester:"+dec;
+	}
+}
+/**
  * Selector which checks if given descriptors exists in a rule
  *
  */

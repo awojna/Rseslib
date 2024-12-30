@@ -33,6 +33,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import rseslib.structure.attribute.NominalAttribute;
+
 /**
  * Main panel of Visual Rough Set Classifier
  * @author Krzysztf Niemkiewicz
@@ -95,7 +97,36 @@ class AmountController implements TableModelListener{
 	boolean showDefault; 
 	private void setLabelText(){
 		if (showDefault){
-			jl.setText("All rules: "+vrs.getRules().size()+"          Matching rules: "+rtm.getDefaultRulesCount()+"          Selected rules: "+rtm.getRowCount());			
+			//jl.setText("All rules: "+vrs.getRules().size()+"          Matching rules: "+rtm.getDefaultRulesCount()+"          Selected rules: "+rtm.getRowCount());
+			StringBuffer str = new StringBuffer();
+			str.append("<html><table><tr><td colspan=\"3\">All rules: "+vrs.getRules().size()+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+			str.append("Matching rules: "+rtm.getDefaultRulesCount()+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+			str.append("Selected rules: "+rtm.getRowCount()+"</td></tr>");
+			double sum = rtm.getAllDistrSum();
+			if(sum > 0) {
+				str.append("<tr><td>VOTING:</td><td></td><td></td></tr>");
+				rseslib.structure.vector.Vector distr = rtm.getDistr();
+				int d = 0;
+				while(d < distr.dimension()) {
+					double code = vrs.getHeader().nominalDecisionAttribute().globalValueCode(d);
+					str.append("<tr><td>" + NominalAttribute.stringValue(code) + ": " + (int)distr.get(d) + " (" + Math.round(distr.get(d) * 100 / sum) + "%)&nbsp;&nbsp;</td><td>");
+					d++;
+					if(d < distr.dimension()) {
+						code = vrs.getHeader().nominalDecisionAttribute().globalValueCode(d);
+						str.append(NominalAttribute.stringValue(code) + ": " + (int)distr.get(d) + " (" + Math.round(distr.get(d) * 100 / sum) + "%)&nbsp;&nbsp;");
+						d++;
+					}
+					str.append("</td><td>");
+					if(d < distr.dimension()) {
+						code = vrs.getHeader().nominalDecisionAttribute().globalValueCode(d);
+						str.append(NominalAttribute.stringValue(code) + ": " + (int)distr.get(d) + " (" + Math.round(distr.get(d) * 100 / sum) + "%)&nbsp;&nbsp;");
+						d++;
+					}
+					str.append("</td></tr>");
+				}
+			}
+			str.append("</table></html>");
+			jl.setText(str.toString());			
 		}else
 		jl.setText("All rules: "+vrs.getRules().size()+"          Selected rules: "+rtm.getRowCount());
 	};

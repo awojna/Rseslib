@@ -46,6 +46,8 @@ public class RulesTableModel extends AbstractTableModel {
 	private Vector<EqualityDescriptorsRule> defaultRules;	
 	private Comparator<EqualityDescriptorsRule>lastComparator;
 	private RulesSelector defSelector;
+	private rseslib.structure.vector.Vector distr;
+	private double defaultDistrSum;
 	private static final long serialVersionUID = 6968820149519008089L;
 
 
@@ -65,11 +67,17 @@ public class RulesTableModel extends AbstractTableModel {
 			rules.add((EqualityDescriptorsRule)i.next());
 		};}else
 		{
+			distr = new rseslib.structure.vector.Vector(vrs.attributes().nominalDecisionAttribute().noOfValues());
 			while (i.hasNext()){
 				EqualityDescriptorsRule edr=(EqualityDescriptorsRule)i.next();
 				if (defSelector.isChoosen(edr)){
-				rules.add(edr);};
+				rules.add(edr);
+				distr.add(edr.getDecisionVector());
+				};
 			};
+			defaultDistrSum = 0;
+			for(int d = 0; d < distr.dimension(); d++)
+				defaultDistrSum += distr.get(d);
 		}
 		
 		defaultRules=new Vector<EqualityDescriptorsRule>(rules);
@@ -111,11 +119,14 @@ public class RulesTableModel extends AbstractTableModel {
 	public void reSelect(VectorMultipleRulesSelector s){
 		s.add(defSelector);
 		rules=new Vector<EqualityDescriptorsRule>();
+		distr = new rseslib.structure.vector.Vector(vrs.attributes().nominalDecisionAttribute().noOfValues());
 		Iterator<EqualityDescriptorsRule> i=defaultRules.iterator();
 		while (i.hasNext()){
 			EqualityDescriptorsRule edr=i.next();
 			if (s.isChoosen(edr)){
-			rules.add(edr);};
+			rules.add(edr);
+			distr.add(edr.getDecisionVector());
+			};
 		};
 		if (lastComparator!=null){this.reSort(lastComparator);};
 		this.fireTableDataChanged();
@@ -176,14 +187,26 @@ public class RulesTableModel extends AbstractTableModel {
 
 	public  Vector<EqualityDescriptorsRule> getAllRules() {
 			return defaultRules;
+	}	
+	/**
+	 * Gives sum of decision distribution for all rules.
+	 */
+	public double getAllDistrSum() {
+		return defaultDistrSum;
 	}
-	
     /**
      * Gives all the visible rules as a vector
      */
 	
 	public  Vector<EqualityDescriptorsRule> getRules() {
 		return rules;
+	}
+	/**
+	 * Gives decision distribution for visible rules.
+	 */
+	
+	public rseslib.structure.vector.Vector getDistr() {
+		return distr;
 	}
 
 } 

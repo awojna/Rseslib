@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 - 2024 The Rseslib Contributors
+ * Copyright (C) 2002 - 2025 The Rseslib Contributors
  * 
  *  This file is part of Rseslib.
  *

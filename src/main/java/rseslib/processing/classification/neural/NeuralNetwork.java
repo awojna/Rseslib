@@ -20,11 +20,16 @@
 
 package rseslib.processing.classification.neural;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
 import rseslib.processing.classification.Classifier;
+import rseslib.processing.classification.ClassifierWithDistributedDecision;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.ConfigurationWithStatistics;
@@ -38,8 +43,11 @@ import rseslib.system.progress.Progress;
  * 
  * @author Jakub Sakowicz
  */
-public class NeuralNetwork extends ConfigurationWithStatistics implements Classifier
+public class NeuralNetwork extends ConfigurationWithStatistics implements Classifier, ClassifierWithDistributedDecision, Serializable
 {
+    /** Serialization version. */
+	private static final long serialVersionUID = 1L;
+	
 	protected long timeLimit;
 	protected int[] networkStructure;
 	/** Cala tabelka */
@@ -130,6 +138,30 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 		}
 	}
 	
+    /**
+     * Writes this object. Dummy implementation.
+     * TODO Ought to be implemented for WEKA
+     *
+     * @param out			Output for writing.
+     * @throws IOException	if an I/O error has occured.
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+    	writeConfigurationAndStatistics(out);
+    }
+
+    /**
+     * Reads this object. Dummy implementation.
+     * TODO Ought to be implemented for WEKA
+     *
+     * @param in			Input for reading.
+     * @throws IOException	if an I/O error has occured.
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+    	readConfigurationAndStatistics(in);
+    }
+
 	/**
 	 * Przygotowuje Progress do raportowania uczenia
 	 * @param prog Progrees wykorzystywany do raportowania
@@ -246,6 +278,14 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 		return bestEngine.classify(dd);
 	}
 
+    /**
+	 * Klasyfikuje podany rekord z rozkladem decyzji
+	 * @param dd - DoubleData do sklasyfikowania
+     */
+    public double[] classifyWithDistributedDecision(DoubleData dd) {
+    	return bestEngine.classifyWithDistributedDecision(dd);
+    }
+    
     /**
      * Calculates statistics.
      */

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
+import rseslib.structure.attribute.NominalAttribute;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.data.DoubleDataWithDecision;
 import rseslib.structure.table.DoubleDataTable;
@@ -148,6 +149,16 @@ public class NeuronNetworkEngine {
 	}
 	
 	/**
+	 * Przelicza i zwraca wynik rozkladowy dla wejscia
+	 * @param dd - rekord z danymi
+	 * @return rozklad decyzji
+	 */
+	public double[] classifyWithDistributedDecision(DoubleData dd) {
+		count(dd);
+		return resultCombiner.getDistributedResult();
+	}
+	
+	/**
 	 * Zwraca celnosc sieci na danych walidacyjnych
 	 * @return liczba zmiennoprzecinkowa z zakresu 0..100
 	 */
@@ -224,11 +235,10 @@ public class NeuronNetworkEngine {
 	 * Oblicza ilosc mozliwych rezultatow i tworzy obiekt odpowiadajacy za wyjscie.
 	 */
 	private void createResultCombiner() {
-		Set<Double> availableResultsSet = new HashSet<Double>();
-		for (DoubleData dd : fullTable.getDataObjects()) {
-			availableResultsSet.add(new Double(((DoubleDataWithDecision)dd).getDecision()));
-		}
-		availableResults = new ArrayList<Double>(availableResultsSet);
+		availableResults = new ArrayList<Double>();
+		NominalAttribute decAttr = fullTable.attributes().nominalDecisionAttribute();
+		for(int d = 0; d < decAttr.noOfValues(); ++d)
+			availableResults.add(decAttr.globalValueCode(d));
 		resultCombiner = new ResultCombiner(availableResults);
 	}
 	

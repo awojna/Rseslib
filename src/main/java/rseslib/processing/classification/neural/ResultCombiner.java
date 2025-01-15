@@ -45,6 +45,10 @@ public class ResultCombiner implements IDeviationCounter {
 	 */
 	private double result;
 	/**
+	 * Wynik rozkladowy sieci
+	 */
+	private double[] distributedResult;
+	/**
 	 * Oczekiwany wynik sieci - do liczenia bledow
 	 */
 	private double expectedResult;
@@ -64,8 +68,9 @@ public class ResultCombiner implements IDeviationCounter {
 		double max = 0; 
 		int maxIndex = 0;
 		for (int i=0; i < input.noOfInputs(); i++) {
-			if (input.get(i) > max) {
-				max = input.get(i);
+			distributedResult[i] = input.get(i);
+			if (distributedResult[i] > max) {
+				max = distributedResult[i];
 				maxIndex = i;
 			}				
 		}
@@ -81,11 +86,20 @@ public class ResultCombiner implements IDeviationCounter {
 	}
 	
 	/**
+	 * Zwraca rozkladowy wynik dzialania sieci - nalezy pamietac o wczesniejszym wywolaniu count()
+	 * @return Rozklad wag decyzji
+	 */
+	public double[] getDistributedResult() {
+		return distributedResult;
+	}
+	
+	/**
 	 * Ustawia ostatnia warstwe sieci 
 	 * @param input
 	 */
 	public void setInput(IInputProvider input) {
 		this.input = input;
+		distributedResult = new double[input.noOfInputs()];
 	}	
 	
 	/**

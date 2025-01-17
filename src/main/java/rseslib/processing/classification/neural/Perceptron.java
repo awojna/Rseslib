@@ -20,6 +20,7 @@
 
 package rseslib.processing.classification.neural;
 
+import java.io.Serializable;
 
 /**
  * @author Jakub Sakowicz
@@ -27,7 +28,10 @@ package rseslib.processing.classification.neural;
  * Pojedynczy perceptron
  * 
  */
-public class Perceptron {
+public class Perceptron implements Serializable {
+    /** Serialization version. */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Wejscie perceptronu
 	 */

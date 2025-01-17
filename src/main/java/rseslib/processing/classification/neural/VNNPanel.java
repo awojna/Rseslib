@@ -36,9 +36,8 @@ import java.awt.Graphics;
 import java.awt.geom.Line2D;
 import java.awt.Rectangle;
 
+import rseslib.structure.attribute.Header;
 import rseslib.structure.attribute.NominalAttribute;
-import rseslib.structure.data.DoubleData;
-import rseslib.structure.table.DoubleDataTable;
 
 /**
  * Klasa reprezentujaca panel z siecia neuronowa
@@ -96,8 +95,8 @@ public class VNNPanel extends JComponent implements
 
 	private double minWeight, maxWeight;
 
-	private DoubleDataTable table;
-
+	private Header attributes;
+	
 	private Layer inputFoo;
 	
 	public JButton TrainButton;
@@ -117,7 +116,7 @@ public class VNNPanel extends JComponent implements
 	 * @param newLayers
 	 *            lista perceptronow w kolejnych warstwach - bez wejscia
 	 */
-	public VNNPanel(int[] newSizes, List<Layer> newLayers, DoubleDataTable tab, boolean addButtons) {
+	public VNNPanel(int[] newSizes, List<Layer> newLayers, Header attrs, boolean addButtons) {
 		/* inicjalizacja jako podklasy JPanel */
 		super();
 		
@@ -176,7 +175,7 @@ public class VNNPanel extends JComponent implements
 		setLayout(null);
 		//setPreferredSize(new Dimension(DimensionX, DimensionY));
 		addMouseListener(this);
-		table = tab;
+		attributes = attrs;
 		showClassification = false;
 
 		repaint();
@@ -346,11 +345,13 @@ public class VNNPanel extends JComponent implements
 		
 		/* dodanie opisu do neuronow wejsciowych - z lewej strony obrazka neuronu */
 		StringBuffer text = new StringBuffer();
-		Set<Double> valueSet = new HashSet<Double>();
-		Iterator vSIterator = valueSet.iterator();
 		Rectangle ElementPosition, stringPosition;
 		int attr_no = 0;		
-		for (Perceptron p : inputFoo.perceptrons) {
+		int vi = 0;
+		for (Perceptron p : inputFoo.perceptrons)
+		{
+			if (attributes.attribute(attr_no).isDecision())
+				attr_no++;
 			ElementPosition = points.get(p);
 			stringPosition = (Rectangle) ElementPosition.clone();
 			if (stringPosition.x - LEFT_MARGIN > 0)
@@ -359,51 +360,33 @@ public class VNNPanel extends JComponent implements
 			else
 				stringPosition.setLocation(0, stringPosition.y + 12);
 			text.setLength(0);
-			text.append(table.attributes().name(attr_no));
+			text.append(" ");
+			text.append(attributes.name(attr_no));
 			if (text.length() > 15)
 				text.setLength(15);
-			if (table.attributes().isNumeric(attr_no)) {
+			if(attributes.attribute(attr_no).isNumeric())
 				attr_no++;
-			} else {
-				if (table.attributes().attribute(attr_no).isNominal()) {
-					if (table.attributes().attribute(attr_no).isDecision()) {
-						attr_no++;
-						text.setLength(0);
-						text.append(table.attributes().name(attr_no));
-					}
-					if (!vSIterator.hasNext()) {
-						valueSet = new HashSet<Double>();
-						for (DoubleData dd : table.getDataObjects()) {
-							valueSet.add(new Double(dd.get(attr_no)));
-						}
-						vSIterator = valueSet.iterator();
-					}
-					// dopisanie kolejnej wartosci
-					text.append(" "+ (NominalAttribute.stringValue((Double) vSIterator.next())));
-					// sprawdzenie czy moge sknczyc iterowanie
-					if (!vSIterator.hasNext())
-						attr_no++;
+			else if (attributes.attribute(attr_no).isNominal()) {
+				NominalAttribute att = (NominalAttribute)attributes.attribute(attr_no);
+				// dopisanie kolejnej wartosci
+				text.append(" "+ (NominalAttribute.stringValue(att.globalValueCode(vi++))));
+				// sprawdzenie czy moge sknczyc iterowanie
+				if (vi == att.noOfValues()) {
+					vi = 0;
+					attr_no++;
 				}
 			}
 			gg.drawString(text.toString(), stringPosition.x, stringPosition.y);
 		}
 
 		/* dodanie opisu do neuronow wyjsciowych - z prawej strony obrazka neuronu*/
-		attr_no = 0;
-		while (! table.attributes().attribute(attr_no).isDecision())
-			attr_no++;
-		valueSet = new HashSet<Double>();
-		for (DoubleData dd : table.getDataObjects()) {
-			valueSet.add(new Double(dd.get(attr_no)));
-		}
-		vSIterator = valueSet.iterator();
-		
+		vi = 0;
 		for (Perceptron p : layers.get(layers.size() - 1).perceptrons) {
 			ElementPosition = points.get(p);
 			stringPosition = (Rectangle) ElementPosition.clone();
 			stringPosition.setLocation(stringPosition.x + 40,
 					stringPosition.y + 12);
-			gg.drawString(NominalAttribute.stringValue((Double) vSIterator.next()), stringPosition.x, stringPosition.y);
+			gg.drawString(NominalAttribute.stringValue(attributes.nominalDecisionAttribute().globalValueCode(vi++)), stringPosition.x, stringPosition.y);
 		}
 
 		/* dodanie przyciskow */

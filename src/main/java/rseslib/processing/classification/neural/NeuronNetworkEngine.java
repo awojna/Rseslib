@@ -20,18 +20,19 @@
 
 package rseslib.processing.classification.neural;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
 
-import rseslib.structure.attribute.NominalAttribute;
+import rseslib.structure.attribute.Header;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.data.DoubleDataWithDecision;
-import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.Report;
 
 /**
@@ -40,57 +41,59 @@ import rseslib.system.Report;
  * Silnik sieci neuronowej
  *
  */
-public class NeuronNetworkEngine {
+public class NeuronNetworkEngine implements Serializable {
+	
+    /** Serialization version. */
+	private static final long serialVersionUID = 1L;
 	
 	/**
 	 * Konstruktor
-	 * @param fullTable    - cala tabelka z danymi
+	 * @param attrs        - naglowek danych
+	 * @param data         - cala tabelka z danymi
 	 * @param trainData    - czesc treningowa
 	 * @param validateData - czesc walidacyjna
 	 */
-	public NeuronNetworkEngine(DoubleDataTable fullTable, ArrayList trainData, ArrayList validateData) {
+	public NeuronNetworkEngine(Header attrs, ArrayList<DoubleData> data, ArrayList trainData, ArrayList validateData, double initAlpha, double targetRatio) {
 	
-		this.fullTable = fullTable;
+		this.attributes = attrs;
+		this.data = data;
 		this.trainData = (ArrayList)trainData.clone(); // kopia, gdyz pozniej randomizowana jest kolejnosc
 		this.validateData = validateData;
+		this.ALFA = initAlpha;
+		this.DEST_TARGET_RATIO = targetRatio;
 		this.setup();
 	}
 	
 	/**
 	 * Konstruktor
-	 * @param fullTable    - cala tabelka z danymi
+	 * @param attrs        - naglowek danych
+	 * @param data         - cala tabelka z danymi
 	 * @param trainData    - czesc treningowa
 	 * @param validateData - czesc walidacyjna
 	 * @param hidden_no     - liczba ukrytych warstw
 	 * @param structure     - lista licznosci kolejnych warstw
 	 */
-	public NeuronNetworkEngine(DoubleDataTable fullTable, ArrayList trainData, ArrayList validateData, int hidden_no, int[] structure) {
+	public NeuronNetworkEngine(Header attrs, ArrayList<DoubleData> data, ArrayList trainData, ArrayList validateData, int hidden_no, int[] structure, double initAlpha, double targetRatio) {
 	
-		this.fullTable = fullTable;
+		this.attributes = attrs;
+		this.data = data;
 		this.trainData = (ArrayList)trainData.clone(); // kopia, gdyz pozniej randomizowana jest kolejnosc
 		this.validateData = validateData;
+		this.ALFA = initAlpha;
+		this.DEST_TARGET_RATIO = targetRatio;
 		this.setup(hidden_no, structure);
 		//raz to jestem (przychodzac z learn) juz z tablica uwzgledniajaca input'a i zakonczenie ale poprawnym hidden_no
 		//czy jestem tu a innym razem?
 	}	
 	
 	/**
-	 * Warstwa wejsiowa (bez perceptronow, tylko tlumaczenie wejscia)
-	 */
-	public DoubleDataProvider input;
-	/**
-	 * Ilosci perceptronow w warstwach
-	 */
-	public int[] noOfPerceptronsInLayer;
-	/**
-	 * Warstwy sieci
-	 */
-	public List<Layer> layers;
-	
-	/**
-	 * Tabela z danymi 
+	 * Nagłowek danych 
 	 */	
-	private DoubleDataTable fullTable;
+	private Header attributes;
+	/**
+	 * Dane
+	 */	
+	private ArrayList<DoubleData> data;
 	/**
 	 * Czesc treningowa
 	 */
@@ -105,18 +108,30 @@ public class NeuronNetworkEngine {
 	private Iterator dataIterator;
 	
 	/**
+	 * Parametr ALFA tego silnika
+	 */
+	private double ALFA;
+	/**
+	 * Parametr DEST_TARGET_RATIO tego silnika
+	 */
+	private double DEST_TARGET_RATIO;
+	/**
 	 * Skutecznosc tego silnika
 	 */
 	private double myRatio = 0;
-	/**
-	 * Parametr ALFA tego silnika
-	 */
-	private double ALFA = Global.INITIAL_ALFA;
 	
 	/**
-	 * Lista dostepnych wartosci parametru decyzyknego
+	 * Warstwa wejsiowa (bez perceptronow, tylko tlumaczenie wejscia)
 	 */
-	public List availableResults;
+	public DoubleDataProvider input;
+	/**
+	 * Ilosci perceptronow w warstwach
+	 */
+	public int[] noOfPerceptronsInLayer;
+	/**
+	 * Warstwy sieci
+	 */
+	public List<Layer> layers;
 	/**
 	 * Obiekt przetwarzajacy wyjscia ostatniej warstwy na wartosci parametru decyzyjnego
 	 */
@@ -127,7 +142,7 @@ public class NeuronNetworkEngine {
 	 * back-prop-update.
 	 */
 	public void learn() {		
-		if (myRatio > Global.DEST_TARGET_RATIO) return; // po co wiecej sie uczyc...
+		if (myRatio > DEST_TARGET_RATIO) return; // po co wiecej sie uczyc...
 		if (myRatio > 50) ALFA *= Global.MULT_ALFA;
 		if (myRatio > 99) ALFA *= Global.MULT_ALFA;
 		shuffle();
@@ -183,7 +198,7 @@ public class NeuronNetworkEngine {
 		createInputProvider(); 					// utworzenie obiektu odpowiadajacego za wejscie
 		createResultCombiner();					// utworzenie obiektu odpowiadajacego za wyjscie
 		// ilosci perceptronow w postepie geometrycznym
-		int av = availableResults.size();
+		int av = attributes.nominalDecisionAttribute().noOfValues();
 		int in = input.noOfInputs();	
 		//System.out.print("AV: " + av + ", in: " + in + " \n");
 		double mult = Math.pow((double)av / (double)in, 1/(double)(Global.NO_OF_LAYERS));
@@ -207,7 +222,7 @@ public class NeuronNetworkEngine {
 		noOfPerceptronsInLayer = new int[hidden_no + 1];
 		createInputProvider(); 					// utworzenie obiektu odpowiadajacego za wejscie
 		createResultCombiner();					// utworzenie obiektu odpowiadajacego za wyjscie
-		int av = availableResults.size();
+		int av = attributes.nominalDecisionAttribute().noOfValues();
         int i;
 		for (i=0; i<hidden_no; i++) {
 			noOfPerceptronsInLayer[i] = structure[i+1];	
@@ -228,18 +243,14 @@ public class NeuronNetworkEngine {
 	 * Tworzy obiekt zarzadzajacy wejsciem
 	 */
 	private void createInputProvider() {
-		input = new DoubleDataProvider(fullTable);
+		input = new DoubleDataProvider(attributes, data);
 	}
 	
 	/**
 	 * Oblicza ilosc mozliwych rezultatow i tworzy obiekt odpowiadajacy za wyjscie.
 	 */
 	private void createResultCombiner() {
-		availableResults = new ArrayList<Double>();
-		NominalAttribute decAttr = fullTable.attributes().nominalDecisionAttribute();
-		for(int d = 0; d < decAttr.noOfValues(); ++d)
-			availableResults.add(decAttr.globalValueCode(d));
-		resultCombiner = new ResultCombiner(availableResults);
+		resultCombiner = new ResultCombiner(attributes.nominalDecisionAttribute());
 	}
 	
 	/**
@@ -377,4 +388,46 @@ public class NeuronNetworkEngine {
 			(layers.get(i)).restoreData(((Object[])data)[i]);
 	}
 	
+    /**
+     * Writes this object.
+     *
+     * @param out			Output for writing.
+     * @throws IOException	if an I/O error has occured.
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+    	out.writeObject(attributes);
+    	out.writeObject(data);
+    	out.writeObject(trainData);
+    	out.writeObject(validateData);
+    	out.writeDouble(ALFA);
+    	out.writeDouble(DEST_TARGET_RATIO);
+    	out.writeDouble(myRatio);
+    	out.writeObject(input);
+    	out.writeObject(noOfPerceptronsInLayer);
+    	out.writeObject(layers);
+    	out.writeObject(resultCombiner);
+    }
+
+    /**
+     * Reads this object.
+     *
+     * @param in			Input for reading.
+     * @throws IOException	if an I/O error has occured.
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+    	attributes = (Header)in.readObject();
+    	data = (ArrayList<DoubleData>)in.readObject();
+    	trainData = (ArrayList)in.readObject();
+    	validateData = (ArrayList)in.readObject();
+    	ALFA = in.readDouble();
+    	DEST_TARGET_RATIO = in.readDouble();
+    	myRatio = in.readDouble();
+    	input = (DoubleDataProvider)in.readObject();
+    	noOfPerceptronsInLayer = (int[])in.readObject();
+    	layers = (List<Layer>)in.readObject();
+    	resultCombiner = (ResultCombiner)in.readObject();
+		dataIterator = trainData.iterator();
+    }
 }

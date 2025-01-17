@@ -30,6 +30,7 @@ import java.util.Properties;
 
 import rseslib.processing.classification.Classifier;
 import rseslib.processing.classification.ClassifierWithDistributedDecision;
+import rseslib.structure.attribute.Header;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.ConfigurationWithStatistics;
@@ -50,8 +51,14 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 	
 	protected long timeLimit;
 	protected int[] networkStructure;
+	/** Poczatkowa wartosc wspolczynnika ALFA dla back-prop-update */
+	protected double INITIAL_ALFA;
+	/** Wspolczynnik powyzej ktorego siec nie bedzie juz uczona */
+	protected double DEST_TARGET_RATIO;
+	/** Naglowek */
+	protected Header attributes;
 	/** Cala tabelka */
-	protected DoubleDataTable trainTable;
+	protected ArrayList<DoubleData> data;
 	/** dane treningowe */
 	protected ArrayList<DoubleData> trainData;
 	/** dane walidacyjne */
@@ -77,22 +84,21 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 	{
 		super(prop);
 		timeLimit = ((long)this.getIntProperty(Global.TIME_LIMIT_NAME)) * 1000;
-		Global.INITIAL_ALFA = this.getDoubleProperty(Global.INITIAL_ALFA_NAME);
-		Global.DEST_TARGET_RATIO = this.getDoubleProperty(Global.DEST_TARGET_RATIO_NAME);
+		INITIAL_ALFA = this.getDoubleProperty(Global.INITIAL_ALFA_NAME);
+		DEST_TARGET_RATIO = this.getDoubleProperty(Global.DEST_TARGET_RATIO_NAME);
 		if (getBoolProperty("showTraining"))
-		{
 			setupProgress(new EmptyProgress());  
-			prog.set("Learning the neural network", 1);
-		}
-		else setupProgress(prog);
+		else
+			setupProgress(prog);
 		// czas - aby moc przerwac uczenie po okreslonym czasie
 		startTime = System.currentTimeMillis();
 		// podzial tabelki na czesc treningowa i walidacyjna
 		Collection<DoubleData>[] split = trainTable.randomSplit(3,1);
 		trainData = new ArrayList<DoubleData>(split[0]);
 		validateData = new ArrayList<DoubleData>(split[1]);
-		this.trainTable = trainTable;
-		bestEngine = new NeuronNetworkEngine(trainTable, trainData, validateData);
+		attributes = trainTable.attributes();
+		this.data = trainTable.getDataObjects();
+		bestEngine = new NeuronNetworkEngine(attributes, data, trainData, validateData, INITIAL_ALFA, DEST_TARGET_RATIO);
 		
 		/*wczytanie sposobu generowania sieci i jej ewentualnej struktury*/
 		if (getBoolProperty("automaticNetworkStructure"))
@@ -103,7 +109,7 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 			for (int i= 1;  i < Global.NO_OF_LAYERS; i++) {
 				networkStructure[i] = bestEngine.noOfPerceptronsInLayer[i-1];
 			}
-			networkStructure[networkStructure.length - 1] = bestEngine.availableResults.size();
+			networkStructure[networkStructure.length - 1] = attributes.nominalDecisionAttribute().noOfValues();
 		}
 		else
 		{
@@ -127,8 +133,8 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 			networkStructure = new int[i+2];
 			for (i = 1; i < (networkStructure.length - 1); i++) networkStructure[i] = tabpom[i-1];
 			networkStructure[0] = bestEngine.input.noOfInputs();
-			networkStructure[networkStructure.length - 1] = bestEngine.availableResults.size();
-			bestEngine = new NeuronNetworkEngine(trainTable, trainData, validateData, networkStructure.length-2, networkStructure);
+			networkStructure[networkStructure.length - 1] = attributes.nominalDecisionAttribute().noOfValues();
+			bestEngine = new NeuronNetworkEngine(attributes, data, trainData, validateData, networkStructure.length-2, networkStructure, INITIAL_ALFA, DEST_TARGET_RATIO);
 		}
 		if (getBoolProperty("showTraining")) prog.step();
 		else
@@ -139,8 +145,7 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 	}
 	
     /**
-     * Writes this object. Dummy implementation.
-     * TODO Ought to be implemented for WEKA
+     * Writes this object.
      *
      * @param out			Output for writing.
      * @throws IOException	if an I/O error has occured.
@@ -148,11 +153,19 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
     private void writeObject(ObjectOutputStream out) throws IOException
     {
     	writeConfigurationAndStatistics(out);
+    	out.writeLong(timeLimit);
+    	out.writeObject(networkStructure);
+    	out.writeDouble(INITIAL_ALFA);
+    	out.writeDouble(DEST_TARGET_RATIO);
+    	out.writeObject(attributes);
+    	out.writeObject(data);
+    	out.writeObject(trainData);
+    	out.writeObject(validateData);
+    	out.writeObject(bestEngine);
     }
 
     /**
-     * Reads this object. Dummy implementation.
-     * TODO Ought to be implemented for WEKA
+     * Reads this object.
      *
      * @param in			Input for reading.
      * @throws IOException	if an I/O error has occured.
@@ -160,6 +173,16 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
     	readConfigurationAndStatistics(in);
+    	timeLimit = in.readLong();
+    	networkStructure = (int[])in.readObject();
+    	INITIAL_ALFA = in.readDouble();
+    	DEST_TARGET_RATIO = in.readDouble();
+    	attributes = (Header)in.readObject();
+    	data = (ArrayList<DoubleData>)in.readObject();
+    	trainData = (ArrayList)in.readObject();
+    	validateData = (ArrayList)in.readObject();
+    	bestEngine = (NeuronNetworkEngine)in.readObject();
+		setupProgress(new EmptyProgress());  
     }
 
 	/**
@@ -236,7 +259,7 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 			}
 
 			// czy wymagamy uczenia
-			if (result < Global.DEST_TARGET_RATIO)
+			if (result < DEST_TARGET_RATIO)
 				shouldLearnMore = true;
 
 			// raport postepu
@@ -247,7 +270,7 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 			// usuwanie silnika, ktorego dzialanie nie przynosi juz efektow, startowanie w zamian nowego
 			if (i - best_round > Global.GRACE_LEARN_PERIOD) {
 				Report.debugnl("Usunieto bezuzyteczny silnik");
-				bestEngine = new NeuronNetworkEngine(trainTable, trainData, validateData);
+				bestEngine = new NeuronNetworkEngine(attributes, data, trainData, validateData, INITIAL_ALFA, DEST_TARGET_RATIO);
 				best_round = i;
 				max_result = -1;
 			}

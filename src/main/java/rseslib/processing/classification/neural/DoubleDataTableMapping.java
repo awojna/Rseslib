@@ -20,22 +20,27 @@
 
 package rseslib.processing.classification.neural;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import rseslib.structure.attribute.Header;
+import rseslib.structure.attribute.NominalAttribute;
 import rseslib.structure.data.DoubleData;
-import rseslib.structure.table.DoubleDataTable;
 
 /**
  * @author Jakub Sakowicz
  *
  * Klasa okresla metode mapowania DoubleData w wektor liczb zmiennoprzecinkowych.
  */
-public class DoubleDataTableMapping {
+public class DoubleDataTableMapping implements Serializable {
+    /**
+     * Serialization version.
+     */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * Atrybut numeryczny
 	 */
@@ -51,12 +56,52 @@ public class DoubleDataTableMapping {
 	 * Klasa okreslajaca mapowanie na pojedyncze wyjscie.  
 	 * 	 
 	 */
-	private class Output {
-		public int index; 		// numer atrybutu z DoubleData 
-		public int type;		// typ atrybutu
-		public double data1;	// wartosc aktywacji (dla atrybutow nominalnych),
-								// wartosc minimalna (dla atrybutow numerycznych)
-		public double data2;	// rozpietosc wartosci
+	private class Output implements Serializable {
+	    /** Serialization version. */
+		private static final long serialVersionUID = 1L;
+
+		public int index; 			// numer atrybutu z DoubleData 
+		public int type;			// typ atrybutu
+		public NominalAttribute na;	// atrybut jesli nominalny 
+		public double data1;		// wartosc aktywacji (dla atrybutow nominalnych),
+									// wartosc minimalna (dla atrybutow numerycznych)
+		public double data2;		// rozpietosc wartosci
+		
+		/**
+		 * Writes this object.
+		 *
+		 * @param out			Output for writing.
+		 * @throws IOException	if an I/O error has occured.
+		 */
+		private void writeObject(ObjectOutputStream out) throws IOException
+		{
+			out.writeInt(index);
+			out.writeInt(type);
+			if(type == TYPE_NOMINAL) {
+				out.writeObject(na);
+				out.writeInt(na.localValueCode(data1));
+			} else
+				out.writeDouble(data1);				
+			out.writeDouble(data2);
+		}
+
+		/**
+		 * Reads this object.
+		 *
+		 * @param out			Output for writing.
+		 * @throws IOException	if an I/O error has occured.
+		 */
+		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+		{
+			index = in.readInt();
+			type = in.readInt();
+			if(type == TYPE_NOMINAL) {
+				na = (NominalAttribute)in.readObject();
+				data1 = na.globalValueCode(in.readInt());
+			} else
+				data1 = in.readDouble();
+			data2 = in.readDouble();
+		}
 	}
 	
 	/**
@@ -66,19 +111,18 @@ public class DoubleDataTableMapping {
 	
 	/**
 	 * Konstruktor
-	 * @param ddt - tabelka z danymi, dla ktorych nalezy przygotowac mapowanie
+	 * @param header - naglowek danych, dla ktorych nalezy przygotowac mapowanie
+	 * @param data   - tabelka z danymi, dla ktorych nalezy przygotowac mapowanie
 	 */
-	public DoubleDataTableMapping(DoubleDataTable ddt) {
+	public DoubleDataTableMapping(Header header, ArrayList<DoubleData> data) {
 		mapping = new ArrayList<Output>();
-		
-		Header header = ddt.attributes();
 		
 		for (int i = 0; i < header.noOfAttr(); i++ ) {
 			if (header.isConditional(i)) {
 				if (header.isNumeric(i))
-					addNumeric(i, ddt);				
+					addNumeric(i, data);				
 				if (header.isNominal(i))
-					addNominal(i, ddt);				
+					addNominal(i, (NominalAttribute)header.attribute(i));				
 			}
 		}
 	}
@@ -86,31 +130,27 @@ public class DoubleDataTableMapping {
 	/**
 	 * Dodaje wyjscia odpowiadajace atrybutowi numerycznemu
 	 * @param index - indeks atrybutu z DoubleData
-	 * @param ddt   - tabelka z danymi
+	 * @param data  - tabelka z danymi
 	 */
-	public void addNumeric(int index, DoubleDataTable ddt) {
+	public void addNumeric(int index, ArrayList<DoubleData> data) {
 		double min =   1000000;
 		double max = - 1000000;
-		for (DoubleData dd : ddt.getDataObjects()) {
-			double data = dd.get(index);
-			if (data < min) min = data;
-			if (data > max) max = data;
+		for (DoubleData dd : data) {
+			double val = dd.get(index);
+			if (val < min) min = val;
+			if (val > max) max = val;
 		}
-		addOutput(index, TYPE_NUMERIC, min, 1/Math.max(1, max - min));
+		addOutput(index, TYPE_NUMERIC, null, min, 1/Math.max(1, max - min));
 	}
 	
 	/**
 	 * Dodaje wyjscia odpowiadajace atrybutowi nominalnemu
 	 * @param index - indeks atrybutu z DoubleData
-	 * @param ddt   - tabelka z danymi
+	 * @param na    - atrybut
 	 */
-	public void addNominal(int index, DoubleDataTable ddt) {
-		Set<Double> valueSet = new HashSet<Double>();
-		for (DoubleData dd : ddt.getDataObjects()) {
-			valueSet.add(new Double(dd.get(index)));
-		}
-		for (Iterator i = valueSet.iterator(); i.hasNext(); )		
-			addOutput(index, TYPE_NOMINAL, ((Double) i.next()).doubleValue(), 0);		
+	public void addNominal(int index, NominalAttribute na) {
+		for (int i = 0; i < na.noOfValues(); ++i)
+			addOutput(index, TYPE_NOMINAL, na, na.globalValueCode(i), 0);		
 	}
 	
 	/**
@@ -121,10 +161,11 @@ public class DoubleDataTableMapping {
 	 * 				- wartosc minimalna (dla atrybutow numerycznych)
 	 * @param data2 - rozpietosc wartosci
 	 */
-	public void addOutput(int index, int type, double data1, double data2) {
+	public void addOutput(int index, int type, NominalAttribute na, double data1, double data2) {
 		Output output = new Output();
 		output.index = index;
-		output.type = type; 
+		output.type = type;
+		output.na = na;
 		output.data1 = data1;
 		output.data2 = data2;
 		

@@ -20,8 +20,11 @@
 
 package rseslib.processing.classification.neural;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
+import rseslib.structure.attribute.Header;
 import rseslib.structure.data.DoubleData;
-import rseslib.structure.table.DoubleDataTable;
 
 /**
  * @author Jakub Sakowicz
@@ -32,14 +35,17 @@ import rseslib.structure.table.DoubleDataTable;
  * w zakresie wynikajacym z tabelki testowej, dane do klasyfikacji moga produkowac na wyjsciach 
  * wartosci z poza tego zakresu).
  */
-public class DoubleDataProvider implements IInputProvider {
+public class DoubleDataProvider implements IInputProvider, Serializable {
+
+    /** Serialization version. */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Konstruktor
 	 * @param ddt - tabelka z danymi wejsciowymi
 	 */
-	public DoubleDataProvider (DoubleDataTable ddt) {
-		mapping = new DoubleDataTableMapping(ddt);
+	public DoubleDataProvider (Header header, ArrayList<DoubleData> data) {
+		mapping = new DoubleDataTableMapping(header, data);
 		
 	}
 	

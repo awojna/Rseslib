@@ -20,8 +20,10 @@
 
 package rseslib.processing.classification.neural;
 
-import java.util.List;
+import java.io.Serializable;
 import java.util.ListIterator;
+
+import rseslib.structure.attribute.NominalAttribute;
 
 
 /**
@@ -31,11 +33,16 @@ import java.util.ListIterator;
  * i okreslajacy rzeczywisty wynik dzialania sieci.
  * 
  */
-public class ResultCombiner implements IDeviationCounter {
+public class ResultCombiner implements IDeviationCounter, Serializable {
+    /**
+     * Serialization version.
+     */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Lista mozliwych wartosci parametru decyzyjnego
 	 */
-	private List availableResults;
+	private NominalAttribute decAttr;
 	/**
 	 * Wyniki ostatniej warstwy
 	 */
@@ -57,8 +64,8 @@ public class ResultCombiner implements IDeviationCounter {
 	 * Konstruktor
 	 * @param availableResults lista mozliwych wartosci parametru decyzyjnego
 	 */
-	public ResultCombiner(List availableResults) {
-		this.availableResults = availableResults;
+	public ResultCombiner(NominalAttribute decAttr) {
+		this.decAttr = decAttr;
 	}
 	
 	/**
@@ -74,7 +81,7 @@ public class ResultCombiner implements IDeviationCounter {
 				maxIndex = i;
 			}				
 		}
-		result = ((Double)availableResults.get(maxIndex)).doubleValue();		
+		result = decAttr.globalValueCode(maxIndex);		
 	}
 	
 	/**
@@ -133,7 +140,7 @@ public class ResultCombiner implements IDeviationCounter {
 	 * @return 1 jesli wejscie odpowiada za wynik, 0 wpp
 	 */
 	private double expectedForInput(int i) {
-		if (((Double)availableResults.get(i)).doubleValue() == expectedResult)
+		if (decAttr.globalValueCode(i) == expectedResult)
 			return 1;
 		return 0;
 	}

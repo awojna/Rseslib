@@ -20,6 +20,7 @@
 
 package rseslib.processing.classification.neural;
 
+import java.io.Serializable;
 import java.util.List;
 
 
@@ -29,7 +30,10 @@ import java.util.List;
  * Klasa grupujaca wyjscia perceptronow. Implementuje interfejs IInputProvider. 
  * 
  */
-public class PerceptronOutputContainerProvider implements IInputProvider {
+public class PerceptronOutputContainerProvider implements IInputProvider, Serializable {
+
+    /** Serialization version. */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * lista perceptronow, ktorych wyjscia maja byc zgrupowane 

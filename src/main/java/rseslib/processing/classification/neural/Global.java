@@ -38,10 +38,6 @@ public class Global {
 	
 	
 	/**
-	 * Poczatkowa wartosc wspolczynnika ALFA dla back-prop-update
-	 */
-	public static double INITIAL_ALFA = 0.9;
-	/**
 	 * Mnoznik dla wspolczynnika ALFA - powodujacy jego zmniejszanie, 
 	 * gdy skutecznosc sieci bedzie dosc duza
 	 */
@@ -88,10 +84,4 @@ public class Global {
 	 * Maksymalna ilosc tur
 	 */
 	public static int MAX_REPEAT_COUNT = 999999;	
-	
-			
-	/**
-	 * Wspolczynnik powyzej ktorego siec nie bedzie juz uczona
-	 */
-	public static double DEST_TARGET_RATIO = 99.9;
 }

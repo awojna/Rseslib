@@ -20,6 +20,7 @@
 
 package rseslib.processing.classification.neural;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +33,12 @@ import java.util.ListIterator;
  * Klasa reprezentujaca warstwe perceptronow
  * 
  */
-public class Layer implements IDeviationCounter {
+public class Layer implements IDeviationCounter, Serializable {
+    /**
+     * Serialization version.
+     */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Wynik dzialania warstwy - wejscie dla nastepnej 
 	 */

@@ -25,6 +25,9 @@ import javax.swing.BoxLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Properties;
 
 import javax.swing.*;
@@ -48,6 +51,8 @@ import rseslib.system.progress.Progress;
  */
 public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifier,
 		ActionListener {
+	private static final long serialVersionUID = 1L;
+	
 	public VNNPanel nnView, nnViewOne;
 	
 	public AddNodesDialog addNodesView;
@@ -80,6 +85,26 @@ public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifi
 		task.execute();
 	}
 	
+	/**
+	 * Writes this object.
+	 *
+	 * @param out			Output for writing.
+	 * @throws IOException	if an I/O error has occured.
+	 */
+	private void writeObject(ObjectOutputStream out) throws IOException
+	{
+	}
+
+	/**
+	 * Reads this object.
+	 *
+	 * @param out			Output for writing.
+	 * @throws IOException	if an I/O error has occured.
+	 */
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -109,7 +134,7 @@ public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifi
 	}
 
 	private void init(JPanel canv) {
-		nnView = new VNNPanel(networkStructure, bestEngine.layers, trainTable, true);
+		nnView = new VNNPanel(networkStructure, bestEngine.layers, attributes, true);
 		nnView.TrainButton.addActionListener(this);
 		nnView.AddNodes.addActionListener(this);		
 		JScrollPane scrollPane = new JScrollPane(nnView);
@@ -118,7 +143,7 @@ public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifi
 	}
 	
 	private void initOne(JPanel canv) {
-		nnViewOne = new VNNPanel(networkStructure, bestEngine.layers, trainTable, false);
+		nnViewOne = new VNNPanel(networkStructure, bestEngine.layers, attributes, false);
 		JScrollPane scrollPane = new JScrollPane(nnViewOne);
 		canv.add(scrollPane);
 		canv.setLayout(new BoxLayout( canv, BoxLayout.Y_AXIS));
@@ -150,8 +175,7 @@ public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifi
 	}
 	
 	public Header attributes() {
-		// TODO Auto-generated method stub
-		return null;
+		return attributes;
 	}
 
 	/**
@@ -165,7 +189,7 @@ public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifi
 				//bestEngine.changeNetwork(row-1);
 				networkStructure[row]++;
 			}
-			bestEngine = new NeuronNetworkEngine(trainTable, trainData,	validateData, networkStructure.length - 2, networkStructure);
+			bestEngine = new NeuronNetworkEngine(attributes, data, trainData,	validateData, networkStructure.length - 2, networkStructure, INITIAL_ALFA, DEST_TARGET_RATIO);
 			if (nnView != null) nnView.updateModel(networkStructure, bestEngine.layers);
 			if (nnViewOne != null) nnViewOne.updateModel(networkStructure, bestEngine.layers);			
 		}
@@ -223,7 +247,7 @@ public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifi
 			}
 
 			// czy wymagamy uczenia
-			if (result < Global.DEST_TARGET_RATIO)
+			if (result < DEST_TARGET_RATIO)
 				shouldLearnMore = true;
 
 			// raport postepu
@@ -237,7 +261,7 @@ public class NeuralNetworkVisual extends NeuralNetwork implements VisualClassifi
 			// startowanie w zamian nowego
 			if (i - best_round > Global.GRACE_LEARN_PERIOD) {
 				Report.debugnl("Usunieto bezuzyteczny silnik");
-				bestEngine = new NeuronNetworkEngine(trainTable, trainData,	validateData, networkStructure.length - 2, networkStructure);
+				bestEngine = new NeuronNetworkEngine(attributes, data, trainData,	validateData, networkStructure.length - 2, networkStructure, INITIAL_ALFA, DEST_TARGET_RATIO);
 				if (nnView != null) {
 					nnView.updateModel(networkStructure, bestEngine.layers);
 				}

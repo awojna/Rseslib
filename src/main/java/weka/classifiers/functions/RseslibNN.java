@@ -30,6 +30,12 @@ import weka.classifiers.AbstractRseslibClassifierWrapper;
 import weka.core.Option;
 import weka.core.Utils;
 
+/**
+ * Weka wrapper for Rseslib neural network.
+ * @see rseslib.processing.classification.neural.NeuralNetwork
+ *
+ * @author      Arkadiusz Wojna
+ */
 public class RseslibNN extends AbstractRseslibClassifierWrapper
 {
 	/** for serialization */

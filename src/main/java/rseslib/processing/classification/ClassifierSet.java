@@ -107,7 +107,6 @@ public class ClassifierSet implements Serializable
      *
      * @param name 				Name of a classifier to be added.
      * @param classifierType	Class of a classifier to be added.
-     * @param prog				Progress object to report training progress.
      */
 	public void addClassifier(String name, Class classifierType) throws PropertyConfigurationException
 	{

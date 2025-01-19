@@ -60,6 +60,13 @@ public abstract class AbstractClassifierWithDistributedDecision extends Configur
     }
 
     /**
+     * Constructor used when loading the object from a file.
+     */
+    protected AbstractClassifierWithDistributedDecision()
+    {
+    }
+
+    /**
      * Writes this object.
      *
      * @param out			Output for writing.

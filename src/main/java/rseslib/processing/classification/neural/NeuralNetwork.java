@@ -28,12 +28,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
-import rseslib.processing.classification.Classifier;
-import rseslib.processing.classification.ClassifierWithDistributedDecision;
+import rseslib.processing.classification.AbstractClassifierWithDistributedDecision;
 import rseslib.structure.attribute.Header;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.table.DoubleDataTable;
-import rseslib.system.ConfigurationWithStatistics;
 import rseslib.system.PropertyConfigurationException;
 import rseslib.system.Report;
 import rseslib.system.progress.EmptyProgress;
@@ -44,7 +42,7 @@ import rseslib.system.progress.Progress;
  * 
  * @author Jakub Sakowicz
  */
-public class NeuralNetwork extends ConfigurationWithStatistics implements Classifier, ClassifierWithDistributedDecision, Serializable
+public class NeuralNetwork extends AbstractClassifierWithDistributedDecision implements Serializable
 {
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
@@ -82,7 +80,7 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 	 */
 	public NeuralNetwork(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
 	{
-		super(prop);
+		super(prop, trainTable);
 		timeLimit = ((long)this.getIntProperty(Global.TIME_LIMIT_NAME)) * 1000;
 		INITIAL_ALFA = this.getDoubleProperty(Global.INITIAL_ALFA_NAME);
 		DEST_TARGET_RATIO = this.getDoubleProperty(Global.DEST_TARGET_RATIO_NAME);
@@ -152,7 +150,7 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
      */
     private void writeObject(ObjectOutputStream out) throws IOException
     {
-    	writeConfigurationAndStatistics(out);
+    	writeAbstractClassifier(out);
     	out.writeLong(timeLimit);
     	out.writeObject(networkStructure);
     	out.writeDouble(INITIAL_ALFA);
@@ -172,7 +170,7 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
-    	readConfigurationAndStatistics(in);
+    	readAbstractClassifier(in);
     	timeLimit = in.readLong();
     	networkStructure = (int[])in.readObject();
     	INITIAL_ALFA = in.readDouble();
@@ -290,15 +288,6 @@ public class NeuralNetwork extends ConfigurationWithStatistics implements Classi
 		bestEngine.restoreData(best_perceptrons_weights);
 		Report.debugnl("Walidacja najlepszego daje wynik " + bestEngine.targetRatio());
 		reportStep(this.timeLimit);
-	}
-
-	/**
-	 * Klasyfikuje podany rekord
-	 * @param dd - DoubleData do sklasyfikowania
-	 * @see rseslib.processing.classification.Classifier#classify(rseslib.structure.data.DoubleData)
-	 */
-	public double classify(DoubleData dd) {
-		return bestEngine.classify(dd);
 	}
 
     /**

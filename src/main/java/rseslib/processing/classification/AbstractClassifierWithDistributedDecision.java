@@ -41,14 +41,13 @@ public abstract class AbstractClassifierWithDistributedDecision extends Configur
 {
 	/** Decision attribute. */
 	private NominalAttribute m_DecisionAttribute;
-	/** Distribution of decision values in the whole training set. */
-	private int[] trainDecDistr;
+	/** Preferences of decision values in case of ties. */
+	private int[] m_DecPreferencesForTies;
 
     /**
      * Constructor.
      *
      * @param prop     Map between property names and property values.
-     * @param decAttr  Decision attribute information.
      * @param trainTab Training table.
      * @throws PropertyConfigurationException If an I/O error occurs while reading properties.
      */
@@ -56,7 +55,22 @@ public abstract class AbstractClassifierWithDistributedDecision extends Configur
     {
         super(prop);
         m_DecisionAttribute = trainTab.attributes().nominalDecisionAttribute();
-        trainDecDistr = trainTab.getDecisionDistribution();
+        m_DecPreferencesForTies = trainTab.getDecisionDistribution();
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param prop        Map between property names and property values.
+     * @param decAttr     Decision attribute information.
+     * @param decTiePrefs Decision preferences in case of ties.
+     * @throws PropertyConfigurationException If an I/O error occurs while reading properties.
+     */
+    public AbstractClassifierWithDistributedDecision(Properties prop, NominalAttribute decAttr, int[] decTiePrefs) throws PropertyConfigurationException
+    {
+        super(prop);
+        m_DecisionAttribute = decAttr;
+        m_DecPreferencesForTies = decTiePrefs;
     }
 
     /**
@@ -76,7 +90,7 @@ public abstract class AbstractClassifierWithDistributedDecision extends Configur
     {
     	writeConfigurationAndStatistics(out);
     	out.writeObject(m_DecisionAttribute);
-    	out.writeObject(trainDecDistr);
+    	out.writeObject(m_DecPreferencesForTies);
     }
 
     /**
@@ -89,7 +103,7 @@ public abstract class AbstractClassifierWithDistributedDecision extends Configur
     {
     	readConfigurationAndStatistics(in);
     	m_DecisionAttribute = (NominalAttribute)in.readObject();
-    	trainDecDistr = (int[])in.readObject();
+    	m_DecPreferencesForTies = (int[])in.readObject();
     }
 
     /**
@@ -103,7 +117,7 @@ public abstract class AbstractClassifierWithDistributedDecision extends Configur
         double[] decDistr = classifyWithDistributedDecision(dObj);
         int bestDec = 0;
         for (int dec = 1; dec < decDistr.length; dec++)
-            if (decDistr[dec] > decDistr[bestDec] || (decDistr[dec] == decDistr[bestDec] && trainDecDistr[dec] > trainDecDistr[bestDec]))
+            if (decDistr[dec] > decDistr[bestDec] || (decDistr[dec] == decDistr[bestDec] && m_DecPreferencesForTies[dec] > m_DecPreferencesForTies[bestDec]))
             	bestDec = dec;
         return m_DecisionAttribute.globalValueCode(bestDec);
     }

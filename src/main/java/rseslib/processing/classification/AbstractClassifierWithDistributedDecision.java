@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import rseslib.structure.attribute.NominalAttribute;
 import rseslib.structure.data.DoubleData;
+import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.ConfigurationWithStatistics;
 import rseslib.system.PropertyConfigurationException;
 
@@ -38,43 +39,50 @@ import rseslib.system.PropertyConfigurationException;
  */
 public abstract class AbstractClassifierWithDistributedDecision extends ConfigurationWithStatistics implements ClassifierWithDistributedDecision, Classifier
 {
+	/** Decision attribute. */
 	private NominalAttribute m_DecisionAttribute;
+	/** Distribution of decision values in the whole training set. */
+	private int[] trainDecDistr;
 
     /**
      * Constructor.
      *
-     * @param prop    Map between property names and property values.
-     * @param decAttr Decision attribute information.
+     * @param prop     Map between property names and property values.
+     * @param decAttr  Decision attribute information.
+     * @param trainTab Training table.
      * @throws PropertyConfigurationException If an I/O error occurs while reading properties.
      */
-    public AbstractClassifierWithDistributedDecision(Properties prop, NominalAttribute decAttr) throws PropertyConfigurationException
+    public AbstractClassifierWithDistributedDecision(Properties prop, DoubleDataTable trainTab) throws PropertyConfigurationException
     {
         super(prop);
-        m_DecisionAttribute = decAttr;
+        m_DecisionAttribute = trainTab.attributes().nominalDecisionAttribute();
+        trainDecDistr = trainTab.getDecisionDistribution();
     }
 
     /**
      * Writes this object.
      *
      * @param out			Output for writing.
-     * @throws IOException	if an I/O error has occured.
+     * @throws IOException	if an I/O error has occurred.
      */
     protected void writeAbstractClassifier(ObjectOutputStream out) throws IOException
     {
     	writeConfigurationAndStatistics(out);
     	out.writeObject(m_DecisionAttribute);
+    	out.writeObject(trainDecDistr);
     }
 
     /**
      * Reads this object.
      *
      * @param out			Output for writing.
-     * @throws IOException	if an I/O error has occured.
+     * @throws IOException	if an I/O error has occurred.
      */
     protected void readAbstractClassifier(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
     	readConfigurationAndStatistics(in);
     	m_DecisionAttribute = (NominalAttribute)in.readObject();
+    	trainDecDistr = (int[])in.readObject();
     }
 
     /**
@@ -88,7 +96,8 @@ public abstract class AbstractClassifierWithDistributedDecision extends Configur
         double[] decDistr = classifyWithDistributedDecision(dObj);
         int bestDec = 0;
         for (int dec = 1; dec < decDistr.length; dec++)
-            if (decDistr[dec] > decDistr[bestDec]) bestDec = dec;
+            if (decDistr[dec] > decDistr[bestDec] || (decDistr[dec] == decDistr[bestDec] && trainDecDistr[dec] > trainDecDistr[bestDec]))
+            	bestDec = dec;
         return m_DecisionAttribute.globalValueCode(bestDec);
     }
 }

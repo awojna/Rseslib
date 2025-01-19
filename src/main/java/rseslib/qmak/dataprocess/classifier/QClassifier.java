@@ -284,26 +284,21 @@ public class QClassifier implements iQClassifier, iQXMLstoreable {
 	}
 
 	   
-	public void load() throws IOException {
-	    try {
-	      File file = new File(getFileName());
-	      if (file.exists()) {
-	      	ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-	      	klasyfikator = (Classifier) in.readObject();
-	        in.close();
-	        
-	        wlasciwosci.load(new FileInputStream(getFileName().substring(0, getFileName().lastIndexOf(".")) + ".qclp"));
-	        wytrenowany = true;
-	      }
-	      else {
-	    	wlasciwosci.load(new FileInputStream(getFileName().substring(0, getFileName().lastIndexOf(".")) + "." + properties_extension));
-	        wytrenowany = false;
-	      }
-	   }
-	    catch (Exception ex) {
-	    	throw new IOException();
-		    }
-	  }
+	public void load() throws IOException, ClassNotFoundException {
+		File file = new File(getFileName());
+		if (file.exists()) {
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+			klasyfikator = (Classifier) in.readObject();
+			in.close();
+
+			wlasciwosci.load(new FileInputStream(getFileName().substring(0, getFileName().lastIndexOf(".")) + ".qclp"));
+			wytrenowany = true;
+		}
+		else {
+			wlasciwosci.load(new FileInputStream(getFileName().substring(0, getFileName().lastIndexOf(".")) + "." + properties_extension));
+			wytrenowany = false;
+		}
+	}
 	
 	public void setPosition(Point newP) {
 		p = newP;

@@ -73,8 +73,7 @@ public class XmlClassifierOpener extends DefaultHandler {
 			try {
 				classifier.load();
 			} catch (Exception ex) {
-				throw new SAXException(
-						"Classifier couldn't be loaded from file");
+				throw new SAXException(ex);
 			}
 		}
 

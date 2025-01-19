@@ -88,9 +88,9 @@ public interface iQClassifier extends iQProjectElement , FileStoreable  {
 	 * Wczytanie klasyfikatora z pliku wpisanego do instancji klasy
 	 * 
 	 * @throws IOException
-	 * @throws InterruptedException
+	 * @throws ClassNotFoundException
 	 */
-	public void load() throws IOException, InterruptedException;
+	public void load() throws IOException, ClassNotFoundException;
 	
 	/**
 	 * Zapisanie klasyfikatora do podanego pliku

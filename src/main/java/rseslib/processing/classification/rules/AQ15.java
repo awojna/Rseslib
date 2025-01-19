@@ -74,8 +74,6 @@ public class AQ15 extends ConfigurationWithStatistics implements Classifier {
     /** Negative weights of corresponding rules 
      * (matched examples with different decision) */
     private double[]   m_RulesNegWeight;
-    /** To use classification by voting or by max weight */
-    boolean            m_vote = true;
     
     private int[]      m_narrayOfDescriptors;
     private Header     m_header;
@@ -83,8 +81,6 @@ public class AQ15 extends ConfigurationWithStatistics implements Classifier {
 	public AQ15(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
 	{
 		super(prop);
-
-		m_vote = getBoolProperty("classificationByRuleVoting");
 
 		DoubleDataTable preparedTrainTable = 
 			prepareAndGetArrayOfDescriptors(trainTable);
@@ -101,6 +97,7 @@ public class AQ15 extends ConfigurationWithStatistics implements Classifier {
         
         Collection rules = (new CoveringRuleGenerator(getProperties())).generate(preparedTrainTable, prog);
         countWeights(rules, preparedTrainTable);
+        makePropertyModifiable("classificationByRuleVoting");
 	}
 	
 	private DoubleDataTable prepareAndGetArrayOfDescriptors(DoubleDataTable trainTable)
@@ -168,9 +165,9 @@ public class AQ15 extends ConfigurationWithStatistics implements Classifier {
 	}
 
 
-	public double classify(DoubleData dObj)
+	public double classify(DoubleData dObj) throws PropertyConfigurationException
 	{
-		if (m_vote)
+		if (getBoolProperty("classificationByRuleVoting"))
 			return classifyByWeightVoting(dObj);
 		else
 			return classifyByMaxWeight(dObj);

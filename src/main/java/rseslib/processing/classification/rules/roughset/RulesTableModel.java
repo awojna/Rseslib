@@ -98,8 +98,8 @@ public class RulesTableModel extends AbstractTableModel {
      */
 	public Vector<Attribute> getAttributes(){
 		Vector<Attribute> res=new Vector<Attribute>(); 
-		for (int i=0;i<vrs.getHeader().noOfAttr();i++){
-			res.add(vrs.getHeader().attribute(i));
+		for (int i=0;i<vrs.getDiscretizedHeader().noOfAttr();i++){
+			res.add(vrs.getDiscretizedHeader().attribute(i));
 		}
 		return res;
 	}

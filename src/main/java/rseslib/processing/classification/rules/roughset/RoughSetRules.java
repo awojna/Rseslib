@@ -34,8 +34,7 @@ import rseslib.structure.attribute.Header;
 import rseslib.structure.attribute.NominalAttribute;
 import rseslib.structure.data.*;
 import rseslib.structure.rule.*;
-import rseslib.processing.classification.Classifier;
-import rseslib.processing.classification.ClassifierWithDistributedDecision;
+import rseslib.processing.classification.AbstractClassifierWithDistributedDecision;
 import rseslib.processing.discretization.DiscretizationFactory;
 import rseslib.processing.rules.ReductRuleGenerator;
 import rseslib.processing.transformation.TableTransformer;
@@ -52,7 +51,7 @@ import rseslib.processing.transformation.Transformer;
  * 
  * @author Rafal Latkowski
  */
-public class RoughSetRules extends ConfigurationWithStatistics implements Classifier, ClassifierWithDistributedDecision, Serializable
+public class RoughSetRules extends AbstractClassifierWithDistributedDecision implements Serializable
 {
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
@@ -79,7 +78,7 @@ public class RoughSetRules extends ConfigurationWithStatistics implements Classi
      */
     public RoughSetRules(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
     {
-        super(prop);
+        super(prop, trainTable);
         TransformationProvider discrProv = DiscretizationFactory.getDiscretizationProvider(getProperties());
         if (discrProv != null)
         	m_cDiscretizer = discrProv.generateTransformer(trainTable);
@@ -95,9 +94,11 @@ public class RoughSetRules extends ConfigurationWithStatistics implements Classi
      * 
      * @param	Prepared set of rules.
      * @param	Decision attribute.
+     * @param	Decision preferences in case of ties.
      */
-    public RoughSetRules(Collection<Rule> rules, NominalAttribute decAttr)
+    public RoughSetRules(Collection<Rule> rules, NominalAttribute decAttr, int[] decTiePrefs) throws PropertyConfigurationException
     {
+    	super(null, decAttr, decTiePrefs);
         m_cDecisionRules=rules;
         m_DecAttr = decAttr;
     }
@@ -110,7 +111,7 @@ public class RoughSetRules extends ConfigurationWithStatistics implements Classi
      */
     private void writeObject(ObjectOutputStream out) throws IOException
     {
-    	writeConfigurationAndStatistics(out);
+    	writeAbstractClassifier(out);
     	out.defaultWriteObject();
     }
 
@@ -122,7 +123,7 @@ public class RoughSetRules extends ConfigurationWithStatistics implements Classi
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
-    	readConfigurationAndStatistics(in);
+    	readAbstractClassifier(in);
     	in.defaultReadObject();
     }
 
@@ -146,25 +147,6 @@ public class RoughSetRules extends ConfigurationWithStatistics implements Classi
        	for (int i=0; i<dv.dimension(); i++)
        		result[i] = dv.get(i);
        	return result;
-    }
-    
-    /**
-     * Assigns a decision to a single test object.
-     * The method sums the supports of all rules matching the object for each decision class
-     * and assigns the decision with the greatest sum.
-     *
-     * @param object  Test object to be classified.
-     * @return        Decision assigned.
-     */
-    public double classify(DoubleData object)
-    {
-       	double[] decDistr = classifyWithDistributedDecision(object);
-       	int best = 0;
-       	for (int i=1; i<decDistr.length; i++)
-       		if (decDistr[i] > decDistr[best]) 
-                best=i;
-       	if (decDistr[best] == 0.0) return Double.NaN;
-       	return m_DecAttr.globalValueCode(best);
     }
     
     /**

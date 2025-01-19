@@ -20,16 +20,13 @@
 
 package rseslib.processing.classification.rules.roughset;
 
-import java.util.Collection;
 import java.util.Properties;
 
 import javax.swing.JPanel;
 
 import rseslib.processing.classification.VisualClassifier;
 import rseslib.structure.attribute.Header;
-import rseslib.structure.attribute.NominalAttribute;
 import rseslib.structure.data.DoubleData;
-import rseslib.structure.rule.Rule;
 import rseslib.structure.table.DoubleDataTable;
 import rseslib.system.PropertyConfigurationException;
 import rseslib.system.progress.Progress;
@@ -45,6 +42,7 @@ public class RoughSetRulesVisual extends RoughSetRules implements VisualClassifi
     /** Serialization version. */
 	private static final long serialVersionUID = 1L;
     
+	/** Attributes of the original training table. */
     private Header trainHeader;
     
     /**
@@ -61,21 +59,6 @@ public class RoughSetRulesVisual extends RoughSetRules implements VisualClassifi
 	throws PropertyConfigurationException, InterruptedException {	
     	super(prop, trainTable, prog);
     	trainHeader=trainTable.attributes();	
-    }
-
-    /**
-     * Additional constructor
-     */
-    public RoughSetRulesVisual(Collection<Rule> rules, NominalAttribute decAttr) {
-    	super(rules, decAttr);
-    }
-    
-    /**
-     * This method gives header of training table, useful for visualization
-     * @return header of training table
-     */
-    public Header getHeader() {
-    	return m_DiscrHeader;
     }
 
     /**
@@ -103,12 +86,20 @@ public class RoughSetRulesVisual extends RoughSetRules implements VisualClassifi
     }
 
     /**
-     * This method gives header of training table, useful for visualization
-     * required by VisualClassifer
-     * @return header of training table
+     * This method returns the attributes of the original training table,
+     * required to implement VisualClassifer.
+     * @return Header of the original training table
      */
     
     public Header attributes() {
     	return trainHeader;
     };
+
+    /**
+     * This method returns the discretized attributes.
+     * @return Header with the discretized attributes
+     */
+    public Header getDiscretizedHeader() {
+    	return m_DiscrHeader;
+    }
 };

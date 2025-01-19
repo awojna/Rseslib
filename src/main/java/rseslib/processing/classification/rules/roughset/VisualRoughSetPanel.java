@@ -108,17 +108,17 @@ class AmountController implements TableModelListener{
 				rseslib.structure.vector.Vector distr = rtm.getDistr();
 				int d = 0;
 				while(d < distr.dimension()) {
-					double code = vrs.getHeader().nominalDecisionAttribute().globalValueCode(d);
+					double code = vrs.getDiscretizedHeader().nominalDecisionAttribute().globalValueCode(d);
 					str.append("<tr><td>" + NominalAttribute.stringValue(code) + ": " + (int)distr.get(d) + " (" + Math.round(distr.get(d) * 100 / sum) + "%)&nbsp;&nbsp;</td><td>");
 					d++;
 					if(d < distr.dimension()) {
-						code = vrs.getHeader().nominalDecisionAttribute().globalValueCode(d);
+						code = vrs.getDiscretizedHeader().nominalDecisionAttribute().globalValueCode(d);
 						str.append(NominalAttribute.stringValue(code) + ": " + (int)distr.get(d) + " (" + Math.round(distr.get(d) * 100 / sum) + "%)&nbsp;&nbsp;");
 						d++;
 					}
 					str.append("</td><td>");
 					if(d < distr.dimension()) {
-						code = vrs.getHeader().nominalDecisionAttribute().globalValueCode(d);
+						code = vrs.getDiscretizedHeader().nominalDecisionAttribute().globalValueCode(d);
 						str.append(NominalAttribute.stringValue(code) + ": " + (int)distr.get(d) + " (" + Math.round(distr.get(d) * 100 / sum) + "%)&nbsp;&nbsp;");
 						d++;
 					}

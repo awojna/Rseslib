@@ -17,16 +17,16 @@ java -cp jcommon-0.9.6.jar:jfreechart-0.9.21.jar:weka.jar:rseslib.jar rseslib.qm
 ```
 
 ### 2. Java library
-[Rseslib 3 algorithms](https://rseslib.mimuw.edu.pl/algorithms.html) provide a brief list of algorithms available in the project and [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) is the main source of information how to use Rseslib components within Java code.
+[Rseslib 3 algorithms](https://rseslib.mimuw.edu.pl/algorithms.html) provide a brief list of algorithms available in the library and [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) is the main source of information how to use Rseslib components within Java code.
 
-### 3. WEKA platform
-4 selected classifiers (Rough Set based, K Nearest Neighbors, K Nearest Neighbors with Local Metric Induction, and RIONIDA) are available in WEKA. See the chapter *WEKA* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) for information how to install the Rseslib package using WEKA package manager and where to find Rseslib classifiers in WEKA catalog.
-
-### 4. Command line
+### 3. Command line
 Rseslib includes command-line programs evaluating attributes, computing reducts or rules or running experiments with Rseslib classifiers. See the chapter *Command line programs* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) for information how to run them. While starting a program, add weka jar version 3.8.x to classpath to make it work on ARFF data files, for example:
 ```
 java -cp rseslib.jar:weka.jar rseslib.example.ComputeReducts data/iris.arff iris.reducts
 ```
 
-### 5. Simple Grid Manager
+### 4. Simple Grid Manager
 Simple Grid Manager is a tool included in Rseslib for running experiments with Rseslib classifiers on many computers or cores. See the chapter *SGM: Computing many experiments on many computers/cores* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) for information how to configure experiments and run the tool.
+
+### 5. WEKA platform
+4 selected classifiers (Rough Set based, K Nearest Neighbors, K Nearest Neighbors with Local Metric Induction, and RIONIDA) are available in WEKA. See the chapter *WEKA* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) for information how to install the Rseslib package using WEKA package manager and where to find Rseslib classifiers in WEKA catalog.

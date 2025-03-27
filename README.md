@@ -1,5 +1,5 @@
 # Rseslib & QMAK
-Tools, algorithms and data structures in Java for rough sets and explainable machine learning.
+Data structures, algorithms and tools in Java for rough sets, machine learning, data mining and visualization.
 
 The project includes algorithms for lower and upper approximation, discernibility matrix, reducts, decision rules and wide range of discretization and classification algorithms, including KNN classifier optimizing automatically the distance measure and the number of voting neighbors, a neural network with automated selection of network structure, and dedicated to imbalanced data RIONIDA with multidimensional self-optimization. The project includes also QMAK - a tool for interacting with machine learning models and visualizing classification process, and Simple Grid Manager for running experiments on many computers or cores. For more information visit https://rseslib.mimuw.edu.pl.
 

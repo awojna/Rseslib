@@ -10,14 +10,14 @@ mvn package
 
 Rseslib can be used in the following ways:
 
-### 1. QMAK
+### 1. Java library
+[Rseslib 3 algorithms](https://rseslib.mimuw.edu.pl/algorithms.html) provide a brief list of algorithms available in the library and [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) is the main source of information how to use Rseslib components within Java code.
+
+### 2. QMAK
 QMAK is a GUI tool included in Rseslib. 5-minute video demonstrating the tool is available at [QMAK website](http://rseslib.mimuw.edu.pl/qmak). The simplest way to run QMAK is to download the package from the website, unpack it and run *qmak.sh* (on Linux) or *qmak.bat* (on Windows). See the chapter *QMAK: Interaction wit classifers and their visualization* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) and *Help* in the main menu of the appliction for information how to use the tool. If you run QMAK from the source add jcommon-0.9.6.jar, jfreechart-0.9.21.jar and weka jar version 3.8.x to the classpath, for example:
 ```
 java -cp jcommon-0.9.6.jar:jfreechart-0.9.21.jar:weka.jar:rseslib.jar rseslib.qmak.QmakMain
 ```
-
-### 2. Java library
-[Rseslib 3 algorithms](https://rseslib.mimuw.edu.pl/algorithms.html) provide a brief list of algorithms available in the library and [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) is the main source of information how to use Rseslib components within Java code.
 
 ### 3. Command line
 Rseslib includes command-line programs evaluating attributes, computing reducts or rules or running experiments with Rseslib classifiers. See the chapter *Command line programs* in [Rseslib User Guide](https://rseslib.mimuw.edu.pl/rseslib.pdf) for information how to run them. While starting a program, add weka jar version 3.8.x to classpath to make it work on ARFF data files, for example:

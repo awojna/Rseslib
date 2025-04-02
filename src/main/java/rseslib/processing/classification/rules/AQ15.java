@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
 
-import rseslib.processing.classification.Classifier;
+import rseslib.processing.classification.AbstractClassifierWithDistributedDecision;
 import rseslib.processing.rules.CoveringRuleGenerator;
 import rseslib.structure.attribute.ArrayHeader;
 import rseslib.structure.attribute.Attribute;
@@ -36,7 +36,6 @@ import rseslib.structure.data.DoubleDataObject;
 import rseslib.structure.rule.Rule;
 import rseslib.structure.table.ArrayListDoubleDataTable;
 import rseslib.structure.table.DoubleDataTable;
-import rseslib.system.ConfigurationWithStatistics;
 import rseslib.system.PropertyConfigurationException;
 import rseslib.system.progress.Progress;
 
@@ -52,7 +51,7 @@ import rseslib.system.progress.Progress;
  *  
  * @author	Cezary Tkaczyk
  */
-public class AQ15 extends ConfigurationWithStatistics implements Classifier {
+public class AQ15 extends AbstractClassifierWithDistributedDecision {
 
 	/** Decision attribute. */
     NominalAttribute m_DecisionAttribute;
@@ -80,7 +79,7 @@ public class AQ15 extends ConfigurationWithStatistics implements Classifier {
     
 	public AQ15(Properties prop, DoubleDataTable trainTable, Progress prog) throws PropertyConfigurationException, InterruptedException
 	{
-		super(prop);
+		super(prop, trainTable);
 
 		DoubleDataTable preparedTrainTable = 
 			prepareAndGetArrayOfDescriptors(trainTable);
@@ -165,7 +164,7 @@ public class AQ15 extends ConfigurationWithStatistics implements Classifier {
 	}
 
 
-	public double classify(DoubleData dObj) throws PropertyConfigurationException
+    public double[] classifyWithDistributedDecision(DoubleData dObj) throws PropertyConfigurationException
 	{
 		if (getBoolProperty("classificationByRuleVoting"))
 			return classifyByWeightVoting(dObj);
@@ -173,7 +172,7 @@ public class AQ15 extends ConfigurationWithStatistics implements Classifier {
 			return classifyByMaxWeight(dObj);
 	}
 	
-	private double classifyByMaxWeight(DoubleData dObj)
+	private double[] classifyByMaxWeight(DoubleData dObj)
 	{
 		ArrayList<Integer> candidates = new ArrayList<Integer>();
 		double dec = m_DecisionAttribute.globalValueCode(m_nMajorityDecision);
@@ -193,39 +192,35 @@ public class AQ15 extends ConfigurationWithStatistics implements Classifier {
 		/* Debug */
 		//System.out.println("MaxWeight: " + maxWeight);
 		
-		return dec;
+		double[] voteTable = new double[m_DecisionAttribute.noOfValues()];
+		voteTable[m_DecisionAttribute.localValueCode(dec)] = 1.0;
+		return voteTable;
 	}
 	
-	private double classifyByWeightVoting(DoubleData dObj)
+	private double[] classifyByWeightVoting(DoubleData dObj)
 	{
-		int   dec       = m_nMajorityDecision;
-		int[] voteTable = new int[m_DecisionAttribute.noOfValues()];
+		int      dec       = m_nMajorityDecision;
+		double[] voteTable = new double[m_DecisionAttribute.noOfValues()];
 		
 		for(int i=0; i<m_Rules.length; i++) {
-			if (m_Rules[i].matches(prepare(dObj)))
-            {
+			if (m_Rules[i].matches(prepare(dObj))) {
 				dec = m_DecisionAttribute.localValueCode(m_Rules[i].getDecision());
 				voteTable[dec] += m_RulesWeight[i]; 
             }
 		}
 		
-		int voteMaxCount = 0;
+		double voteMaxCount = 0;
 		for(int i=0; i<m_DecisionAttribute.noOfValues(); i++) {
 			if (voteTable[i] > voteMaxCount) {
 				voteMaxCount = voteTable[i];
 				dec = i;
 			}
 		}
+		if (voteMaxCount > 0)
+			m_nNoOfMatchesWithRules++;
 		m_nNoOfClassifiedObjects++;
 		
-		//System.out.println("MaxVoteCount: " + voteMaxCount);
-		
-		if (voteMaxCount > 0) {
-			m_nNoOfMatchesWithRules++;
-			return m_DecisionAttribute.globalValueCode(dec);
-		}
-		else
-			return m_DecisionAttribute.globalValueCode(m_nMajorityDecision);
+		return voteTable;
 	}
 
 	/**

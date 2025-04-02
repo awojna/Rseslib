@@ -20,6 +20,11 @@
 
 package rseslib.structure.rule;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 import rseslib.structure.attribute.NominalAttribute;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.function.booleanval.BooleanFunction;
@@ -29,8 +34,11 @@ import rseslib.structure.function.booleanval.BooleanFunction;
  *
  * @author      Arkadiusz Wojna
  */
-public class BooleanFunctionRule implements Rule
+public class BooleanFunctionRule implements Rule, Serializable
 {
+    /** Serialization version. */
+	private static final long serialVersionUID = 1L;
+	
 	/** Decision attrbiute */
 	NominalAttribute m_DecisionAttr;
     /** Predecessor of this rule. */
@@ -51,6 +59,32 @@ public class BooleanFunctionRule implements Rule
         m_nDecision = decision;
     }
 
+    /**
+     * Writes this object.
+     *
+     * @param out			Output for writing.
+     * @throws IOException	if an I/O error has occured.
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+    	out.writeObject(m_DecisionAttr);
+    	out.writeObject(m_Predecessor);
+    	out.writeInt(m_DecisionAttr.localValueCode(m_nDecision));
+    }
+
+    /**
+     * Reads this object.
+     *
+     * @param in			Input for reading.
+     * @throws IOException	if an I/O error has occured.
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+    	m_DecisionAttr = (NominalAttribute)in.readObject();
+    	m_Predecessor = (BooleanFunction)in.readObject();
+    	m_nDecision = m_DecisionAttr.globalValueCode(in.readInt());
+    }
+    
     /**
      * Checks whether this rule matches a given data object.
      *

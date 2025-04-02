@@ -20,6 +20,10 @@
 
 package rseslib.processing.rules;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -30,7 +34,6 @@ import rseslib.structure.attribute.NumericAttribute;
 import rseslib.structure.data.DoubleData;
 import rseslib.structure.data.DoubleDataWithDecision;
 import rseslib.structure.function.booleanval.BooleanFunction;
-//import rseslib.structure.rule.BooleanFunctionRule;
 import rseslib.structure.rule.BooleanFunctionRule;
 import rseslib.structure.rule.Rule;
 import rseslib.structure.table.DoubleDataTable;
@@ -340,7 +343,11 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 	}
 	
 	
-	class Candidate implements BooleanFunction, Comparable {
+	class Candidate implements BooleanFunction, Comparable, Serializable {
+
+	    /** Serialization version. */
+		private static final long serialVersionUID = 1L;
+
 		private Selector[] m_nSelectors;
 		private int        m_nPerformance;
 		
@@ -348,6 +355,16 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 			m_nSelectors = new Selector[m_nNoOfDescriptors];
 		}
 		
+	    private void writeObject(ObjectOutputStream out) throws IOException {
+	    	out.writeObject(m_nSelectors);
+	    	out.writeInt(m_nPerformance);
+	    }
+
+	    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+	    	m_nSelectors = (Selector[])in.readObject();
+	    	m_nPerformance = in.readInt();
+	    }
+	    
 		public void set(Selector selector) {
 			set(selector.getAttrIndex(), selector);
 		}
@@ -514,8 +531,11 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 	}//class Candidate
 	
 	
-	abstract class Selector implements BooleanFunction, Comparable {
+	abstract class Selector implements BooleanFunction, Comparable, Serializable {
 		
+	    /** Serialization version. */
+		private static final long serialVersionUID = 1L;
+
 		public static final int THIS_MORE_GENERAL = 0;
 		public static final int THAT_MORE_GENERAL = 1;
 		public static final int EQUAL             = 2;
@@ -526,6 +546,14 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 
 	    Selector(int attrIndex) {
 	    	setAttrIndex(attrIndex);
+	    }
+	    
+	    private void writeObject(ObjectOutputStream out) throws IOException {
+	    	out.writeInt(m_nAttributeIndex);
+	    }
+
+	    private void readObject(ObjectInputStream in) throws IOException {
+	    	m_nAttributeIndex = in.readInt();
 	    }
 	    
 		public void setAttrIndex(int attrIndex) {
@@ -555,6 +583,9 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 	
 	class InequalitySelector extends Selector {
 		
+	    /** Serialization version. */
+		private static final long serialVersionUID = 1L;
+		
 		/** Attribute of this selector */
 		NominalAttribute m_Attr;
 	    /** The value to be compared. */
@@ -573,6 +604,23 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 	    	addValue(attrValue);
 	    }
 	    
+	    private void writeObject(ObjectOutputStream out) throws IOException
+	    {
+	    	out.writeObject(m_Attr);
+	    	out.writeInt(m_nAttributeValues.size());
+	    	for(double val : m_nAttributeValues)
+	    		out.writeInt(m_Attr.localValueCode(val));
+	    }
+
+	    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+	    {
+	    	m_Attr = (NominalAttribute)in.readObject();
+	    	int size = in.readInt();
+	    	m_nAttributeValues = new ArrayList<Double>(size);
+	    	for(int i = 0; i < size; ++i)
+	    		m_nAttributeValues.add(m_Attr.globalValueCode(in.readInt()));
+	    }
+	    
 		public boolean booleanVal(DoubleData dObj) {
 			boolean  match   = true;
 			Iterator it      = m_nAttributeValues.iterator();
@@ -585,7 +633,6 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 			}
 			return match;
 		}
-		
 		
 	    public void addValue(double val) {
 	    	m_nAttributeValues.add(val);
@@ -692,6 +739,9 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 	
 	class IntervalSelector extends Selector {
 	    
+	    /** Serialization version. */
+		private static final long serialVersionUID = 1L;
+		
 		NumericAttribute m_Attr;
 	    Double m_nLeftBound;
 	    Double m_nRightBound;
@@ -706,6 +756,20 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 	    	m_nPositiveExample = positiveExample;
 	    }
 
+	    private void writeObject(ObjectOutputStream out) throws IOException {
+	    	out.writeObject(m_Attr);
+	    	out.writeObject(m_nLeftBound);
+	    	out.writeObject(m_nRightBound);
+	    	out.writeObject(m_nPositiveExample);
+	    }
+
+	    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+	    	m_Attr = (NumericAttribute)in.readObject();
+	    	m_nLeftBound = (Double)in.readObject();
+	    	m_nRightBound = (Double)in.readObject();
+	    	m_nPositiveExample = (Double)in.readObject();
+	    }
+	    
 	    public void addValue(double val) {
 	    	//addValueWithoutMargin(val);
 	    	addValueWithMargin(val, m_nMargin);

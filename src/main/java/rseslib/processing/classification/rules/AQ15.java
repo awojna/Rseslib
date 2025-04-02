@@ -20,7 +20,10 @@
 
 package rseslib.processing.classification.rules;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
@@ -51,16 +54,15 @@ import rseslib.system.progress.Progress;
  *  
  * @author	Cezary Tkaczyk
  */
-public class AQ15 extends AbstractClassifierWithDistributedDecision {
+public class AQ15 extends AbstractClassifierWithDistributedDecision implements Serializable {
 
+    /** Serialization version. */
+	private static final long serialVersionUID = 1L;
+	
 	/** Decision attribute. */
     NominalAttribute m_DecisionAttribute;
     /** Majority decision computed from a training data set. */
     private int m_nMajorityDecision;
-    /** Number of objects with majority decision in a training set. */
-    private int m_nNoOfMajorityObjects;
-    /** Number of all objects in a training set. */
-    private int m_nNoOfAllObjects;
     /** Number of test objects that match a rule. */
     private int m_nNoOfMatchesWithRules = 0; 
     /** Number of <code>classify()</code> method invocation */
@@ -70,9 +72,6 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision {
     /** Weights of corresponding rules 
      * (matched examples with same decision) */
     private double[]   m_RulesWeight;
-    /** Negative weights of corresponding rules 
-     * (matched examples with different decision) */
-    private double[]   m_RulesNegWeight;
     
     private int[]      m_narrayOfDescriptors;
     private Header     m_header;
@@ -91,10 +90,8 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision {
         m_nMajorityDecision = 0;
         for (int dec = 1; dec < decDistr.length; dec++)
             if (decDistr[dec] > decDistr[m_nMajorityDecision]) m_nMajorityDecision = dec;
-        m_nNoOfMajorityObjects = decDistr[m_nMajorityDecision];
-        m_nNoOfAllObjects      = preparedTrainTable.noOfObjects();
         
-        Collection rules = (new CoveringRuleGenerator(getProperties())).generate(preparedTrainTable, prog);
+        Collection<Rule> rules = (new CoveringRuleGenerator(getProperties())).generate(preparedTrainTable, prog);
         countWeights(rules, preparedTrainTable);
         makePropertyModifiable("classificationByRuleVoting");
 	}
@@ -132,13 +129,12 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision {
 		return newDobj;
 	}
 
-	private void countWeights(Collection rules, DoubleDataTable trainTable)
+	private void countWeights(Collection<Rule> rules, DoubleDataTable trainTable)
 	{
 		m_Rules          = new Rule[rules.size()];
 		m_RulesWeight    = new double[rules.size()];
-		m_RulesNegWeight = new double[rules.size()];
 		int decAttr = trainTable.attributes().decision();
-		Iterator ruleIter = rules.iterator();
+		Iterator<Rule> ruleIter = rules.iterator();
         for (int i=0; ruleIter.hasNext(); i++)
         {
             Rule r = (Rule)ruleIter.next();
@@ -149,9 +145,6 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision {
         		if ((m_Rules[i].matches(dObj)) 
         			&& (dObj.get(decAttr) == m_Rules[i].getDecision()))
         			m_RulesWeight[i]++;
-        		if ((m_Rules[i].matches(dObj)) 
-            			&& (dObj.get(decAttr) != m_Rules[i].getDecision()))
-            		m_RulesNegWeight[i]++;
         	}
         }
         /* Debug */
@@ -162,6 +155,40 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision {
         }
         */
 	}
+
+    /**
+     * Writes this object.
+     *
+     * @param out			Output for writing.
+     * @throws IOException	if an I/O error has occured.
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+    	writeAbstractClassifier(out);
+    	out.writeObject(m_DecisionAttribute);
+    	out.writeInt(m_nMajorityDecision);
+    	out.writeObject(m_Rules);
+    	out.writeObject(m_RulesWeight);
+    	out.writeObject(m_narrayOfDescriptors);
+    	out.writeObject(m_header);
+    }
+
+    /**
+     * Reads this object.
+     *
+     * @param in			Input for reading.
+     * @throws IOException	if an I/O error has occured.
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+    	readAbstractClassifier(in);
+    	m_DecisionAttribute = (NominalAttribute)in.readObject();
+    	m_nMajorityDecision = in.readInt();
+    	m_Rules = (Rule[])in.readObject();
+    	m_RulesWeight = (double[])in.readObject();
+    	m_narrayOfDescriptors = (int[])in.readObject();
+    	m_header = (Header)in.readObject();
+    }
 
 
     public double[] classifyWithDistributedDecision(DoubleData dObj) throws PropertyConfigurationException
@@ -174,16 +201,15 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision {
 	
 	private double[] classifyByMaxWeight(DoubleData dObj)
 	{
-		ArrayList<Integer> candidates = new ArrayList<Integer>();
+		dObj = prepare(dObj);
 		double dec = m_DecisionAttribute.globalValueCode(m_nMajorityDecision);
 		double maxWeight = 0;
 		for(int i=0; i<m_Rules.length; i++) {
-			if ((m_Rules[i].matches(prepare(dObj)))
+			if ((m_Rules[i].matches(dObj))
 				&& (m_RulesWeight[i] > maxWeight))
             {
 				maxWeight = m_RulesWeight[i];
 				dec       = m_Rules[i].getDecision();
-				candidates.add(i);
             }
 		}
 		if (maxWeight > 0) m_nNoOfMatchesWithRules++;
@@ -199,11 +225,13 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision {
 	
 	private double[] classifyByWeightVoting(DoubleData dObj)
 	{
+		dObj = prepare(dObj);
+		
 		int      dec       = m_nMajorityDecision;
 		double[] voteTable = new double[m_DecisionAttribute.noOfValues()];
 		
 		for(int i=0; i<m_Rules.length; i++) {
-			if (m_Rules[i].matches(prepare(dObj))) {
+			if (m_Rules[i].matches(dObj)) {
 				dec = m_DecisionAttribute.localValueCode(m_Rules[i].getDecision());
 				voteTable[dec] += m_RulesWeight[i]; 
             }
@@ -228,8 +256,6 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision {
      */
     public void calculateStatistics()
     {
-        addToStatistics("Majority class in a training set", NominalAttribute.stringValue(m_nMajorityDecision) +
-        		" " + m_nNoOfMajorityObjects+"/"+m_nNoOfAllObjects);
         addToStatistics("Number of matches with rules", 
         		" " + m_nNoOfMatchesWithRules + "/" + m_nNoOfClassifiedObjects);
     }	

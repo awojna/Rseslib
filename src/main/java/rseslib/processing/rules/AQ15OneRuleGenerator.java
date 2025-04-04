@@ -56,6 +56,8 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
 	//TODO: Petli sie przy sprzecznych przykladach
 	//TODO: Optymalizacja jakas?
 	
+	public static String MARGIN_NAME = "margin";
+	
 	int    m_nNoOfDescriptors;
 	double m_nMargin;
 	
@@ -67,7 +69,7 @@ public class AQ15OneRuleGenerator extends Configuration implements OneRuleGenera
      */
 	public AQ15OneRuleGenerator(Properties prop) throws PropertyConfigurationException {
 		super(prop);
-		m_nMargin    = getDoubleProperty("margin");
+		m_nMargin    = getDoubleProperty(MARGIN_NAME);
 	}
 
 	public Rule generate(

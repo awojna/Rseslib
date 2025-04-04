@@ -22,7 +22,6 @@ package rseslib.processing.rules;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Properties;
 
 
@@ -41,6 +40,9 @@ import rseslib.system.progress.Progress;
  */
 public class CoveringRuleGenerator extends Configuration implements RuleGenerator{
 
+	public static String COVERAGE_NAME = "coverage";
+	public static String SEARCH_WIDTH_NAME = "searchWidth";
+
 	private OneRuleGenerator m_oneRuleGenerator;
 	private int              m_k;
 	private double           m_prooning;
@@ -55,8 +57,8 @@ public class CoveringRuleGenerator extends Configuration implements RuleGenerato
     {
         super(prop);
         m_oneRuleGenerator = new AQ15OneRuleGenerator(getProperties());
-        m_k                = getIntProperty("searchWidth");
-        m_prooning         = 1-getDoubleProperty("coverage");
+        m_k                = getIntProperty(SEARCH_WIDTH_NAME);
+        m_prooning         = 1-getDoubleProperty(COVERAGE_NAME);
     }
     
     /**
@@ -84,12 +86,21 @@ public class CoveringRuleGenerator extends Configuration implements RuleGenerato
 
 			int prooningObjts = uncovered.size();
 			
-			//usually - while (uncovered.size() > 0) 
+			//usually - while (uncovered.size() > 0)
+			int failed = 0;
 			while (uncovered.size() > m_prooning * prooningObjts) {
 				Rule r = m_oneRuleGenerator.generate(tab, uncovered, m_k, dec);
 				if (r != null) {
-					rules.add(r);
-					uncovered = removeCovered(uncovered, rules);
+					int before = uncovered.size();
+					uncovered = removeCovered(uncovered, r);
+					if (uncovered.size() < before) {
+						rules.add(r);
+						failed = 0;
+					} else {
+						failed++;
+						if(failed == 100)
+							break;
+					}
 				} else
 					break;
 			}
@@ -107,24 +118,14 @@ public class CoveringRuleGenerator extends Configuration implements RuleGenerato
 	
 	private ArrayList<DoubleDataWithDecision> removeCovered(
 			ArrayList<DoubleDataWithDecision> uncovered,
-			ArrayList<Rule> rules) {
+			Rule rule) {
 		
 		ArrayList<DoubleDataWithDecision> uncoveredTmp =
 			new ArrayList<DoubleDataWithDecision>();
-		Iterator uncoveredIt = uncovered.iterator();
 		
-		while (uncoveredIt.hasNext()) {
-			DoubleDataWithDecision example = 
-				(DoubleDataWithDecision)uncoveredIt.next();
-			boolean  notMatched            = true;
-			Iterator rulesIt               = rules.iterator();
- 			while (rulesIt.hasNext()) {
- 				Rule rule = (Rule) rulesIt.next();
- 				if (rule.matches(example))
- 					notMatched = false;
- 			}
- 			if (notMatched) uncoveredTmp.add(example);
-		}
+		for(DoubleDataWithDecision example : uncovered)
+ 			if (!rule.matches(example))
+ 				uncoveredTmp.add(example);
 		
 		return uncoveredTmp;
 	}

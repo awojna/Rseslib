@@ -57,7 +57,9 @@ import rseslib.system.progress.Progress;
 public class AQ15 extends AbstractClassifierWithDistributedDecision implements Serializable {
 
     /** Serialization version. */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;	
+	/** Name of the switch indicating whether test objects are classified by rule voting or by one best rule. */
+	public static final String RULE_VOTING_NAME = "ruleVoting";
 	
 	/** Decision attribute. */
     NominalAttribute m_DecisionAttribute;
@@ -93,7 +95,7 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision implements S
         
         Collection<Rule> rules = (new CoveringRuleGenerator(getProperties())).generate(preparedTrainTable, prog);
         countWeights(rules, preparedTrainTable);
-        makePropertyModifiable("classificationByRuleVoting");
+        makePropertyModifiable(RULE_VOTING_NAME);
 	}
 	
 	private DoubleDataTable prepareAndGetArrayOfDescriptors(DoubleDataTable trainTable)
@@ -193,7 +195,7 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision implements S
 
     public double[] classifyWithDistributedDecision(DoubleData dObj) throws PropertyConfigurationException
 	{
-		if (getBoolProperty("classificationByRuleVoting"))
+		if (getBoolProperty(RULE_VOTING_NAME))
 			return classifyByWeightVoting(dObj);
 		else
 			return classifyByMaxWeight(dObj);
@@ -226,26 +228,20 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision implements S
 	private double[] classifyByWeightVoting(DoubleData dObj)
 	{
 		dObj = prepare(dObj);
-		
-		int      dec       = m_nMajorityDecision;
 		double[] voteTable = new double[m_DecisionAttribute.noOfValues()];
 		
 		for(int i=0; i<m_Rules.length; i++) {
 			if (m_Rules[i].matches(dObj)) {
-				dec = m_DecisionAttribute.localValueCode(m_Rules[i].getDecision());
+				int dec = m_DecisionAttribute.localValueCode(m_Rules[i].getDecision());
 				voteTable[dec] += m_RulesWeight[i]; 
             }
 		}
 		
-		double voteMaxCount = 0;
-		for(int i=0; i<m_DecisionAttribute.noOfValues(); i++) {
-			if (voteTable[i] > voteMaxCount) {
-				voteMaxCount = voteTable[i];
-				dec = i;
+		for(int i=0; i<voteTable.length; i++)
+			if (voteTable[i] > 0) {
+				m_nNoOfMatchesWithRules++;
+				break;
 			}
-		}
-		if (voteMaxCount > 0)
-			m_nNoOfMatchesWithRules++;
 		m_nNoOfClassifiedObjects++;
 		
 		return voteTable;

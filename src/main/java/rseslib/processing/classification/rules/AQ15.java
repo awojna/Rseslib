@@ -237,11 +237,16 @@ public class AQ15 extends AbstractClassifierWithDistributedDecision implements S
             }
 		}
 		
+		boolean matched = false;
 		for(int i=0; i<voteTable.length; i++)
 			if (voteTable[i] > 0) {
-				m_nNoOfMatchesWithRules++;
+				matched = true;
 				break;
 			}
+		if(matched)
+			m_nNoOfMatchesWithRules++;
+		else
+			voteTable[m_nMajorityDecision] = 1.0;
 		m_nNoOfClassifiedObjects++;
 		
 		return voteTable;

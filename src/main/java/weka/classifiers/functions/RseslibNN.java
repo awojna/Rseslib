@@ -122,7 +122,7 @@ public class RseslibNN extends AbstractRseslibClassifierWrapper
 
 		result.addElement(new Option(
 				"\tTime limit on searching for the optimal network (in seconds).\n"
-						+ "\t(default: 120)",
+						+ "\t(default: 30)",
 						"L", 1, "-L <time limit>"));
 
 		result.addElement(new Option(

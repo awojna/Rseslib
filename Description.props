@@ -6,10 +6,10 @@
 PackageName=Rseslib
 
 # Version (required)
-Version=3.5.0-SANPSHOT
+Version=3.5.0
 
 #Date
-Date=2025-01-01
+Date=2025-04-14
 
 # Title (required)
 Title=Rough Sets, Rule Induction, Neural Net and Analogy-Based Reasoning
@@ -39,7 +39,7 @@ The RIONIDA classifier dedicated to imbalanced data with two decision classes co
 and to control the impact of rules on the decision selection process and applies multi-dimensional optimization of classification measures relevant for imbalanced data.
 
 # Package URL for obtaining the package archive (required)
-PackageURL=https://github.com/awojna/Rseslib/releases/download/v3.4.1/rseslib-3.4.1-weka.zip
+PackageURL=https://github.com/awojna/Rseslib/releases/download/v3.5.0/rseslib-3.5.0-weka.zip
 
 # URL for further information
 URL=http://rseslib.mimuw.edu.pl

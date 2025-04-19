@@ -47,7 +47,7 @@ public class Communication
     public static final int s_nPacketSize=1500;
     public static final int s_nBufferSize=2000;
     
-    public static final String s_strSGMVersion = "3.5.0";
+    public static final String s_strSGMVersion = "3.6.0-SNAPSHOT";
     
     public static String getTimeStamp()
     {

@@ -20,16 +20,21 @@
 
 package rseslib.structure.function.booleanval;
 
+import java.io.Serializable;
+
 import rseslib.structure.attribute.NumericAttribute;
 import rseslib.structure.data.DoubleData;
 
 /**
  * Interval inclusion test for an attribute.
  *
- * @author      Arkadiusz Wojna
+ * @author      Arkadiusz Wojna, Cezary Tkaczyk
  */
-public class AttributeInterval implements BooleanFunction
+public class AttributeInterval implements ComparableBooleanFunction, Serializable
 {
+    /** Serialization version. */
+	private static final long serialVersionUID = 1L;
+	
 	/** Attribute of this test. */
 	NumericAttribute m_Attr;
     /** The index of an attribute to be tested. */
@@ -74,6 +79,59 @@ public class AttributeInterval implements BooleanFunction
         return (!Double.isNaN (val)
                 && (m_nLeft < val || m_nLeft==val && m_bLeftClosed)
                 && (m_nRight > val || m_nRight==val && m_bRightClosed));
+    }
+
+    /**
+     * This method compares which boolean function is more general.
+     * A function is more general than another function
+     * if whenever the second function returns true,
+     * the first function also returns true.  
+     *
+     * @param toCompare	A boolean function to be compared.
+     * @return			Information which function is more general.
+     */
+    public CompareResult compareGenerality(ComparableBooleanFunction toCompare) throws ClassCastException
+    {
+    	AttributeInterval thatSelector = (AttributeInterval) toCompare;
+    	double leftDiff = 0.0, rightDiff = 0.0;
+    	if(!Double.isInfinite(m_nLeft) && !Double.isInfinite(thatSelector.m_nLeft))
+    		leftDiff = m_nLeft - thatSelector.m_nLeft;
+    	if(!Double.isInfinite(m_nRight) && !Double.isInfinite(thatSelector.m_nRight))
+    		rightDiff = m_nRight - thatSelector.m_nRight;
+    	
+    	if (leftDiff == 0 && rightDiff == 0)
+    		return CompareResult.EQUAL;
+    	if (leftDiff <= 0 && rightDiff >= 0)
+    		return CompareResult.THIS_MORE_GENERAL;
+    	if (leftDiff >= 0 && rightDiff <= 0)
+    		return CompareResult.THAT_MORE_GENERAL;
+    	return CompareResult.NOT_COMPARABLE;
+    }
+    
+    /**
+     * Shrinks to exclude a given value
+     * by a given margin in relation to another value.
+     * 
+     * @param val			Value to be excluded from this interval.
+     * @param relativeTo	Reference value used to calculate how much to shrink.
+     * @param margin		Value between 0 and 1 controlling how much the interval boundary is shifted beyond the excluded value.
+     * @return				True if the operation succeeded and the updated interval excludes the value, false otherwise.
+     */
+    public boolean excludeValueWithMargin(double val, double relativeTo, double margin)
+    {
+    	if(Double.isNaN(val))
+    		return true;
+    	if(val == relativeTo)
+    		return false;
+    	double newBoundary = val + (relativeTo - val) * margin;		// equal to:  val - (val - relativeTo) * margin
+    	if (newBoundary > m_nLeft && newBoundary < m_nRight)
+    	{
+    		if (val < relativeTo)
+    			m_nLeft = newBoundary;    			
+    		else
+    			m_nRight = newBoundary;
+    	}
+    	return true;
     }
 
     /**
